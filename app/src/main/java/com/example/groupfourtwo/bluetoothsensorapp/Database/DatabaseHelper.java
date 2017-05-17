@@ -19,6 +19,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     /* debugging only */
     private static final String LOG_TAG = DatabaseHelper.class.getSimpleName();
 
+
     /**
      * Creates a new helper object to manage creating and connection to a database.
      * @see DatabaseHelper
@@ -28,6 +29,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     DatabaseHelper(Context context) {
         super(context, DatabaseContract.DB_NAME, null, DatabaseContract.DB_VERSION);
     }
+
 
     /**
      * Called when the database is created for the first time. Initializes all necessary tables.
@@ -46,6 +48,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
             Log.e(LOG_TAG, "Error while creating tables: ", e);
         }
     }
+
 
     /**
      * Called when the database is upgraded from a lower version.

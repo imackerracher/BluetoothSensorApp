@@ -11,6 +11,7 @@ import com.example.groupfourtwo.bluetoothsensorapp.Data.Measurement;
 import com.example.groupfourtwo.bluetoothsensorapp.Data.Sensor;
 import com.example.groupfourtwo.bluetoothsensorapp.Data.User;
 
+import java.util.HashMap;
 import java.util.Date;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Date;
  * Contains methods to access the database and to save and access data.
  *
  * @author Stefan Erk
- * @version 1.0
+ * @version 1.1
  */
 
 public class DataManager {
@@ -37,6 +38,16 @@ public class DataManager {
     private DatabaseHelper dbHelper;
 
     /**
+     * A cache of all sensors that have been referenced in this session.
+     */
+    private SensorHashMap sensors;
+
+    /**
+     * A cache of all users that have been referenced in this session.
+     */
+    private UserHashMap users;
+
+    /**
      * Creates a new DataManager object. Passes its context to create a new database helper.
      *
      * @param context  context of the calling activity
@@ -44,6 +55,7 @@ public class DataManager {
     public DataManager(Context context) {
         dbHelper = new DatabaseHelper(context);
     }
+
 
     /**
      * Open the connection to an SQLite database.
@@ -59,24 +71,41 @@ public class DataManager {
         }
     }
 
+
     /**
-     * Closes the connection to an open SQLite database.
+     * Close the connection to an open SQLite database.
      */
     public void close() {
         dbHelper.close();
         Log.d(LOG_TAG, "Database was closed.");
     }
 
+
     /**
-     * Insert a new measurement and its contained information into the database.
+     * Calculate the total number of measurements that are saved in the database.
+     *
+     * @return  number of saved measurements
+     */
+    public int getNoOfMeasurements() {
+        String[] column = {DatabaseContract.MeasurementData._ID};
+        Cursor cursor = database.query(DatabaseContract.MeasurementData.TABLE_MEASUREMENT,
+                column, null, null, null, null, null);
+        int result = cursor.getCount();
+        cursor.close();
+        return result;
+    }
+
+
+    /**
+     * Insert a new measurement with its information into the database.
      *
      * @param measurement  the measurement to save
      */
     public void saveMeasurement(Measurement measurement) {
         ContentValues values = new ContentValues();
 
-        values.put(DatabaseContract.MeasurementData.COLUMN_SENSOR_ID, measurement.getSensor());
-        values.put(DatabaseContract.MeasurementData.COLUMN_USER_ID, measurement.getUser());
+        values.put(DatabaseContract.MeasurementData.COLUMN_SENSOR_ID, measurement.getSensor().getId());
+        values.put(DatabaseContract.MeasurementData.COLUMN_USER_ID, measurement.getUser().getId());
         values.put(DatabaseContract.MeasurementData.COLUMN_TIME, measurement.getTime().getTime());
         values.put(DatabaseContract.MeasurementData.COLUMN_BRIGHTNESS, measurement.getBrightness());
         values.put(DatabaseContract.MeasurementData.COLUMN_DISTANCE, measurement.getDistance());
@@ -88,19 +117,6 @@ public class DataManager {
         Log.d(LOG_TAG, "Inserted new measurement: " + id);
     }
 
-    /**
-     * Calculate the total number of measurements that are saved in the database.
-     *
-     * @return  number of saved measurements
-     */
-    public int getNumberOfEntries() {
-        String[] column = {DatabaseContract.MeasurementData._ID};
-        Cursor cursor = database.query(DatabaseContract.MeasurementData.TABLE_MEASUREMENT,
-                column, null, null, null, null, null);
-        int result = cursor.getCount();
-        cursor.close();
-        return result;
-    }
 
     /**
      * Insert a new sensor into the database.
@@ -118,8 +134,9 @@ public class DataManager {
         Log.d(LOG_TAG, "Inserted new sensor: " + id);
     }
 
+
     /**
-     * Insert a new user profile into the database.
+     * Insert a new user into the database.
      *
      * @param user  the user to save
      */
@@ -133,13 +150,27 @@ public class DataManager {
         Log.d(LOG_TAG, "Inserted new user: " + id);
     }
 
+
+    public void updateSensor(Sensor sensor) {
+        ContentValues values = new ContentValues();
+
+        values.put(DatabaseContract.SensorData._ID, sensor.getId());
+        values.put(DatabaseContract.SensorData.COLUMN_NAME, sensor.getName());
+        values.put(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince().getTime());
+
+        long id = database.update(DatabaseContract.SensorData.TABLE_SENSOR, values,
+                DatabaseContract.SensorData._ID + " =" + sensor.getId(), null);
+        Log.d(LOG_TAG, "Updated sensor: " + id);
+    }
+
+
     /**
-     * Retrieve the measured values and meta data of a whole measurement from an database request.
+     * Retrieve the measured values and meta data of a whole measurement from a database request.
      *
      * @param cursor  cursor pointing to the desired entry
-     * @return  measurement containing the retrieved data
+     * @return  measurement containing the row's data
      */
-    public Measurement cursorToMeasurement(Cursor cursor) {
+    private Measurement cursorToMeasurement(Cursor cursor) {
         int indexID = cursor.getColumnIndex(DatabaseContract.MeasurementData._ID);
         int indexSensor = cursor.getColumnIndex(DatabaseContract.MeasurementData.COLUMN_SENSOR_ID);
         int indexUser = cursor.getColumnIndex(DatabaseContract.MeasurementData.COLUMN_USER_ID);
@@ -151,8 +182,8 @@ public class DataManager {
         int indexTemperature = cursor.getColumnIndex(DatabaseContract.MeasurementData.COLUMN_TEMPERATURE);
 
         long id = cursor.getLong(indexID);
-        long sensor = cursor.getLong(indexSensor);
-        long user = cursor.getLong(indexUser);
+        Sensor sensor = sensors.getOrPut(cursor.getLong(indexSensor));
+        User user = users.getOrPut(cursor.getLong(indexUser));
         Date time = new Date(cursor.getLong(indexTime));
         float brightness = cursor.getFloat(indexBrightness);
         float distance = cursor.getFloat(indexDistance);
@@ -163,4 +194,169 @@ public class DataManager {
         return new Measurement(
                 id, sensor, user, time, brightness, distance, humidity, pressure, temperature);
     }
+
+
+    /**
+     * Creates a new sensor object from the information retrieved of a table entry.
+     *
+     * @param cursor  the cursor pointing to table entry
+     * @return  sensor object from row
+     */
+    private Sensor cursorToSensor(Cursor cursor) {
+        int indexID = cursor.getColumnIndex(DatabaseContract.SensorData._ID);
+        int indexName = cursor.getColumnIndex(DatabaseContract.SensorData.COLUMN_NAME);
+        int indexKnownSince = cursor.getColumnIndex(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE);
+
+        long id = cursor.getLong(indexID);
+        String name = cursor.getString(indexName);
+        Date knownSince = new Date(cursor.getLong(indexKnownSince));
+
+        return new Sensor(id, name, knownSince);
+    }
+
+
+    /**
+     * Creates a new user object from the information retrieved of a table entry.
+     *
+     * @param cursor  the cursor pointing to table entry
+     * @return  user object from row
+     */
+    private User cursorToUser(Cursor cursor) {
+        int indexID = cursor.getColumnIndex(DatabaseContract.UserData._ID);
+        int indexName = cursor.getColumnIndex(DatabaseContract.UserData.COLUMN_NAME);
+
+        long id = cursor.getLong(indexID);
+        String name = cursor.getString(indexName);
+
+        return new User(id, name);
+    }
+
+
+    /**
+     * Adds automatic inserting to a HashMap of sensors in case the item was not found.
+     */
+    private class SensorHashMap extends HashMap<Long, Sensor> {
+        /**
+         * Find and return a sensor with the given key in the map.
+         * If no object was found, fetch sensor from database and insert it into the map.
+         *
+         * @param key  id of the sensor to search
+         * @return  the sensor with the given id
+         */
+        private Sensor getOrPut(Long key) {
+            Sensor sensor = this.get(key);
+            if (sensor == null) // wanted sensor not in map -> search in database
+                sensor = findSensor(key);
+            if (sensor != null) { // wanted sensor was found -> cache and return
+                sensors.put(sensor.getId(), sensor);
+                Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
+            }
+            return sensor;
+        }
+    }
+
+
+    /**
+     * Adds automatic inserting to a HashMap of users in case the item was not found.
+     */
+    private class UserHashMap extends HashMap<Long, User> {
+        /**
+         * Find and return a user with the given key in the map.
+         * If no object was found, fetch user from database and insert it into the map.
+         *
+         * @param key  id of the user to search
+         * @return  the user with the given id
+         */
+        private User getOrPut(Long key) {
+            User user = this.get(key);
+            if (user == null) // wanted user not in map -> search in database
+                user = findUser(key);
+            if (user != null) { // wanted user was found -> cache and return it
+                users.put(user.getId(), user);
+                Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
+            }
+            return user;
+        }
+    }
+
+
+    /**
+     * Search for and return the measurement with the given id in the database.
+     *
+     * @param id  the id of the wanted measurement
+     * @return  the wanted measurement
+     */
+    private Measurement findMeasurement(long id) {
+        String[] columns = {DatabaseContract.MeasurementData._ID,
+                DatabaseContract.MeasurementData.COLUMN_SENSOR_ID,
+                DatabaseContract.MeasurementData.COLUMN_USER_ID,
+                DatabaseContract.MeasurementData.COLUMN_TIME,
+                DatabaseContract.MeasurementData.COLUMN_BRIGHTNESS,
+                DatabaseContract.MeasurementData.COLUMN_DISTANCE,
+                DatabaseContract.MeasurementData.COLUMN_HUMIDITY,
+                DatabaseContract.MeasurementData.COLUMN_PRESSURE,
+                DatabaseContract.MeasurementData.COLUMN_TEMPERATURE};
+
+        Cursor cursor = database.query(DatabaseContract.MeasurementData.TABLE_MEASUREMENT, columns,
+                DatabaseContract.MeasurementData._ID + " = " + id, null, null, null, null);
+
+        if (!cursor.moveToFirst()) // empty cursor -> object not in database
+            return null;
+
+        Measurement measurement = cursorToMeasurement(cursor);
+        cursor.close();
+
+        Log.d(LOG_TAG, "Retrieved measurement " + id + " from database.");
+        return measurement;
+    }
+
+
+    /**
+     * Search for and return the sensor with the given id in the database.
+     *
+     * @param id  the id of the wanted sensor
+     * @return  the wanted sensor
+     */
+    private Sensor findSensor(long id) {
+        String[] columns = {DatabaseContract.SensorData._ID,
+                DatabaseContract.SensorData.COLUMN_NAME,
+                DatabaseContract.SensorData.COLUMN_KNOWN_SINCE};
+
+        Cursor cursor = database.query(DatabaseContract.SensorData.TABLE_SENSOR, columns,
+                DatabaseContract.SensorData._ID + " = " + id, null, null, null, null);
+
+        if (!cursor.moveToFirst()) // empty cursor -> object not in database
+            return null;
+
+        Sensor sensor = cursorToSensor(cursor);
+        cursor.close();
+
+        Log.d(LOG_TAG, "Retrieved sensor " + id + " from database.");
+        return sensor;
+    }
+
+
+    /**
+     * Search for and return the user with the given id in the database.
+     *
+     * @param id  the id of the wanted user
+     * @return  the wanted user
+     */
+    private User findUser(long id) {
+        String[] columns = {DatabaseContract.UserData._ID,
+                DatabaseContract.UserData.COLUMN_NAME};
+
+        Cursor cursor = database.query(DatabaseContract.UserData.TABLE_USER, columns,
+                DatabaseContract.UserData._ID + " = " + id, null, null, null, null);
+
+        if (!cursor.moveToFirst()) // empty cursor -> object not in database
+            return null;
+
+        User user = cursorToUser(cursor);
+        cursor.close();
+
+        Log.d(LOG_TAG, "Retrieved user " + id + " from database.");
+        return user;
+    }
+
 }
