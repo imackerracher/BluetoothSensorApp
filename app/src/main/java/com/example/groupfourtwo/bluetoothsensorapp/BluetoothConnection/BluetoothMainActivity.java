@@ -54,8 +54,8 @@ public class BluetoothMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.bluetooth_activity_main);
+        Intent intent = getIntent();
         listViewLE = (ListView)findViewById(R.id.lelist);
         startScanningButton = (Button) findViewById(R.id.StartScanButton);
         stopScanningButton = (Button) findViewById(R.id.StopScanButton);

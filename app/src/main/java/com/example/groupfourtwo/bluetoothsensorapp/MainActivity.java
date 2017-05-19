@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.Database.DataManager;
 
 public class MainActivity extends AppCompatActivity
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, ClearDataActivity.class);
             startActivity(intent);
         }else if (id == R.id.nav_manage_connection) {
-            Intent intent = new Intent(this, ManageConnectionActivity.class);
+            Intent intent = new Intent(this, BluetoothMainActivity.class);
             startActivity(intent);
         }
 

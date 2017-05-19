@@ -34,7 +34,7 @@
             android:name=".HumidityActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".ManageConnectionActivity"
+            android:name=".BluetoothConnection.BluetoothMainActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ManageSensorsActivity"
@@ -45,6 +45,10 @@
         <activity
             android:name=".TemperatureActivity"
             android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".BluetoothConnection.ControlActivity"
+            android:parentActivityName=".MainActivity"/>
+        <service android:name=".BluetoothConnection.BluetoothLeService" android:enabled="true"/>
     </application>
 
 </manifest>
