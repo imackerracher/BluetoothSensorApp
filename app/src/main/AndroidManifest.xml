@@ -47,7 +47,7 @@
             android:parentActivityName=".MainActivity"></activity>
         <activity
             android:name=".BluetoothConnection.ControlActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".BluetoothConnection.BluetoothMainActivity"/>
         <service android:name=".BluetoothConnection.BluetoothLeService" android:enabled="true"/>
     </application>
 
