@@ -16,7 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothMainActivity;
-import com.example.groupfourtwo.bluetoothsensorapp.Database.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

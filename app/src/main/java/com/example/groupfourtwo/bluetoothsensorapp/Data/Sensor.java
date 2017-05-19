@@ -36,6 +36,12 @@ public class Sensor {
      * @param knownSince  datetime of first connection
      */
     public Sensor(long id, String name, Date knownSince) {
+
+        Objects.requireNonNull(name, "Name must not be null.");
+        Objects.requireNonNull(knownSince, "KnownSince must not be null.");
+        if (name.length() == 0 || name.length() > 50)
+            throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
+
         this.id = id;
         this.name = name;
         this.knownSince = knownSince;
@@ -78,7 +84,7 @@ public class Sensor {
      *
      * @param name  the new name
      */
-    public void setName(String name) {
+    void setName(String name) {
         Objects.requireNonNull(name, "Parameter 'name' must not be null.");
 
         if (name.length() == 0 || name.length() > 50)
