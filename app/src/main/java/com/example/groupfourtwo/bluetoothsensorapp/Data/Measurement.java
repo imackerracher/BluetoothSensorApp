@@ -1,6 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.Data;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Wrapper for the tuple of different values and their corresponding metadata.
@@ -58,9 +59,9 @@ public class Measurement {
 
 
     /**
-     * Creates a new measurement object, either newly taken or generated from the database.
+     * Creates a completely new measurement object just received.
+     * Note: Field id is set by the database, therefore set to 0 here.
      *
-     * @param id           the measurement's unique id, 0 when just received
      * @param sensor       the corresponding sensor
      * @param user         the corresponding user
      * @param time         the time when the measurement was taken
@@ -70,8 +71,44 @@ public class Measurement {
      * @param pressure     the measured pressure
      * @param temperature  the measured temperature
      */
-    public Measurement(long id, Sensor sensor, User user, Date time, float brightness,
+    public Measurement(Sensor sensor, User user, Date time, float brightness,
+                float distance, float humidity, float pressure, float temperature) {
+
+        Objects.requireNonNull(sensor, "Sensor must not be null.");
+        Objects.requireNonNull(user, "User must not be null.");
+        Objects.requireNonNull(time, "Time must not be null.");
+
+        this.sensor = sensor;
+        this.user = user;
+        this.time = time;
+        this.brightness = brightness;
+        this.distance = distance;
+        this.humidity = humidity;
+        this.pressure = pressure;
+        this.temperature = temperature;
+    }
+
+
+    /**
+     * Recreates a new measurement object with information from the database.
+     *
+     * @param id           the measurement's unique id
+     * @param sensor       the corresponding sensor
+     * @param user         the corresponding user
+     * @param time         the time when the measurement was taken
+     * @param brightness   the measured brightness
+     * @param distance     the distance to the sensor
+     * @param humidity     the measured humidity
+     * @param pressure     the measured pressure
+     * @param temperature  the measured temperature
+     */
+    Measurement(long id, Sensor sensor, User user, Date time, float brightness,
                        float distance, float humidity, float pressure, float temperature) {
+
+        Objects.requireNonNull(sensor, "Sensor must not be null.");
+        Objects.requireNonNull(user, "User must not be null.");
+        Objects.requireNonNull(time, "Time must not be null.");
+
         this.id = id;
         this.sensor = sensor;
         this.user = user;

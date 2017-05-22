@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Database;
+package com.example.groupfourtwo.bluetoothsensorapp.Data;
 
 import android.content.Context;
 import android.database.SQLException;
