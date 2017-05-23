@@ -44,11 +44,11 @@ public class DrawGraph {
 
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setAxisMinimum(30f);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM_INSIDE);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         //Choose between TOP, BOTTOM, BOTH_SIDED, TOP_INSIDE or BOTTOM_INSIDE
         xAxis.setTextSize(10f);
 
-        xAxis.setValueFormatter(new MyXAxisValueFormatter());
+        xAxis.setValueFormatter(new MyXAxisValueFormatter(lineChart));
 
 
 

@@ -13,8 +13,8 @@ public class PressureActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pressure);
-
+        //setContentView(R.layout.activity_pressure);
+        setContentView(R.layout.activity_temperature); //TODO: crashes with activity_pressure
         //Get the intent that started this activity
         Intent intent = getIntent();
 
