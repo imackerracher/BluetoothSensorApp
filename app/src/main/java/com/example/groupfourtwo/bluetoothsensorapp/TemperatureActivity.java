@@ -27,11 +27,7 @@ public class TemperatureActivity extends AppCompatActivity {
         LineChart lineChart;
 
 
-        /*@Override
-        protected void onCreate(Bundle savedInstanceState){
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
-        */
+
 
 
         /*referenz in main.xml*/
@@ -92,13 +88,13 @@ public class TemperatureActivity extends AppCompatActivity {
                 yAxes2_2.add(new Entry(i, yAxes2[i]));
             }
 
-
+            /*
             String[] xaxes = new String[xAxes.size()];
 
             for (int i = 0; i < xAxes.size(); i++)
                 xaxes[i] = xAxes.get(i).toString();
 
-
+            */
             ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
