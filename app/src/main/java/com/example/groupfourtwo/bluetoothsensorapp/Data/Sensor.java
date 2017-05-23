@@ -7,7 +7,7 @@ import java.util.Objects;
  * Wrapper for information about the sensor chip generating a measurement.
  *
  * @author Stefan Erk
- * @version 1.0
+ * @version 1.2
  */
 
 public class Sensor {
@@ -15,7 +15,7 @@ public class Sensor {
     /**
      * The unique identifier according to the sensor's bluetooth MAC address.
      */
-    private long id;
+    private final long id;
 
     /**
      * A describing name of the sensor.
@@ -25,7 +25,7 @@ public class Sensor {
     /**
      * The moment in time when this exact sensor was first connected to.
      */
-    private Date knownSince;
+    private final Date knownSince;
 
 
     /**

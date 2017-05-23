@@ -7,63 +7,86 @@ import java.util.Objects;
  * Wrapper for the tuple of different values and their corresponding metadata.
  *
  * @author Stefan Erk
- * @version 1.0
+ * @version 1.2
  */
 
 public class Measurement {
 
     /**
-     * The unique id of the measurement.
+     * The unique id of the measurement. -1 for objects that are not contained within the database.
      */
     private long id;
 
     /**
-     * The MAC address of the sensor that generated the measurement.
+     * The record during which the measurement was recorded.
      */
-    private Sensor sensor;
-
-    /**
-     * The id of the user who received the measurement.
-     */
-    private User user;
+    private final Record record;
 
     /**
      * The date and time when the measurement was taken.
      */
-    private Date time;
+    private final Date time;
 
     /**
      * The measured value of brightness.
      */
-    private float brightness;
+    private final float brightness;
 
     /**
      * The distance to the sensor at the moment of measuring.
      */
-    private float distance;
+    private final float distance;
 
     /**
      * The measured value of humidity.
      */
-    private float humidity;
+    private final float humidity;
 
     /**
      * The measured value of pressure.
      */
-    private float pressure;
+    private final float pressure;
 
     /**
      * The measured value of temperature.
      */
-    private float temperature;
+    private final float temperature;
+
+
+    /**
+     * Creates a new measurement. Only to be used for recreation from database context.
+     *
+     * @param id           the measurement's unique id
+     * @param record       the record the measurement was taken at
+     * @param time         the time when the measurement was taken
+     * @param brightness   the measured brightness
+     * @param distance     the distance to the sensor
+     * @param humidity     the measured humidity
+     * @param pressure     the measured pressure
+     * @param temperature  the measured temperature
+     */
+    Measurement(long id, Record record, Date time, float brightness, float distance,
+                float humidity, float pressure, float temperature) {
+
+        Objects.requireNonNull(record, "Record must not be null.");
+        Objects.requireNonNull(time, "Time must not be null.");
+
+        this.id = id;
+        this.record = record;
+        this.time = time;
+        this.brightness = brightness;
+        this.distance = distance;
+        this.humidity = humidity;
+        this.pressure = pressure;
+        this.temperature = temperature;
+    }
 
 
     /**
      * Creates a completely new measurement object just received.
-     * Note: Field id is set by the database, therefore set to 0 here.
+     * Note: As the measurement is not saved in the database yet, id is set to -1.
      *
-     * @param sensor       the corresponding sensor
-     * @param user         the corresponding user
+     * @param record       the record the measurement was taken at
      * @param time         the time when the measurement was taken
      * @param brightness   the measured brightness
      * @param distance     the distance to the sensor
@@ -71,15 +94,14 @@ public class Measurement {
      * @param pressure     the measured pressure
      * @param temperature  the measured temperature
      */
-    public Measurement(Sensor sensor, User user, Date time, float brightness,
-                float distance, float humidity, float pressure, float temperature) {
+    public Measurement(Record record, Date time, float brightness, float distance,
+                       float humidity, float pressure, float temperature) {
 
-        Objects.requireNonNull(sensor, "Sensor must not be null.");
-        Objects.requireNonNull(user, "User must not be null.");
+        Objects.requireNonNull(record, "Record must not be null.");
         Objects.requireNonNull(time, "Time must not be null.");
 
-        this.sensor = sensor;
-        this.user = user;
+        this.id = -1;
+        this.record = record;
         this.time = time;
         this.brightness = brightness;
         this.distance = distance;
@@ -90,39 +112,7 @@ public class Measurement {
 
 
     /**
-     * Recreates a new measurement object with information from the database.
-     *
-     * @param id           the measurement's unique id
-     * @param sensor       the corresponding sensor
-     * @param user         the corresponding user
-     * @param time         the time when the measurement was taken
-     * @param brightness   the measured brightness
-     * @param distance     the distance to the sensor
-     * @param humidity     the measured humidity
-     * @param pressure     the measured pressure
-     * @param temperature  the measured temperature
-     */
-    Measurement(long id, Sensor sensor, User user, Date time, float brightness,
-                       float distance, float humidity, float pressure, float temperature) {
-
-        Objects.requireNonNull(sensor, "Sensor must not be null.");
-        Objects.requireNonNull(user, "User must not be null.");
-        Objects.requireNonNull(time, "Time must not be null.");
-
-        this.id = id;
-        this.sensor = sensor;
-        this.user = user;
-        this.time = time;
-        this.brightness = brightness;
-        this.distance = distance;
-        this.humidity = humidity;
-        this.pressure = pressure;
-        this.temperature = temperature;
-    }
-
-
-    /**
-     * Returns the id of the measurement
+     * Returns the id of the measurement.
      *
      * @return  the measurement's id
      */
@@ -132,22 +122,12 @@ public class Measurement {
 
 
     /**
-     * Returns the corresponding sensor.
+     * Returns the corresponding record.
      *
-     * @return  the corresponding sensor
+     * @return  the corresponding record
      */
-    public Sensor getSensor() {
-        return sensor;
-    }
-
-
-    /**
-     * Returns the corresponding user.
-     *
-     * @return  the corresponding user
-     */
-    public User getUser() {
-        return user;
+    public Record getRecord() {
+        return record;
     }
 
 
@@ -208,5 +188,18 @@ public class Measurement {
      */
     public float getTemperature() {
         return temperature;
+    }
+
+
+    /**
+     * Set the measurements id after being inserted into the database.
+     *
+     * @param id  the measurement's actual id
+     */
+    void setId(long id) {
+        if (id != -1)
+            throw new IllegalStateException("Id cannot be set after being assigned by database");
+
+        this.id = id;
     }
 }
