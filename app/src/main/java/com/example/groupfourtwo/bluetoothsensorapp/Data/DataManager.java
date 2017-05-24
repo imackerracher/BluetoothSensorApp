@@ -338,7 +338,7 @@ public class DataManager {
 
         // INSERT INTO RECORD VALUES (sensor, user, begin, end)
         long id = database.insert(DatabaseContract.RecordData.TABLE_RECORD, null, values);
-        Log.d(LOG_TAG, "Inserted new record: " + id);
+        Log.d(LOG_TAG, "Inserted new record: " + id + " " + record.getId());
 
         record.setId(id);
     }

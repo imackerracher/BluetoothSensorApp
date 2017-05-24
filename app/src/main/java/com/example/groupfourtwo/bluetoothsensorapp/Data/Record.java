@@ -146,7 +146,7 @@ public class Record {
      * Set the recording's id after being inserted into the database.
      */
     void setId(long id) {
-        if (id != -1)
+        if (this.id > 0)
             throw new IllegalStateException("Id cannot be set after being assigned by database.");
 
         this.id = id;
@@ -156,7 +156,7 @@ public class Record {
     /**
      * Finish the record. May only be called when the record is just running.
      */
-    void stop() {
+    public void stop() {
         if (!running)
             throw new IllegalStateException("Cannot stop a record that was already finished.");
 

@@ -26,28 +26,28 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
 
     /**
-     * Return the helper object to manage creating a new or connecting to an existing database.
-     * If no object exists yet a new one is created (singleton pattern).
-     *
-     * @param context the context of the calling activity
-     * @return  the instance
-     */
-    static DatabaseHelper getInstance(Context context) {
-        if (instance == null)
-            // as database helper is global, use application context instead of activity context.
-            instance = new DatabaseHelper(context.getApplicationContext());
-        return instance;
-    }
-
-
-    /**
      * Creates a new helper object of an SQLite database.
-     * @see DatabaseHelper
+     * @see SQLiteOpenHelper
      *
      * @param context  the context of the calling activity
      */
     private DatabaseHelper(Context context) {
         super(context, DatabaseContract.DB_NAME, null, DatabaseContract.DB_VERSION);
+    }
+
+
+    /**
+     * Return the global helper to manage creating a new or connecting to an existing database.
+     * If no object exists yet a new one is created (singleton pattern).
+     *
+     * @param context the context of the calling activity
+     * @return  the instance
+     */
+    static synchronized DatabaseHelper getInstance(Context context) {
+        if (instance == null)
+            // as database helper is global, use application context instead of activity context.
+            instance = new DatabaseHelper(context.getApplicationContext());
+        return instance;
     }
 
 
