@@ -25,6 +25,7 @@ final class DatabaseContract {
      */
     static final int DB_VERSION = 2;
 
+
     /**
      * Defines the names of the table and columns that contain the measured data.
      * @see BaseColumns

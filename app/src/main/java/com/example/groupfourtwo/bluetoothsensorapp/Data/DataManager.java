@@ -20,12 +20,33 @@ import java.util.HashMap;
 
 public class DataManager {
 
-    public enum Measure {BRIGHTNESS, DISTANCE, HUMIDITY, PRESSURE, TEMPERATURE}
-    public enum Interval {HOUR, DAY, WEEK}
+    public enum Measure {
+        BRIGHTNESS (DatabaseContract.MeasurementData.COLUMN_BRIGHTNESS),
+        DISTANCE (DatabaseContract.MeasurementData.COLUMN_DISTANCE),
+        HUMIDITY (DatabaseContract.MeasurementData.COLUMN_HUMIDITY),
+        PRESSURE (DatabaseContract.MeasurementData.COLUMN_PRESSURE),
+        TEMPERATURE (DatabaseContract.MeasurementData.COLUMN_TEMPERATURE);
 
-    private static final long MILLIS_PER_HOUR = 3600000L;
-    private static final long MILLIS_PER_DAY = 86400000L;
-    private static final long MILLIS_PER_WEEK = 604800000L;
+        private final String column;
+
+        Measure(String column) {
+            this.column = column;
+        }
+    }
+
+    public enum Interval {
+        HOUR (3600000, 1000),
+        DAY (86400000, 10000),
+        WEEK (604800000, 60000);
+
+        private final int length;
+        private final int step;
+
+        Interval(int length, int step) {
+            this.length = length;
+            this.step = step;
+        }
+    }
 
     /* debugging only */
     private static final String LOG_TAG = DataManager.class.getSimpleName();
@@ -122,76 +143,74 @@ public class DataManager {
 
 
     /**
-     * Retrieve a collection of all values of a certain measure and interval of time.
+     * Retrieve a list of all values of a measure in a certain interval.
      *
-     * @param measure   the measure of values
+     * @param measure   the measure of values to retrieve
      * @param interval  the interval to retrieve
-     * @return  all values in the interval
-     */
-    public ArrayList<Float> getValueInterval(Measure measure, Interval interval, long begin) {
-        long end;
-        int step;
-        switch (interval) {
-            case HOUR:
-                end = begin + MILLIS_PER_HOUR;
-                step = 1000;
-                break;
-            case DAY:
-                end = begin + MILLIS_PER_DAY;
-                step = 10000;
-                break;
-            case WEEK:
-                end = begin + MILLIS_PER_WEEK;
-                step = 60000;
-                break;
-            default:
-                throw new IllegalArgumentException("undefined Interval");
-        }
-
-        String column;
-        switch (measure) {
-            case BRIGHTNESS:
-                column = DatabaseContract.MeasurementData.COLUMN_BRIGHTNESS;
-                break;
-            case DISTANCE:
-                column = DatabaseContract.MeasurementData.COLUMN_DISTANCE;
-                break;
-            case HUMIDITY:
-                column = DatabaseContract.MeasurementData.COLUMN_HUMIDITY;
-                break;
-            case PRESSURE:
-                column = DatabaseContract.MeasurementData.COLUMN_PRESSURE;
-                break;
-            case TEMPERATURE:
-                column = DatabaseContract.MeasurementData.COLUMN_TEMPERATURE;
-                break;
-            default:
-                throw new IllegalArgumentException("undefined Measure");
-        }
-
-        return getValueInterval(column, begin, end, step);
-    }
-
-
-    /**
-     * Retrieve a collection of the same measure in a certain interval with variable step size.
-     *
-     * @param column  the column of the measure
-     * @param begin   the start point of the interval
-     * @param end     the end point of the interval
-     * @param step    the step size to extract values
+     * @param begin     the start point of the interval
      * @return  all values in the interval, empty list if no entry was found
      */
-    private ArrayList<Float> getValueInterval(String column, long begin, long end, int step) {
-        String[] select = {DatabaseContract.MeasurementData.COLUMN_TIME, column};
+    private ArrayList<Float> getValuesFromInterval(Measure measure, Interval interval, long begin) {
+        long end = begin + interval.length;
+
+        String[] select = {DatabaseContract.MeasurementData.COLUMN_TIME, measure.column};
 
         String where = DatabaseContract.MeasurementData.COLUMN_TIME + " BETWEEN " +
                 begin + " AND " + end;
 
-        // SELECT TIME, column FROM MEASUREMENT WHERE TIME BETWEEN begin AND end ORDER BY TIME
+        // SELECT TIME, measure.column FROM MEASUREMENT WHERE TIME BETWEEN begin AND end ORDER BY TIME
         Cursor cursor = database.query(DatabaseContract.MeasurementData.TABLE_MEASUREMENT, select,
                 where, null, null, null, DatabaseContract.MeasurementData.COLUMN_TIME);
 
+        ArrayList<Float> data = cursorToList(cursor, measure.column, begin, end, interval.step);
+        cursor.close();
+        return data;
+    }
+
+
+    /**
+     * Retrieve a list of the values of a measure from a certain record.
+     *
+     * @param measure  the measure of values to retrieve
+     * @param record   the record to analyse
+     * @return  all values of the record, empty list if no entry was found
+     */
+    public ArrayList<Float> getValuesFromRecord(Measure measure, Record record) {
+        String[] select = {DatabaseContract.MeasurementData.COLUMN_TIME, measure.column};
+
+        String where = DatabaseContract.MeasurementData.COLUMN_RECORD_ID + " = " + record.getId();
+
+        // SELECT TIME, measure.column FROM MEASUREMENT WHERE RECORD_ID = record.id ORDER BY TIME
+        Cursor cursor = database.query(DatabaseContract.MeasurementData.TABLE_MEASUREMENT, select,
+                where, null, null, null, DatabaseContract.MeasurementData.COLUMN_TIME);
+
+        long begin = record.getBegin();
+        long end = record.getEnd();
+
+        int step = Interval.HOUR.step;
+        if (end - begin > Interval.HOUR.length)
+            step = Interval.DAY.step;
+        if (end - begin > Interval.DAY.length)
+            step = Interval.WEEK.step;
+
+        ArrayList<Float> data = cursorToList(cursor, measure.column, begin, end, step);
+        cursor.close();
+        return data;
+    }
+
+
+    /**
+     * Fill a List with all values that a cursor contains. Group if multiple values at a time.
+     *
+     * @param cursor  the cursor pointing to the database
+     * @param column  the column of values to retrieve
+     * @param begin   the start point of data
+     * @param end     the end point of data
+     * @param step    the temporal resolution of results
+     * @return  a list of values from the cursor
+     */
+    private ArrayList<Float> cursorToList(Cursor cursor, String column,
+                                          long begin, long end, int step) {
         int indexTime = cursor.getColumnIndex(DatabaseContract.MeasurementData.COLUMN_TIME);
         int indexValue = cursor.getColumnIndex(column);
 
@@ -202,11 +221,12 @@ public class DataManager {
         if (!cursor.moveToFirst())
             return data;
 
+        // Fill list with values from cursor according to timeline.
         for (long i = begin; i < end; i += step) {
             int noOfValues = 0;
             float sum = 0f;
             // Take arithmetic mean of all values that are in one step size.
-            while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i+step) {
+            while (!cursor.isAfterLast()  &&  cursor.getLong(indexTime) < i + step) {
                 sum += cursor.getFloat(indexValue);
                 ++noOfValues;
                 cursor.moveToNext();
@@ -217,7 +237,7 @@ public class DataManager {
             else
                 data.add(sum / noOfValues);
         }
-        cursor.close();
+
         return data;
     }
 
@@ -403,43 +423,6 @@ public class DataManager {
 
 
     /**
-     * Replace the data of a sensor with a new version.
-     *
-     * @param sensor  the new version of the sensor
-     */
-    private void updateSensor(Sensor sensor) {
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseContract.SensorData._ID, sensor.getId());
-        values.put(DatabaseContract.SensorData.COLUMN_NAME, sensor.getName());
-        values.put(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince());
-
-        // UPDATE SENSOR SET NAME = name, KNOWN_SINCE = knownSince WHERE ID = id
-        long id = database.update(DatabaseContract.SensorData.TABLE_SENSOR, values,
-                DatabaseContract.SensorData._ID + " = " + sensor.getId(), null);
-        Log.d(LOG_TAG, "Updated sensor: " + id);
-    }
-
-
-    /**
-     * Replace the data of a user with a new version.
-     *
-     * @param user  the new version of the user
-     */
-    private void updateUser(User user) {
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseContract.UserData._ID, user.getId());
-        values.put(DatabaseContract.UserData.COLUMN_NAME, user.getName());
-
-        // UPDATE USER SET NAME = name WHERE ID = id
-        long id = database.update(DatabaseContract.UserData.TABLE_USER, values,
-                DatabaseContract.UserData._ID + " = " + user.getId(), null);
-        Log.d(LOG_TAG, "Updated user: " + id);
-    }
-
-
-    /**
      * Retrieve the measured values and meta data of a whole measurement from a database request.
      *
      * @param cursor  cursor pointing to the desired entry
@@ -525,78 +508,6 @@ public class DataManager {
         String name = cursor.getString(indexName);
 
         return new User(id, name);
-    }
-
-
-    /**
-     * Adds automatic inserting to a HashMap of records in case the item was not found.
-     */
-    private class RecordHashMap extends HashMap<Long, Record> {
-        /**
-         * Find and return a record with the given key in the map.
-         * If no object was found, fetch record from database and insert it into the map.
-         *
-         * @param key  id of the record to search
-         * @return  the record with the given id
-         */
-        private Record getOrPut(long key) {
-            Record record = this.get(key);
-            if (record == null) // wanted sensor not in map -> search in database
-                record = findRecord(key);
-            if (record != null) { // wanted sensor was found -> cache and return
-                records.put(record.getId(), record);
-                Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
-            }
-            return record;
-        }
-    }
-
-
-    /**
-     * Adds automatic inserting to a HashMap of sensors in case the item was not found.
-     */
-    private class SensorHashMap extends HashMap<Long, Sensor> {
-        /**
-         * Find and return a sensor with the given key in the map.
-         * If no object was found, fetch sensor from database and insert it into the map.
-         *
-         * @param key  id of the sensor to search
-         * @return  the sensor with the given id
-         */
-        private Sensor getOrPut(long key) {
-            Sensor sensor = this.get(key);
-            if (sensor == null) // wanted sensor not in map -> search in database
-                sensor = findSensor(key);
-            if (sensor != null) { // wanted sensor was found -> cache and return
-                sensors.put(sensor.getId(), sensor);
-                Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
-            }
-            return sensor;
-        }
-    }
-
-
-    /**
-     * Adds automatic inserting to a HashMap of users in case the item was not found.
-     */
-    private class UserHashMap extends HashMap<Long, User> {
-        /**
-         * Find and return a user with the given key in the map.
-         * If no object was found, fetch user from database and insert it into the map.
-         *
-         * @param key  id of the user to search
-         * @return  the user with the given id
-         */
-        private User getOrPut(long key) {
-            User user = this.get(key);
-            if (user == null) // wanted user not in map -> search in database
-                user = findUser(key);
-            if (user != null) { // wanted user was found -> cache and return it
-                users.put(user.getId(), user);
-                Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
-            }
-            return user;
-        }
     }
 
 
@@ -715,4 +626,112 @@ public class DataManager {
         return user;
     }
 
+
+    /**
+     * Replace the data of a sensor with a new version.
+     *
+     * @param sensor  the new version of the sensor
+     */
+    private void updateSensor(Sensor sensor) {
+        ContentValues values = new ContentValues();
+
+        values.put(DatabaseContract.SensorData._ID, sensor.getId());
+        values.put(DatabaseContract.SensorData.COLUMN_NAME, sensor.getName());
+        values.put(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince());
+
+        // UPDATE SENSOR SET NAME = name, KNOWN_SINCE = knownSince WHERE ID = id
+        long id = database.update(DatabaseContract.SensorData.TABLE_SENSOR, values,
+                DatabaseContract.SensorData._ID + " = " + sensor.getId(), null);
+        Log.d(LOG_TAG, "Updated sensor: " + id);
+    }
+
+
+    /**
+     * Replace the data of a user with a new version.
+     *
+     * @param user  the new version of the user
+     */
+    private void updateUser(User user) {
+        ContentValues values = new ContentValues();
+
+        values.put(DatabaseContract.UserData._ID, user.getId());
+        values.put(DatabaseContract.UserData.COLUMN_NAME, user.getName());
+
+        // UPDATE USER SET NAME = name WHERE ID = id
+        long id = database.update(DatabaseContract.UserData.TABLE_USER, values,
+                DatabaseContract.UserData._ID + " = " + user.getId(), null);
+        Log.d(LOG_TAG, "Updated user: " + id);
+    }
+
+
+    /**
+     * Adds automatic inserting to a HashMap of records in case the item was not found.
+     */
+    private class RecordHashMap extends HashMap<Long, Record> {
+        /**
+         * Find and return a record with the given key in the map.
+         * If no object was found, fetch record from database and insert it into the map.
+         *
+         * @param key  id of the record to search
+         * @return  the record with the given id
+         */
+        private Record getOrPut(long key) {
+            Record record = this.get(key);
+            if (record == null) // wanted sensor not in map -> search in database
+                record = findRecord(key);
+            if (record != null) { // wanted sensor was found -> cache and return
+                records.put(record.getId(), record);
+                Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
+            }
+            return record;
+        }
+    }
+
+
+    /**
+     * Adds automatic inserting to a HashMap of sensors in case the item was not found.
+     */
+    private class SensorHashMap extends HashMap<Long, Sensor> {
+        /**
+         * Find and return a sensor with the given key in the map.
+         * If no object was found, fetch sensor from database and insert it into the map.
+         *
+         * @param key  id of the sensor to search
+         * @return  the sensor with the given id
+         */
+        private Sensor getOrPut(long key) {
+            Sensor sensor = this.get(key);
+            if (sensor == null) // wanted sensor not in map -> search in database
+                sensor = findSensor(key);
+            if (sensor != null) { // wanted sensor was found -> cache and return
+                sensors.put(sensor.getId(), sensor);
+                Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
+            }
+            return sensor;
+        }
+    }
+
+
+    /**
+     * Adds automatic inserting to a HashMap of users in case the item was not found.
+     */
+    private class UserHashMap extends HashMap<Long, User> {
+        /**
+         * Find and return a user with the given key in the map.
+         * If no object was found, fetch user from database and insert it into the map.
+         *
+         * @param key  id of the user to search
+         * @return  the user with the given id
+         */
+        private User getOrPut(long key) {
+            User user = this.get(key);
+            if (user == null) // wanted user not in map -> search in database
+                user = findUser(key);
+            if (user != null) { // wanted user was found -> cache and return it
+                users.put(user.getId(), user);
+                Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
+            }
+            return user;
+        }
+    }
 }

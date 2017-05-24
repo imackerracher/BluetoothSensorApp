@@ -84,9 +84,9 @@ public class Sensor {
      * @param name  the new name
      */
     void setName(String name) {
-        Objects.requireNonNull(name, "Parameter 'name' must not be null.");
+        Objects.requireNonNull(name, "Name must not be null.");
 
-        if (name.length() == 0 || name.length() > 50)
+        if (name.trim().length() == 0 || name.length() > 50)
             throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
 
         this.name = name;
