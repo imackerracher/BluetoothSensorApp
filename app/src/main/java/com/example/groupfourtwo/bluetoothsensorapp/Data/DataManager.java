@@ -9,7 +9,6 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Date;
 
 /**
  * Central interface between persistent data of the database and the running application.
@@ -129,20 +128,20 @@ public class DataManager {
      * @param interval  the interval to retrieve
      * @return  all values in the interval
      */
-    public ArrayList<Float> getValueInterval(Measure measure, Interval interval, Date begin) {
-        Date end;
+    public ArrayList<Float> getValueInterval(Measure measure, Interval interval, long begin) {
+        long end;
         int step;
         switch (interval) {
             case HOUR:
-                end = new Date(begin.getTime() + MILLIS_PER_HOUR);
+                end = begin + MILLIS_PER_HOUR;
                 step = 1000;
                 break;
             case DAY:
-                end = new Date(begin.getTime() + MILLIS_PER_DAY);
+                end = begin + MILLIS_PER_DAY;
                 step = 10000;
                 break;
             case WEEK:
-                end = new Date(begin.getTime() + MILLIS_PER_WEEK);
+                end = begin + MILLIS_PER_WEEK;
                 step = 60000;
                 break;
             default:
@@ -183,11 +182,11 @@ public class DataManager {
      * @param step    the step size to extract values
      * @return  all values in the interval, empty list if no entry was found
      */
-    private ArrayList<Float> getValueInterval(String column, Date begin, Date end, int step) {
+    private ArrayList<Float> getValueInterval(String column, long begin, long end, int step) {
         String[] select = {DatabaseContract.MeasurementData.COLUMN_TIME, column};
 
         String where = DatabaseContract.MeasurementData.COLUMN_TIME + " BETWEEN " +
-                begin.getTime() + " AND " + end.getTime();
+                begin + " AND " + end;
 
         // SELECT TIME, column FROM MEASUREMENT WHERE TIME BETWEEN begin AND end ORDER BY TIME
         Cursor cursor = database.query(DatabaseContract.MeasurementData.TABLE_MEASUREMENT, select,
@@ -197,13 +196,13 @@ public class DataManager {
         int indexValue = cursor.getColumnIndex(column);
 
         // The length of the requested interval determines number of data points.
-        int duration = (int) (end.getTime() - begin.getTime());
+        int duration = (int) (end - begin);
         ArrayList<Float> data = new ArrayList<>(duration / step);
 
         if (!cursor.moveToFirst())
             return data;
 
-        for (long i = begin.getTime(); i < end.getTime(); i += step) {
+        for (long i = begin; i < end; i += step) {
             int noOfValues = 0;
             float sum = 0f;
             // Take arithmetic mean of all values that are in one step size.
@@ -308,7 +307,7 @@ public class DataManager {
         ContentValues values = new ContentValues();
 
         values.put(DatabaseContract.MeasurementData.COLUMN_RECORD_ID, measurement.getRecord().getId());
-        values.put(DatabaseContract.MeasurementData.COLUMN_TIME, measurement.getTime().getTime());
+        values.put(DatabaseContract.MeasurementData.COLUMN_TIME, measurement.getTime());
         values.put(DatabaseContract.MeasurementData.COLUMN_BRIGHTNESS, measurement.getBrightness());
         values.put(DatabaseContract.MeasurementData.COLUMN_DISTANCE, measurement.getDistance());
         values.put(DatabaseContract.MeasurementData.COLUMN_HUMIDITY, measurement.getHumidity());
@@ -333,8 +332,8 @@ public class DataManager {
 
         values.put(DatabaseContract.RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());
         values.put(DatabaseContract.RecordData.COLUMN_USER_ID, record.getUser().getId());
-        values.put(DatabaseContract.RecordData.COLUMN_BEGIN, record.getBegin().getTime());
-        values.put(DatabaseContract.RecordData.COLUMN_END, record.getEnd().getTime());
+        values.put(DatabaseContract.RecordData.COLUMN_BEGIN, record.getBegin());
+        values.put(DatabaseContract.RecordData.COLUMN_END, record.getEnd());
 
         // INSERT INTO RECORD VALUES (sensor, user, begin, end)
         long id = database.insert(DatabaseContract.RecordData.TABLE_RECORD, null, values);
@@ -354,7 +353,7 @@ public class DataManager {
 
         values.put(DatabaseContract.SensorData._ID, sensor.getId());
         values.put(DatabaseContract.SensorData.COLUMN_NAME, sensor.getName());
-        values.put(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince().getTime());
+        values.put(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince());
 
         // INSERT INTO SENSOR VALUES (id, name, knownSince)
         long id = database.insert(DatabaseContract.SensorData.TABLE_SENSOR, null, values);
@@ -413,7 +412,7 @@ public class DataManager {
 
         values.put(DatabaseContract.SensorData._ID, sensor.getId());
         values.put(DatabaseContract.SensorData.COLUMN_NAME, sensor.getName());
-        values.put(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince().getTime());
+        values.put(DatabaseContract.SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince());
 
         // UPDATE SENSOR SET NAME = name, KNOWN_SINCE = knownSince WHERE ID = id
         long id = database.update(DatabaseContract.SensorData.TABLE_SENSOR, values,
@@ -458,7 +457,7 @@ public class DataManager {
 
         long id = cursor.getLong(indexID);
         Record record = records.getOrPut(cursor.getLong(indexRecord));
-        Date time = new Date(cursor.getLong(indexTime));
+        long time = cursor.getLong(indexTime);
         float brightness = cursor.getFloat(indexBrightness);
         float distance = cursor.getFloat(indexDistance);
         float humidity = cursor.getFloat(indexHumidity);
@@ -486,10 +485,10 @@ public class DataManager {
         long id = cursor.getLong(indexID);
         Sensor sensor = sensors.getOrPut(cursor.getLong(indexSensor));
         User user = users.getOrPut(cursor.getLong(indexUser));
-        Date begin = new Date(cursor.getLong(indexBegin));
-        Date end = new Date(cursor.getLong(indexEnd));
+        long begin = cursor.getLong(indexBegin);
+        long end = cursor.getLong(indexEnd);
 
-        return new Record(id, sensor, user, begin, end, false);
+        return new Record(id, sensor, user, begin, end);
     }
 
 
@@ -506,7 +505,7 @@ public class DataManager {
 
         long id = cursor.getLong(indexID);
         String name = cursor.getString(indexName);
-        Date knownSince = new Date(cursor.getLong(indexKnownSince));
+        long knownSince = cursor.getLong(indexKnownSince);
 
         return new Sensor(id, name, knownSince);
     }

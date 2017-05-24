@@ -1,6 +1,5 @@
 package com.example.groupfourtwo.bluetoothsensorapp.Data;
 
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -28,57 +27,55 @@ public class Record {
     private final User user;
 
     /**
-     * The moment in time when the record began.
+     * The instant in time when the record began.
      */
-    private final Date begin;
+    private final long begin;
 
     /**
-     * The moment in time when the record ended.
+     * The moment in time when the record ended. -1 if record is still running.
      */
-    private Date end;
-
-    /**
-     * Indicates whether the record was just started and is still running or already finished.
-     */
-    private boolean running;
+    private long end;
 
 
     /**
      * Constructs a new record. Either by firstly connecting or loading from database.
      *
-     * @param id       unique MAC address
+     * @param id       the unique id of the record
      * @param sensor   the associated sensor
      * @param user     the associated user
-     * @param begin    the sensor's name
-     * @param end      datetime of first connection
-     * @param running  whether the record has already finished
+     * @param begin    when the record started
+     * @param end      when the record ended, -1 if running
      */
-    Record(long id, Sensor sensor, User user, Date begin, Date end, boolean running) {
+    Record(long id, Sensor sensor, User user, long begin, long end) {
 
-        Objects.requireNonNull(id, "ID must not be null");
         Objects.requireNonNull(sensor, "Sensor must not be null.");
         Objects.requireNonNull(user, "User must not be null.");
-        Objects.requireNonNull(begin, "Begin point must not be null.");
+
+        if (id <= 0)
+            throw new IllegalArgumentException("Id must be positive.");
+        if (begin <= 0)
+            throw new IllegalArgumentException("Begin cannot be negative");
+        if (end > 0 && end < begin)
+            throw new IllegalArgumentException("End cannot lay in past of begin.");
 
         this.id = id;
         this.sensor = sensor;
         this.user = user;
         this.begin = begin;
         this.end = end;
-        this.running = running;
     }
 
 
     /**
      * Start a new record at this very moment.
-     * Note: As the record is not saved in the database yet, no valid id can be assigned yet.
+     * Note: As the record is not saved in the database, no valid id nor end point is assigned yet.
      *
      * @param sensor  the associated sensor
      * @param user    the associated user
-     * @return  a new running
+     * @return  a new running record
      */
-    public static Record start(Sensor sensor, User user) {
-        return new Record(-1, sensor, user, new Date(), null, true);
+    public static Record startRecord(Sensor sensor, User user) {
+        return new Record(-1, sensor, user, System.currentTimeMillis(), -1);
     }
 
 
@@ -113,21 +110,21 @@ public class Record {
 
 
     /**
-     * Return the datetime when the record was started.
+     * Return the instant of time when the record was started.
      *
      * @return  the begin point
      */
-    public Date getBegin() {
+    public long getBegin() {
         return begin;
     }
 
 
     /**
-     * Return the datetime when the record was finished.
+     * Return the instant of time when the record was finished.
      *
      * @return  the end point
      */
-    public Date getEnd() {
+    public long getEnd() {
         return end;
     }
 
@@ -138,7 +135,7 @@ public class Record {
      * @return  whether the record is running
      */
     public boolean isRunning() {
-        return running;
+        return end <= 0;
     }
 
 
@@ -157,10 +154,9 @@ public class Record {
      * Finish the record. May only be called when the record is just running.
      */
     public void stop() {
-        if (!running)
+        if (end > 0)
             throw new IllegalStateException("Cannot stop a record that was already finished.");
 
-        end = new Date();
-        running = false;
+        end = System.currentTimeMillis();
     }
 }

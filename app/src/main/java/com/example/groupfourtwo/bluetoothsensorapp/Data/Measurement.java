@@ -1,6 +1,5 @@
 package com.example.groupfourtwo.bluetoothsensorapp.Data;
 
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -23,9 +22,9 @@ public class Measurement {
     private final Record record;
 
     /**
-     * The date and time when the measurement was taken.
+     * The instant in time when the measurement was taken.
      */
-    private final Date time;
+    private final long time;
 
     /**
      * The measured value of brightness.
@@ -65,7 +64,7 @@ public class Measurement {
      * @param pressure     the measured pressure
      * @param temperature  the measured temperature
      */
-    Measurement(long id, Record record, Date time, float brightness, float distance,
+    Measurement(long id, Record record, long time, float brightness, float distance,
                 float humidity, float pressure, float temperature) {
 
         Objects.requireNonNull(record, "Record must not be null.");
@@ -94,20 +93,10 @@ public class Measurement {
      * @param pressure     the measured pressure
      * @param temperature  the measured temperature
      */
-    public Measurement(Record record, Date time, float brightness, float distance,
-                       float humidity, float pressure, float temperature) {
+    public Measurement newMeasurement(Record record, long time, float brightness, float distance,
+                                      float humidity, float pressure, float temperature) {
 
-        Objects.requireNonNull(record, "Record must not be null.");
-        Objects.requireNonNull(time, "Time must not be null.");
-
-        this.id = -1;
-        this.record = record;
-        this.time = time;
-        this.brightness = brightness;
-        this.distance = distance;
-        this.humidity = humidity;
-        this.pressure = pressure;
-        this.temperature = temperature;
+        return new Measurement(-1, record, time, brightness, distance, humidity, pressure, temperature);
     }
 
 
@@ -136,7 +125,7 @@ public class Measurement {
      *
      * @return  the measurement's time
      */
-    public Date getTime() {
+    public long getTime() {
         return time;
     }
 
