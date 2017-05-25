@@ -37,7 +37,6 @@ public class Sensor {
     public Sensor(long id, String name, long knownSince) {
 
         Objects.requireNonNull(name, "Name must not be null.");
-        Objects.requireNonNull(knownSince, "KnownSince must not be null.");
         if (name.trim().length() == 0 || name.length() > 50)
             throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
 

@@ -68,7 +68,6 @@ public class Measurement {
                 float humidity, float pressure, float temperature) {
 
         Objects.requireNonNull(record, "Record must not be null.");
-        Objects.requireNonNull(time, "Time must not be null.");
 
         this.id = id;
         this.record = record;
@@ -93,8 +92,10 @@ public class Measurement {
      * @param pressure     the measured pressure
      * @param temperature  the measured temperature
      */
-    public Measurement newMeasurement(Record record, long time, float brightness, float distance,
+    public static Measurement newMeasurement(Record record, long time, float brightness, float distance,
                                       float humidity, float pressure, float temperature) {
+
+        Objects.requireNonNull(record, "Record must not be null.");
 
         return new Measurement(-1, record, time, brightness, distance, humidity, pressure, temperature);
     }

@@ -348,6 +348,8 @@ public class DataManager {
      * @param record  the record to save
      */
     public void saveRecord(Record record) {
+        record.stop();
+
         ContentValues values = new ContentValues();
 
         values.put(DatabaseContract.RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());
@@ -360,6 +362,7 @@ public class DataManager {
         Log.d(LOG_TAG, "Inserted new record: " + id + " " + record.getId());
 
         record.setId(id);
+        records.put(id, record);
     }
 
 
@@ -378,6 +381,8 @@ public class DataManager {
         // INSERT INTO SENSOR VALUES (id, name, knownSince)
         long id = database.insert(DatabaseContract.SensorData.TABLE_SENSOR, null, values);
         Log.d(LOG_TAG, "Inserted new sensor: " + id);
+
+        sensors.put(sensor.getId(), sensor);
     }
 
 
@@ -395,6 +400,8 @@ public class DataManager {
         // INSERT INTO USER VALUES (id, name)
         long id = database.insert(DatabaseContract.UserData.TABLE_USER, null, values);
         Log.d(LOG_TAG, "Inserted new user: " + id);
+
+        users.put(user.getId(), user);
     }
 
 
@@ -643,6 +650,8 @@ public class DataManager {
         long id = database.update(DatabaseContract.SensorData.TABLE_SENSOR, values,
                 DatabaseContract.SensorData._ID + " = " + sensor.getId(), null);
         Log.d(LOG_TAG, "Updated sensor: " + id);
+
+        sensors.put(id, sensor);
     }
 
 
@@ -661,6 +670,8 @@ public class DataManager {
         long id = database.update(DatabaseContract.UserData.TABLE_USER, values,
                 DatabaseContract.UserData._ID + " = " + user.getId(), null);
         Log.d(LOG_TAG, "Updated user: " + id);
+
+        users.put(id, user);
     }
 
 

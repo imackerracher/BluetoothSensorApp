@@ -32,8 +32,8 @@ final class DatabaseContract {
      */
     static final class MeasurementData implements BaseColumns {
         static final String TABLE_MEASUREMENT = "measurement";
-        static final String COLUMN_TIME = "time";
         static final String COLUMN_RECORD_ID = "recordID";
+        static final String COLUMN_TIME = "time";
         static final String COLUMN_BRIGHTNESS = "brightness";
         static final String COLUMN_DISTANCE = "distance";
         static final String COLUMN_HUMIDITY = "humidity";
@@ -129,17 +129,17 @@ final class DatabaseContract {
 
 
     /**
-     * Defines the SQL statement to delete the sensor table.
-     */
-    static final String SQL_DROP_SENSOR =
-            "DROP TABLE IF EXISTS " + SensorData.TABLE_SENSOR;
-
-
-    /**
      * Defines the SQL statement to delete the record table.
      */
     static final String SQL_DROP_RECORD =
             "DROP TABLE IF EXISTS " + RecordData.TABLE_RECORD;
+
+
+    /**
+     * Defines the SQL statement to delete the sensor table.
+     */
+    static final String SQL_DROP_SENSOR =
+            "DROP TABLE IF EXISTS " + SensorData.TABLE_SENSOR;
 
 
     /**
