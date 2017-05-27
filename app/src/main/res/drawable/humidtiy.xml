@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="510dp"
+    android:height="438dp"
+    android:viewportWidth="510"
+    android:viewportHeight="438">
+
+    <group
+            android:translateX="0.5"
+            android:translateY="0.5">
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:strokeMiterLimit="10"
+            android:pathData="M 254 22 Q 14 342 134 382 Q 254 422 374 382 Q 494 342 254 22" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:strokeMiterLimit="10"
+            android:pathData="M 134 202 Q 174 222 184 212 Q 194 202 214 202 Q 234 202 244 212 Q 254 222 274
+212 Q 294 202 304 212 Q 314 222 324 212 Q 334 202 374 202" />
+        <path
+            android:fillColor="#000000"
+            android:strokeColor="#000000"
+            android:strokeWidth="2"
+            android:strokeMiterLimit="10"
+            android:pathData="M 234 -10 L 274 20 L 234 50 Z" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:strokeMiterLimit="10"
+            android:pathData="M 254 22 Q 254 22 254 40" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="10"
+            android:strokeMiterLimit="10"
+            android:pathData="M 224 182 L 284 102" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="10"
+            android:pathData="M 274 162 C 279.522847498 162 284 166.477152502 284 172 C 284 177.522847498 279.522847498 182 274 182 C 268.477152502 182 264 177.522847498 264 172 C 264 166.477152502 268.477152502 162 274 162 Z" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="10"
+            android:pathData="M 234 102 C 239.522847498 102 244 106.477152502 244 112 C 244 117.522847498 239.522847498 122 234 122 C 228.477152502 122 224 117.522847498 224 112 C 224 106.477152502 228.477152502 102 234 102 Z" />
+    </group>
+</vector>

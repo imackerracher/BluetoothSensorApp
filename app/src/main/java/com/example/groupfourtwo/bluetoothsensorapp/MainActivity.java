@@ -14,15 +14,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private DataManager dataManager;
+
+    //Values to be displayed in the homescreen next to the sensor icons
+    TextView currentTemperature;
+    TextView currentBrightness;
+    TextView currentPressure;
+    TextView currentHumidity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +60,14 @@ public class MainActivity extends AppCompatActivity
 
         dataManager = new DataManager(this);
         Log.d(LOG_TAG, "Created new data manager object.");
+
+        //Tie the values in content_main.xml to the textviews in this file
+        currentTemperature = (TextView) findViewById(R.id.textViewCurrentTemperature);
+        currentBrightness = (TextView) findViewById(R.id.textViewCurrentBrightness);
+        currentPressure = (TextView) findViewById(R.id.textViewCurrentPressure);
+        currentHumidity = (TextView) findViewById(R.id.textViewCurrentHumidity);
+
+        setCurrentSensorValues();
     }
 
     @Override
@@ -92,7 +109,6 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_manage_sensors) {
-            // Handle the camera action
             //changeToManageSensors();
             Intent intent = new Intent(this, ManageSensorsActivity.class);
             startActivity(intent);
@@ -128,6 +144,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    //Methods that handle the selection of the respective sensor in the homescreen
     public void changeToTemperature(View view) {
         Intent intent = new Intent(this, TemperatureActivity.class);
         startActivity(intent);
@@ -147,5 +164,14 @@ public class MainActivity extends AppCompatActivity
     public void changeToHumidity(View view) {
         Intent intent = new Intent(this, HumidityActivity.class);
         startActivity(intent);
+    }
+
+
+    //Sets the values in the homescreen next to the sensor icon to the current/last measured value
+    public void setCurrentSensorValues() {
+        currentTemperature.setText("30°C");
+        currentBrightness.setText("970 hPa");
+        currentPressure.setText("10000 lm");
+        currentHumidity.setText("55 %");
     }
 }

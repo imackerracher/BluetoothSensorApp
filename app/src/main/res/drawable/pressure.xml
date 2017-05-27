@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="590dp"
+    android:height="590dp"
+    android:viewportWidth="590"
+    android:viewportHeight="590">
+
+    <group
+            android:translateX="0.5"
+            android:translateY="0.5">
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:pathData="M 294 14 C 448.639729953 14 574 139.360270047 574 294 C 574 448.639729953 448.639729953 574 294 574 C 139.360270047 574 14 448.639729953 14 294 C 14 139.360270047 139.360270047 14 294 14 Z" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:pathData="M 294 94 C 404.456949966 94 494 183.543050034 494 294 C 494 404.456949966 404.456949966 494 294 494 C 183.543050034 494 94 404.456949966 94 294 C 94 183.543050034 183.543050034 94 294 94 Z" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:strokeMiterLimit="10"
+            android:pathData="M 454 454 L 436 436" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:strokeMiterLimit="10"
+            android:pathData="M 152 436 L 134 454" />
+        <path
+            android:fillColor="#000000"
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:pathData="M 289 284 C 291.761423749 284 294 286.238576251 294 289 C 294 291.761423749 291.761423749 294 289 294 C 286.238576251 294 284 291.761423749 284 289 C 284 286.238576251 286.238576251 284 289 284 Z" />
+        <path
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:strokeMiterLimit="10"
+            android:pathData="M 264 354 L 315.95 224.14" />
+        <path
+            android:fillColor="#000000"
+            android:strokeColor="#000000"
+            android:strokeWidth="30"
+            android:strokeMiterLimit="10"
+            android:pathData="M 331.54 185.14 L 328.94 229.34 L 302.95 218.94 Z" />
+    </group>
+</vector>

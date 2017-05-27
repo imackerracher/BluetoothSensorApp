@@ -8,62 +8,101 @@
     tools:context="com.example.groupfourtwo.bluetoothsensorapp.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <ImageButton
+
+    <ImageView
         android:id="@+id/imageButtonTemperature"
-        android:layout_width="57dp"
-        android:layout_height="63dp"
-        android:adjustViewBounds="false"
-        android:cropToPadding="false"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:onClick="changeToTemperature"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/thermometer"
-        app:layout_constraintHorizontal_bias="0.16"
-        app:layout_constraintVertical_bias="0.121" />
+        android:layout_marginTop="33dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginLeft="50dp" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/imageButtonBrightness"
-        android:layout_width="92dp"
-        android:layout_height="45dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:onClick="changeToBrightness"
-        app:srcCompat="@drawable/luxometer"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="54dp"
-        app:layout_constraintLeft_toRightOf="@+id/imageButtonTemperature"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteY="61dp" />
-
-    <ImageButton
-        android:id="@+id/imageButtonPressure"
-        android:layout_width="63dp"
-        android:layout_height="62dp"
-        android:onClick="changeToPressure"
-        app:srcCompat="@drawable/barometer"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginLeft="47dp"
+        app:srcCompat="@drawable/brightness"
+        android:layout_marginTop="33dp"
+        android:layout_marginLeft="50dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonTemperature" />
 
-    <ImageButton
+    <ImageView
+        android:id="@+id/imageButtonPressure"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:onClick="changeToPressure"
+        app:srcCompat="@drawable/pressure"
+        android:layout_marginTop="33dp"
+        android:layout_marginLeft="50dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonBrightness" />
+
+    <ImageView
         android:id="@+id/imageButtonHumidity"
-        android:layout_width="62dp"
-        android:layout_height="57dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:onClick="changeToHumidity"
-        app:srcCompat="@drawable/humidity"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.33"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/imageButtonBrightness"
-        android:layout_marginRight="98dp"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:srcCompat="@drawable/humidtiy"
+        android:layout_marginTop="33dp"
+        android:layout_marginLeft="50dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonPressure" />
+
+
+    <TextView
+        android:id="@+id/textViewCurrentTemperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="33dp"
+        android:text="@string/not_available"
+        android:textSize="30sp"
+        app:layout_constraintLeft_toRightOf="@+id/imageButtonTemperature"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/textViewCurrentPressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="0dp"
+        android:text="@string/not_available"
+        android:textSize="30sp"
+        app:layout_constraintLeft_toRightOf="@+id/imageButtonPressure"
+        app:layout_constraintTop_toTopOf="@+id/imageButtonPressure" />
+
+    <TextView
+        android:id="@+id/textViewCurrentBrightness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="0dp"
+        android:text="@string/not_available"
+        android:textSize="30sp"
+        app:layout_constraintLeft_toRightOf="@+id/imageButtonBrightness"
+        app:layout_constraintTop_toTopOf="@+id/imageButtonBrightness" />
+
+    <TextView
+        android:id="@+id/textViewCurrentHumidity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="0dp"
+        android:text="@string/not_available"
+        android:textSize="30sp"
+        app:layout_constraintLeft_toRightOf="@+id/imageButtonHumidity"
+        app:layout_constraintTop_toTopOf="@+id/imageButtonHumidity" />
+
+
+
+
 
 </android.support.constraint.ConstraintLayout>

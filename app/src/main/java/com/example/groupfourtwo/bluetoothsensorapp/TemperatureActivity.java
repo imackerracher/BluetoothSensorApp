@@ -29,8 +29,5 @@ public class TemperatureActivity extends AppCompatActivity {
 
         DrawGraph drawGraph = new DrawGraph();
         drawGraph.draw(this);
-
-
-
     }
 }
