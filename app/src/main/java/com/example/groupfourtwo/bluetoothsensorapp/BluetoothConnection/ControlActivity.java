@@ -89,9 +89,20 @@ public class ControlActivity extends AppCompatActivity {
                 clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
+                Toast.makeText(context, "SERVICES_DISCOVERED", Toast.LENGTH_SHORT).show();
+                //displayGattServices(mBluetoothLeService.getSupportedGattServices());
+                subscribe();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+                Toast.makeText(context, "DATA AVAILABLE" + intent.getStringExtra(BluetoothLeService.EXTRA_DATA), Toast.LENGTH_SHORT).show();
+                //startReading();
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+
+            } else if (BluetoothLeService.ACTION_CHAR_WRITE.equals(action)) {
+                Toast.makeText(context, "CONTROL: WROTE CHARACTERISTIC SUCCESS", Toast.LENGTH_SHORT).show();
+                //startReading();
+
+            } else if (BluetoothLeService.ACTION_DESCRIPTOR_WRITE.equals(action)) {
+                Toast.makeText(context, "CONTROL: WROTE DESCRIPTOR SUCCESS", Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -110,10 +121,21 @@ public class ControlActivity extends AppCompatActivity {
         });
     }
 
-    private void displayData(String data) {
+    private void displayData(final String data) {
         if (data != null) {
+
             textViewState.setText(data);
         }
+    }
+
+    private void subscribe() {
+        Toast.makeText(this, "Control: SUBSCRIBE", Toast.LENGTH_SHORT).show();
+        mBluetoothLeService.subscribe();
+    }
+
+    private void startReading() {
+        Toast.makeText(this, "Control: STARTREADING", Toast.LENGTH_SHORT).show();
+        mBluetoothLeService.read();
     }
 
     // Iterates above the available GATT-services and displays it(UNNECESSARY FOR FURTHER STEPS)
@@ -254,7 +276,10 @@ public class ControlActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BluetoothLeService.ACTION_CHAR_WRITE);
+        intentFilter.addAction(BluetoothLeService.ACTION_DESCRIPTOR_WRITE);
         return intentFilter;
+
     }
     private static HashMap<String, String> attributes = new HashMap();
 
