@@ -99,7 +99,7 @@ public class BluetoothLeService extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
-                // Debug status
+                Log.d(TAG, "No GATT_Services Discovered");
             }
         }
 
@@ -212,7 +212,6 @@ public class BluetoothLeService extends Service {
         }
         // Establish GATT-Server and GATT-Client connection
         mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        Toast.makeText(this, "Debug: Establish connection", Toast.LENGTH_SHORT).show();
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
         return true;
@@ -337,8 +336,6 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 
         // Specific SensorTag Services.
-        // CHANGE UUIDS         !!!
-        // JUST EXAMPLE UUIDS   !!!
         if (OAD_SERVICE_UUID.equals(characteristic.getUuid())) {
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
                     OAD_SERVICE_UUID);
