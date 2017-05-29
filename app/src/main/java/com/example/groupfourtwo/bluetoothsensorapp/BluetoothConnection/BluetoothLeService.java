@@ -26,6 +26,11 @@ import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.SensortagUUIDs.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,12 +49,25 @@ public class BluetoothLeService extends Service {
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
 
+    private static final UUID UUID_HUMIDITY_SERVICE = UUID.fromString("f000aa20-0451-4000-b000-000000000000");
+    private static final UUID UUID_HUMIDITY_DATA = UUID.fromString("f000aa21-0451-4000-b000-000000000000");
+    private static final UUID UUID_HUMIDITY_CONF = UUID.fromString("f000aa22-0451-4000-b000-000000000000");
+    //private static final UUID UUID_CCC = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+    private static final byte ENABLE_SENSOR = (byte) 0x01;
+
+    private static final Queue<Object> sWriteQueue = new ConcurrentLinkedQueue<Object>();
+    private static boolean sIsWriting = false;
+
+    private BluetoothGattCharacteristic humidityConf;
+    BluetoothGattCharacteristic humidityCharacteristic;
+
     public final static String ACTION_GATT_CONNECTED = "company.bluettest2.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED = "company.bluettest2.ACTION_GATT_DISCONNECTED";
     public final static String ACTION_GATT_SERVICES_DISCOVERED = "company.bluettest2.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE = "company.bluettest2.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA = "company.bluettest2.EXTRA_DATA";
-
+    public final static String ACTION_CHAR_WRITE = "company.bluettest2.ACTION_CHAR_WRITE";
+    public final static String ACTION_DESCRIPTOR_WRITE = "company.bluettest2.ACTION_DESCRIPTOR_WRITE";
     // Test UUIDs
     public static final UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private static final String uuidBtSigBase = "0000****-0000-1000-8000-00805f9b34fb";
@@ -93,6 +111,18 @@ public class BluetoothLeService extends Service {
         }
 
         @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            sIsWriting = false;
+            nextWrite();
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            sIsWriting = false;
+            nextWrite();
+        }
+
+        @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
         }
@@ -101,6 +131,7 @@ public class BluetoothLeService extends Service {
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
         sendBroadcast(intent);
+
     }
 
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
@@ -115,9 +146,8 @@ public class BluetoothLeService extends Service {
 
                 Log.v(TAG, String.format("%02X ", byteChar));
             }
-            intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
+            intent.putExtra(EXTRA_DATA, lookup(characteristic.getUuid()) + "\n" + stringBuilder.toString());
         }
-
         sendBroadcast(intent);
     }
 
@@ -206,17 +236,101 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt = null;
     }
 
+    public void subscribe(UUID id) {
+        Toast.makeText(this, "Service: SUBSCRIBE" + lookup(id), Toast.LENGTH_SHORT).show();
+        /*BluetoothGattService humidityService = mBluetoothGatt.getService(UUID_HUMIDITY_SERVICE);
+        if (humidityService != null) {
+            humidityCharacteristic = humidityService.getCharacteristic(UUID_HUMIDITY_DATA);
+            humidityConf = humidityService.getCharacteristic(UUID_HUMIDITY_CONF);
+            if (humidityCharacteristic != null && humidityConf != null) {
+                Toast.makeText(this, "FOUND CHAR_DATA + CHAR_CONFIG", Toast.LENGTH_SHORT).show();
+                BluetoothGattDescriptor config = humidityCharacteristic.getDescriptor(UUID_CCC);
+                if (config != null) {
+                    mBluetoothGatt.setCharacteristicNotification(humidityCharacteristic, true);
+                    byte[] b = new byte[1];
+                    b[0] = ENABLE_SENSOR;
+                    humidityConf.setValue(b);
+                    write(humidityConf);
+                    config.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                    write(config);
+                }
+            }
+        }*/
+        byte[] b = new byte[1];
+        BluetoothGattService service = mBluetoothGatt.getService(id);
+        if (service == null) {
+            Toast.makeText(this, "Failed to find Service" + '\n' + lookup(id), Toast.LENGTH_SHORT).show();
+        } else {
+            BluetoothGattCharacteristic dataChar = service.getCharacteristic(data.get(id));
+            BluetoothGattCharacteristic configChar = service.getCharacteristic(config.get(id));
+            if (configChar == null || dataChar == null) {
+                Toast.makeText(this, "Failed to find Characteristic" + '\n' + lookup(id), Toast.LENGTH_SHORT).show();
+            } else {
+                BluetoothGattDescriptor configDescr = dataChar.getDescriptor(UUID_CCC);
+                if (configDescr == null) {
+                    Toast.makeText(this, "Failed to find Descriptor" + '\n' + lookup(id), Toast.LENGTH_SHORT).show();
+                } else {
+                    mBluetoothGatt.setCharacteristicNotification(dataChar, true);
+                    b[0] = ENABLE_SENSOR;
+                    configChar.setValue(b);
+                    write(configChar);
+                    configDescr.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                    write(configDescr);
+                }
+            }
+        }
+
+    }
+
+    private synchronized void write(Object o) {
+        //Toast.makeText(this, "write", Toast.LENGTH_SHORT).show();
+        if (sWriteQueue.isEmpty() && !sIsWriting) {
+            doWrite(o);
+        } else {
+            sWriteQueue.add(o);
+        }
+    }
+
+    private synchronized void nextWrite() {
+        if (!sWriteQueue.isEmpty() && !sIsWriting) {
+            doWrite(sWriteQueue.poll());
+        }
+    }
+
+    private synchronized void doWrite(Object o) {
+        if (o instanceof BluetoothGattCharacteristic) {
+            sIsWriting = true;
+            mBluetoothGatt.writeCharacteristic((BluetoothGattCharacteristic) o);
+            //Toast.makeText(this, "SERVICE: WRITE_CHARACTERISTIC", Toast.LENGTH_SHORT).show();
+        } else if (o instanceof BluetoothGattDescriptor) {
+            sIsWriting = true;
+            mBluetoothGatt.writeDescriptor((BluetoothGattDescriptor) o);
+            //Toast.makeText(this, "SERVICE: WRITE_DESCRIPTOR", Toast.LENGTH_SHORT).show();
+        } else {
+            nextWrite();
+        }
+    }
+
     // Request a read on a BluetoothGattCharacteristic
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
         }
+        Toast.makeText(this, "read", Toast.LENGTH_SHORT).show();
+
         mBluetoothGatt.readCharacteristic(characteristic);
+    }
+
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+        if (bluetoothAdapter == null || mBluetoothGatt == null) {
+            return;
+        }
+        mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
 
     // Enables or disables notification on a given characteristic
-    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enabled) {
+   public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enabled) {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
         }

@@ -26,7 +26,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
+import static com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.SensortagUUIDs.*;
 
+import java.util.HashSet;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +45,9 @@ public class ControlActivity extends AppCompatActivity {
 
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private BluetoothLeService mBluetoothLeService;
+
+
+    private UUID testid = UUID.fromString("F000AA20-0451-4000-B000-000000000000");
 
     TextView textViewState;
     private ExpandableListView mGattServicesList;
@@ -89,9 +95,22 @@ public class ControlActivity extends AppCompatActivity {
                 clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
+                //Toast.makeText(context, "SERVICES_DISCOVERED", Toast.LENGTH_SHORT).show();
+                //displayGattServices(mBluetoothLeService.getSupportedGattServices());
+               for (UUID id : gattServices) {
+                   subscribe(id);
+               }
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+                //Toast.makeText(context, "DATA AVAILABLE" + intent.getStringExtra(BluetoothLeService.EXTRA_DATA), Toast.LENGTH_SHORT).show();
+                //startReading();
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+
+            } else if (BluetoothLeService.ACTION_CHAR_WRITE.equals(action)) {
+                Toast.makeText(context, "CONTROL: WROTE CHARACTERISTIC SUCCESS", Toast.LENGTH_SHORT).show();
+                //startReading();
+
+            } else if (BluetoothLeService.ACTION_DESCRIPTOR_WRITE.equals(action)) {
+                Toast.makeText(context, "CONTROL: WROTE DESCRIPTOR SUCCESS", Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -110,10 +129,16 @@ public class ControlActivity extends AppCompatActivity {
         });
     }
 
-    private void displayData(String data) {
+    private void displayData(final String data) {
         if (data != null) {
+
             textViewState.setText(data);
         }
+    }
+
+    private void subscribe(UUID id) {
+        //Toast.makeText(this, "Control: SUBSCRIBE", Toast.LENGTH_SHORT).show();
+        mBluetoothLeService.subscribe(id);
     }
 
     // Iterates above the available GATT-services and displays it(UNNECESSARY FOR FURTHER STEPS)
@@ -222,6 +247,7 @@ public class ControlActivity extends AppCompatActivity {
         mGattServicesList.setOnChildClickListener(servicesListClickListener);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        startService(gattServiceIntent);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
@@ -254,12 +280,20 @@ public class ControlActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BluetoothLeService.ACTION_CHAR_WRITE);
+        intentFilter.addAction(BluetoothLeService.ACTION_DESCRIPTOR_WRITE);
         return intentFilter;
+
     }
-    private static HashMap<String, String> attributes = new HashMap();
+
 
     public static String lookup(String uuid, String defaultName) {
-        String name = attributes.get(uuid);
+        String name = attributes.get(UUID.fromString(uuid));
         return name == null ? defaultName : name;
     }
+
+
+
+
+
 }
