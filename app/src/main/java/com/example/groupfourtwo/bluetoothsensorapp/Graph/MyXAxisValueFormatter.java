@@ -35,6 +35,8 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
 
             int sec = (int) value*60;
 
+            int minutes = determineMinutes(sec);
+
             int hours = determineHours(sec);
 
             int days = determineDays(hours);
@@ -42,13 +44,16 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
             int year = determineYear(days);
 
             int month = determineMonth(days);
+
+            String minuteName = String.format("%02d", minutes % 60);
+            String hourName = String.valueOf(hours % 24);
             String monthName = mMonths[month % mMonths.length];
             String yearName = String.valueOf(year);
 
-            if (chart.getVisibleXRange() > 30 * 8) {
+            if (chart.getVisibleXRange() > 30*300 ) {
 
                 return monthName + " " + yearName;
-            } else {
+            } else if (chart.getVisibleXRange() > 30*6 ) {
 
                 int dayOfMonth = determineDayOfMonth(days, month + 12 * (year - 2016));
 
@@ -79,7 +84,14 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
                 }
 
                 return dayOfMonth == 0 ? "" : dayOfMonth + appendix + " " + monthName;
+            } else {
+                return hourName + ":" + minuteName;
             }
+        }
+
+        private int determineMinutes(int sec) {
+            int minutes = (int) (sec/60)-30 ;
+            return minutes;
         }
 
         private int getDaysForMonth(int month, int year) {
@@ -104,7 +116,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         }
 
         private int determineHours(int sec) {
-                int hours = (int) (sec/3600)+1;      ///3600
+                int hours = (int) (sec/3600);      ///3600
             return hours;
         }
 
@@ -160,6 +172,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
                 return 2020;
 
         }
+
 
 
 }

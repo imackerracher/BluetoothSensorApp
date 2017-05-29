@@ -29,7 +29,7 @@ public class DrawGraph {
         c = context;
     }
 
-    private float datapointCount = 10800f;
+    private int datapointCount = 10800;
 
     public void draw(Activity activity) {
 
@@ -52,28 +52,22 @@ public class DrawGraph {
         //Choose between TOP, BOTTOM, BOTH_SIDED, TOP_INSIDE or BOTTOM_INSIDE
         xAxis.setTextSize(10f);
 
-        //int i=5;
         xAxis.setValueFormatter(new MyXAxisValueFormatter(lineChart));
 
 
 
 
 
-        int numDataPoints = 10000;
-        int gapSize = 500;
-        int gapPosition = 6000;
+        int numDataPoints = datapointCount;
+        int gapSize = datapointCount/10;
+        int gapPosition = datapointCount/3;
 
 
 
         /* deklaration of the Value-Lists */
-        ArrayList<String> xAxes = new ArrayList<>();
-        Float[] yAxes2 = new Float[numDataPoints]; //static
+   //     ArrayList<String> xAxes = new ArrayList<>();
+        Float[] yAxes = new Float[numDataPoints]; //static
 
-
-
-        /*put some Values on the Xaxes*/
-        for (int i = 0; i < numDataPoints; i++)
-            xAxes.add(i, String.valueOf(i));
 
 
         /*1 testdataset*/
@@ -81,10 +75,12 @@ public class DrawGraph {
 
         /*y = sin(x) data with gaps*/
         for (int i = 0; i < gapPosition; i++)
-            yAxes2[i] = (float) Math.sin((float) i / 300);
+            yAxes[i] = (float) i;
+            //yAxes2[i] = (float) Math.sin((float) i / 300);
 
         for (int i = gapPosition + gapSize; i < numDataPoints; i++)
-            yAxes2[i] = (float) Math.sin((float) i / 300);
+            yAxes[i] = (float) i;
+            //yAxes2[i] = (float) Math.sin((float) i / 300);
 
 
         /* split the graph in sections */
@@ -92,13 +88,13 @@ public class DrawGraph {
         ArrayList<Entry> yAxes2_2 = new ArrayList<>();
 
         for (int i = 0; i < gapPosition; i++) {
-            yAxes2_1.add(new Entry(i, yAxes2[i]));
+            yAxes2_1.add(new Entry(i, yAxes[i]));
 
         }
 
 
         for (int i = gapPosition + gapSize; i < numDataPoints; i++) {
-            yAxes2_2.add(new Entry(i, yAxes2[i]));
+            yAxes2_2.add(new Entry(i, yAxes[i]));
         }
 
             /*
@@ -111,11 +107,11 @@ public class DrawGraph {
         ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
-        LineDataSet lineDataSet2 = new LineDataSet(yAxes2_1, " ");
+        LineDataSet lineDataSet2 = new LineDataSet(yAxes2_1, " Humidity");
         lineDataSet2.setColor(Color.RED);
 
 
-        LineDataSet lineDataSet3 = new LineDataSet(yAxes2_2, " ");
+        LineDataSet lineDataSet3 = new LineDataSet(yAxes2_2, "Humidity");
         lineDataSet3.setColor(Color.RED);
 
 
@@ -127,8 +123,8 @@ public class DrawGraph {
 
 
         //## Restraining what's visible
-        lineChart.setVisibleXRangeMaximum(datapointCount); // allow 10800 values to be displayed at once on the x-axis, not more
-        lineChart.setVisibleXRangeMinimum(30f);
+        lineChart.setVisibleXRangeMaximum((float) datapointCount); // allow 10800 values to be displayed at once on the x-axis, not more
+        lineChart.setVisibleXRangeMinimum(10f);
 
         // lineChart.animateX(3000); // Animation that shows the values from left to right
 
