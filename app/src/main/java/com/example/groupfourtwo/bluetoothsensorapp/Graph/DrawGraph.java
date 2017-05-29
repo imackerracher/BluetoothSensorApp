@@ -29,7 +29,7 @@ public class DrawGraph {
         c = context;
     }
 
-    private int datapointCount = 10800;
+    private int datapointCount = 10801;
 
     public void draw(Activity activity) {
 
@@ -44,10 +44,11 @@ public class DrawGraph {
         Legend l = lineChart.getLegend();
         l.setEnabled(false); //The Legend is DISABLED
 
+        lineChart.setDescription(null);
 
 
         XAxis xAxis = lineChart.getXAxis();
-        xAxis.setAxisMinimum(30f);
+        xAxis.setAxisMinimum(0f); //smallest value that is displayed on the XAxis
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         //Choose between TOP, BOTTOM, BOTH_SIDED, TOP_INSIDE or BOTTOM_INSIDE
         xAxis.setTextSize(10f);
@@ -83,6 +84,8 @@ public class DrawGraph {
             //yAxes2[i] = (float) Math.sin((float) i / 300);
 
 
+
+
         /* split the graph in sections */
         ArrayList<Entry> yAxes2_1 = new ArrayList<>();
         ArrayList<Entry> yAxes2_2 = new ArrayList<>();
@@ -97,21 +100,14 @@ public class DrawGraph {
             yAxes2_2.add(new Entry(i, yAxes[i]));
         }
 
-            /*
-            String[] xaxes = new String[xAxes.size()];
-
-            for (int i = 0; i < xAxes.size(); i++)
-                xaxes[i] = xAxes.get(i).toString();
-
-            */
         ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
-        LineDataSet lineDataSet2 = new LineDataSet(yAxes2_1, " Humidity");
+        LineDataSet lineDataSet2 = new LineDataSet(yAxes2_1, null);
         lineDataSet2.setColor(Color.RED);
 
 
-        LineDataSet lineDataSet3 = new LineDataSet(yAxes2_2, "Humidity");
+        LineDataSet lineDataSet3 = new LineDataSet(yAxes2_2, null);
         lineDataSet3.setColor(Color.RED);
 
 

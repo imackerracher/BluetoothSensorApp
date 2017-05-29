@@ -90,7 +90,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         }
 
         private int determineMinutes(int sec) {
-            int minutes = (int) (sec/60)-30 ;
+            int minutes = (int) (sec/60) ;
             return minutes;
         }
 
