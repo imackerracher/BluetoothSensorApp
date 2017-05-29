@@ -1,16 +1,23 @@
 package com.example.groupfourtwo.bluetoothsensorapp.Graph;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.text.DecimalFormat;
 
+import static com.example.groupfourtwo.bluetoothsensorapp.R.id.lineChart;
+import static java.security.AccessController.getContext;
+
 /**
  * Created by kim on 23.05.17.
  */
 
 public class MyXAxisValueFormatter implements IAxisValueFormatter {
+
 
         protected String[] mMonths = new String[]{
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -25,7 +32,8 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
 
-            int sec = (int) value;
+
+            int sec = (int) value*60;
 
             int hours = determineHours(sec);
 
@@ -37,7 +45,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
             String monthName = mMonths[month % mMonths.length];
             String yearName = String.valueOf(year);
 
-            if (chart.getVisibleXRange() > 30 * 6) {
+            if (chart.getVisibleXRange() > 30 * 8) {
 
                 return monthName + " " + yearName;
             } else {
@@ -96,12 +104,12 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         }
 
         private int determineHours(int sec) {
-                int hours = (int) sec;      ///3600;
+                int hours = (int) (sec/3600)+1;      ///3600
             return hours;
         }
 
         private int determineDays(int hours) {
-            int days = (int) ((hours/24));
+            int days = (int) (hours/(24))+1;
             return days;
         }
 
@@ -152,5 +160,6 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
                 return 2020;
 
         }
+
 
 }

@@ -1,6 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.Graph;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
@@ -18,10 +19,17 @@ import java.util.ArrayList;
  * Created by kim on 23.05.17.
  */
 
+
+
 public class DrawGraph {
 
-    public DrawGraph() {
+
+    Context c;
+    public DrawGraph(Context context) {
+        c = context;
     }
+
+    private float datapointCount = 10800f;
 
     public void draw(Activity activity) {
 
@@ -34,13 +42,9 @@ public class DrawGraph {
 
 
         Legend l = lineChart.getLegend();
-        l.setFormSize(10f); // set the size of the legend forms/shapes
-
-        l.setTextSize(12f);
-        l.setTextColor(Color.BLACK);
-        l.setXEntrySpace(5f); // set the space between the legend entries on the x-axis
-        l.setYEntrySpace(5f); // set the space between the legend entries on the y-axis
         l.setEnabled(false); //The Legend is DISABLED
+
+
 
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setAxisMinimum(30f);
@@ -48,6 +52,7 @@ public class DrawGraph {
         //Choose between TOP, BOTTOM, BOTH_SIDED, TOP_INSIDE or BOTTOM_INSIDE
         xAxis.setTextSize(10f);
 
+        //int i=5;
         xAxis.setValueFormatter(new MyXAxisValueFormatter(lineChart));
 
 
@@ -106,7 +111,7 @@ public class DrawGraph {
         ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
-        LineDataSet lineDataSet2 = new LineDataSet(yAxes2_1, "Humidity");
+        LineDataSet lineDataSet2 = new LineDataSet(yAxes2_1, " ");
         lineDataSet2.setColor(Color.RED);
 
 
@@ -122,8 +127,8 @@ public class DrawGraph {
 
 
         //## Restraining what's visible
-        lineChart.setVisibleXRangeMaximum(20000f); // allow 200 values to be displayed at once on the x-axis, not more
-        lineChart.setVisibleXRangeMinimum(20f);
+        lineChart.setVisibleXRangeMaximum(datapointCount); // allow 10800 values to be displayed at once on the x-axis, not more
+        lineChart.setVisibleXRangeMinimum(30f);
 
         // lineChart.animateX(3000); // Animation that shows the values from left to right
 
