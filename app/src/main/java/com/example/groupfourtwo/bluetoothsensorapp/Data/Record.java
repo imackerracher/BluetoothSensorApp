@@ -40,7 +40,7 @@ public class Record {
     /**
      * Constructs a new record. Either by firstly connecting or loading from database.
      *
-     * @param id       the unique id of the record
+     * @param id       the unique id of the record, -1 if not saved yet
      * @param sensor   the associated sensor
      * @param user     the associated user
      * @param begin    when the record started
@@ -61,19 +61,6 @@ public class Record {
         this.user = user;
         this.begin = begin;
         this.end = end;
-    }
-
-
-    /**
-     * Start a new record at this very moment.
-     * Note: As the record is not saved in the database, no valid id nor end point is assigned yet.
-     *
-     * @param sensor  the associated sensor
-     * @param user    the associated user
-     * @return  a new running record
-     */
-    public static Record startRecord(Sensor sensor, User user) {
-        return new Record(Long.MIN_VALUE, sensor, user, System.currentTimeMillis(), -1);
     }
 
 

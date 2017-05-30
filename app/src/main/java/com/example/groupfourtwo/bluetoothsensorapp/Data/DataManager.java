@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -52,6 +53,11 @@ public class DataManager {
     private static final String LOG_TAG = DataManager.class.getSimpleName();
 
     /**
+     * Single data manager object, to access and operate on the database.
+     */
+    private static DataManager instance;
+
+    /**
      * An SQLite database the application is connected to that contains all persistent data.
      */
     private SQLiteDatabase database;
@@ -82,8 +88,23 @@ public class DataManager {
      *
      * @param context  context of the calling activity
      */
-    public DataManager(Context context) {
+    private DataManager(Context context) {
         dbHelper = DatabaseHelper.getInstance(context);
+    }
+
+
+    /**
+     * Get the global instance of the Data Manager object.
+     *
+     * @param context  the context of the calling activity
+     * @return  the instance of the data manager
+     */
+    public static synchronized DataManager getInstance(Context context) {
+        if (instance == null) {
+            instance = new DataManager(context.getApplicationContext());
+            Log.d(LOG_TAG, "Created new data manager object.");
+        }
+        return instance;
     }
 
 
@@ -91,7 +112,7 @@ public class DataManager {
      * Open the connection to an SQLite database.
      * If there is no existing database yet, a new one is created.
      */
-    public void open() {
+    public synchronized void open() {
         try {
             database = dbHelper.getWritableDatabase();
             Log.d(LOG_TAG, "Successfully opened database from: " + database.getPath());
@@ -106,7 +127,7 @@ public class DataManager {
     /**
      * Close the connection to an open SQLite database.
      */
-    public void close() {
+    public synchronized void close() {
         dbHelper.close();
         Log.d(LOG_TAG, "Database was closed.");
     }
@@ -406,6 +427,33 @@ public class DataManager {
 
 
     /**
+     * Start a new record at this very moment.
+     * Note: As the record is still running, no valid id nor end point is assigned yet.
+     *
+     * @param sensor  the associated sensor
+     * @param user    the associated user
+     * @return  a new running record
+     */
+    public Record startRecord(Sensor sensor, User user) {
+        Record record = new Record(-1, sensor, user, System.currentTimeMillis(), Long.MIN_VALUE);
+        saveRecord(record);
+        return record;
+    }
+
+
+    /**
+     * Stop a running Record.
+     *
+     * @param record  the record that shall be stopped
+     */
+    public void stopRecord(Record record) {
+        record.stop();
+        updateRecord(record);
+    }
+
+
+
+    /**
      * Alter the name of a sensor.
      *
      * @param sensor  the sensor to rename
@@ -635,6 +683,29 @@ public class DataManager {
 
 
     /**
+     * Replace the data of a record with a new version.
+     *
+     * @param record  the new version of the record
+     */
+    private void updateRecord(Record record) {
+        ContentValues values = new ContentValues();
+
+        values.put(DatabaseContract.RecordData._ID, record.getId());
+        values.put(DatabaseContract.RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());
+        values.put(DatabaseContract.RecordData.COLUMN_USER_ID, record.getUser().getId());
+        values.put(DatabaseContract.RecordData.COLUMN_BEGIN, record.getBegin());
+        values.put(DatabaseContract.RecordData.COLUMN_END, record.getEnd());
+
+        // UPDATE SENSOR SET END = end WHERE ID = id
+        long id = database.update(DatabaseContract.RecordData.TABLE_RECORD, values,
+                DatabaseContract.RecordData._ID + " = " + record.getId(), null);
+        Log.d(LOG_TAG, "Updated sensor: " + id);
+
+        records.put(id, record);
+    }
+
+
+    /**
      * Replace the data of a sensor with a new version.
      *
      * @param sensor  the new version of the sensor
@@ -678,7 +749,7 @@ public class DataManager {
     /**
      * Adds automatic inserting to a HashMap of records in case the item was not found.
      */
-    private class RecordHashMap extends HashMap<Long, Record> {
+    public class RecordHashMap extends HashMap<Long, Record> {
         /**
          * Find and return a record with the given key in the map.
          * If no object was found, fetch record from database and insert it into the map.
@@ -686,7 +757,7 @@ public class DataManager {
          * @param key  id of the record to search
          * @return  the record with the given id
          */
-        private Record getOrPut(long key) {
+        public Record getOrPut(long key) {
             Record record = this.get(key);
             if (record == null) // wanted sensor not in map -> search in database
                 record = findRecord(key);
@@ -702,7 +773,7 @@ public class DataManager {
     /**
      * Adds automatic inserting to a HashMap of sensors in case the item was not found.
      */
-    private class SensorHashMap extends HashMap<Long, Sensor> {
+    public class SensorHashMap extends HashMap<Long, Sensor> {
         /**
          * Find and return a sensor with the given key in the map.
          * If no object was found, fetch sensor from database and insert it into the map.
@@ -710,7 +781,7 @@ public class DataManager {
          * @param key  id of the sensor to search
          * @return  the sensor with the given id
          */
-        private Sensor getOrPut(long key) {
+        public Sensor getOrPut(long key) {
             Sensor sensor = this.get(key);
             if (sensor == null) // wanted sensor not in map -> search in database
                 sensor = findSensor(key);
@@ -726,7 +797,7 @@ public class DataManager {
     /**
      * Adds automatic inserting to a HashMap of users in case the item was not found.
      */
-    private class UserHashMap extends HashMap<Long, User> {
+    public class UserHashMap extends HashMap<Long, User> {
         /**
          * Find and return a user with the given key in the map.
          * If no object was found, fetch user from database and insert it into the map.
@@ -734,7 +805,7 @@ public class DataManager {
          * @param key  id of the user to search
          * @return  the user with the given id
          */
-        private User getOrPut(long key) {
+        public User getOrPut(long key) {
             User user = this.get(key);
             if (user == null) // wanted user not in map -> search in database
                 user = findUser(key);

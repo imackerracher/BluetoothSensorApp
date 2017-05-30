@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        dataManager = new DataManager(this);
+        dataManager = DataManager.getInstance(this);
         Log.d(LOG_TAG, "Created new data manager object.");
 
         //Tie the values in content_main.xml to the textviews in this file
