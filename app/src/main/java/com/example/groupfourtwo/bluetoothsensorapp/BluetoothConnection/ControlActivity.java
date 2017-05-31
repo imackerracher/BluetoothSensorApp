@@ -4,7 +4,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
  * Bluetooth Connection Control Activity
  *
  * @author Tobias Nusser
- * @version 1.0
+ * @version 1.2
  */
 
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
@@ -46,23 +47,22 @@ public class ControlActivity extends AppCompatActivity {
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private BluetoothLeService mBluetoothLeService;
 
-
-    private UUID testid = UUID.fromString("F000AA20-0451-4000-B000-000000000000");
-
-    TextView textViewState;
+    private TextView textViewState;
     private ExpandableListView mGattServicesList;
 
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
             new ArrayList<>();
 
-    // Code to manage Service lifecycle.
+    /**
+     * Manages service lifecycle
+     */
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                // Unable to initialize Bluetooth
+                Log.d(TAG, "Unable to initialize bluetooth-connection" );
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
@@ -75,12 +75,14 @@ public class ControlActivity extends AppCompatActivity {
         }
     };
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
+
+    /**
+     * Handles various events fired by the Service.
+     * ACTION_GATT_CONNECTED: connected to a GATT server.
+     * ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
+     * ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
+     * ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read or notification operations.
+     */
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -95,7 +97,6 @@ public class ControlActivity extends AppCompatActivity {
                 clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                //Toast.makeText(context, "SERVICES_DISCOVERED", Toast.LENGTH_SHORT).show();
                 //displayGattServices(mBluetoothLeService.getSupportedGattServices());
                for (UUID id : gattServices) {
                    subscribe(id);
@@ -116,32 +117,53 @@ public class ControlActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Sets the Service List to null -> Clears the User Interface
+     */
     private void clearUI() {
         mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
     }
 
-    private void updateConnectionState(final String st) {
+
+    /**
+     * Displays the current connection State
+     * @param connState String which contains GATT-Connection state
+     */
+    private void updateConnectionState(final String connState) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                textViewState.setText(st);
+                textViewState.setText(connState);
             }
         });
     }
 
+
+    /**
+     * Displays the incoming data from GATT-Connection
+     * @param data String which contains the incoming data from the GATT-Connection
+     */
     private void displayData(final String data) {
         if (data != null) {
-
             textViewState.setText(data);
         }
     }
 
+
+    /**
+     * Access the different services via UUID
+     * @param id containing UUIDs for the different services
+     */
     private void subscribe(UUID id) {
-        //Toast.makeText(this, "Control: SUBSCRIBE", Toast.LENGTH_SHORT).show();
         mBluetoothLeService.subscribe(id);
     }
 
-    // Iterates above the available GATT-services and displays it(UNNECESSARY FOR FURTHER STEPS)
+
+    /**
+     * Displays the GATT-Services
+     * //Currently just displaying unknown services/characteristics, will be changed or removed soon
+     * @param gattServices List of available GATT-Services
+     */
     private void displayGattServices(List<BluetoothGattService> gattServices) {
 
         if (gattServices == null) {
@@ -189,7 +211,10 @@ public class ControlActivity extends AppCompatActivity {
             gattCharacteristicData.add(gattCharacteristicGroupData);
         }
 
-        SimpleExpandableListAdapter gattServiceAdapter = new SimpleExpandableListAdapter(this, gattServiceData, android.R.layout.simple_expandable_list_item_2,
+        SimpleExpandableListAdapter gattServiceAdapter = new SimpleExpandableListAdapter(
+                this,
+                gattServiceData,
+                android.R.layout.simple_expandable_list_item_2,
                 new String[] {LIST_NAME, LIST_UUID},
                 new int[] { android.R.id.text1, android.R.id.text2 },
                 gattCharacteristicData,
@@ -200,7 +225,10 @@ public class ControlActivity extends AppCompatActivity {
         mGattServicesList.setAdapter(gattServiceAdapter);
     }
 
-    // If a given GATT characteristic is selected, check for supported features i.e. read/notify
+
+    /**
+     * Expandable ListView which shows GATT-Characteristics for a GATT-Service when its clicked on
+     */
     private final ExpandableListView.OnChildClickListener servicesListClickListener =
             new ExpandableListView.OnChildClickListener() {
                 @Override
@@ -226,6 +254,7 @@ public class ControlActivity extends AppCompatActivity {
                     return false;
                 }
             };
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -274,6 +303,10 @@ public class ControlActivity extends AppCompatActivity {
         mBluetoothLeService = null;
     }
 
+    /**
+     * IntentFilter for GATT-Connection Updates
+     * @return Intentfilter
+     */
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
@@ -287,6 +320,12 @@ public class ControlActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Lookup method for getting either default name or real UUID
+     * @param uuid String with service UUID
+     * @param defaultName String if UUID is empty
+     * @return
+     */
     public static String lookup(String uuid, String defaultName) {
         String name = attributes.get(UUID.fromString(uuid));
         return name == null ? defaultName : name;

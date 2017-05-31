@@ -3,11 +3,9 @@ package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
 /**
  * Bluetooth Low Energy Connection Service Activity
  *
- * @author Tobias Nusser
- * @version 1.0
+ * @author Tobias Nusser, Patrick Reichle
+ * @version 1.2
  */
-
-
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -59,7 +57,7 @@ public class BluetoothLeService extends Service {
     private static boolean sIsWriting = false;
 
     private BluetoothGattCharacteristic humidityConf;
-    BluetoothGattCharacteristic humidityCharacteristic;
+    private BluetoothGattCharacteristic humidityCharacteristic;
 
     public final static String ACTION_GATT_CONNECTED = "company.bluettest2.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED = "company.bluettest2.ACTION_GATT_DISCONNECTED";
@@ -68,14 +66,13 @@ public class BluetoothLeService extends Service {
     public final static String EXTRA_DATA = "company.bluettest2.EXTRA_DATA";
     public final static String ACTION_CHAR_WRITE = "company.bluettest2.ACTION_CHAR_WRITE";
     public final static String ACTION_DESCRIPTOR_WRITE = "company.bluettest2.ACTION_DESCRIPTOR_WRITE";
-    // Test UUIDs
-    public static final UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-    private static final String uuidBtSigBase = "0000****-0000-1000-8000-00805f9b34fb";
-    private static final String uuidTiBase = "f000****-0451-4000-b000-000000000000";
-    public static final UUID OAD_SERVICE_UUID = UUID.fromString("f000ffc0-0451-4000-b000-000000000000");
-    public static final UUID CC_SERVICE_UUID = UUID.fromString("f000ccc0-0451-4000-b000-000000000000");
 
-    // Implements callback methods for GATT events
+    // Test UUIDs
+    public static final UUID test_UUID = UUID.fromString("f000ffc0-0451-4000-b000-000000000000");
+
+    /**
+     * Implements callback methods for GATT events
+     */
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -128,12 +125,22 @@ public class BluetoothLeService extends Service {
         }
     };
 
+
+    /**
+     *
+     * @param action
+     */
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
         sendBroadcast(intent);
 
     }
 
+    /**
+     *
+     * @param action
+     * @param characteristic
+     */
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
@@ -172,7 +179,11 @@ public class BluetoothLeService extends Service {
         return super.onUnbind(intent);
     }
 
-    // Initializes a reference to the Bluetoothadapter
+
+    /**
+     * Initializes a reference to the Bluetoothadapter
+     * @return boolean whether it was successful or not
+     */
     public boolean initialize() {
         if (bluetoothManager == null) {
             bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -190,7 +201,11 @@ public class BluetoothLeService extends Service {
     }
 
 
-    // Connects to the GATT server hosted on the Bluetooth LE device.
+    /**
+     * Connects to the GATT server hosted on the Bluetooth LE device.
+     * @param address String which contains MAC-Address of the device
+     * @return boolean whether it was successful or not
+     */
     public boolean connect(final String address) {
         if (bluetoothAdapter == null || address == null) {
             return false;
@@ -218,7 +233,9 @@ public class BluetoothLeService extends Service {
     }
 
 
-    // Disconnects a connection between GATT-Server (device) and GATT-Client
+    /**
+     * Disconnects a connection between GATT-Server (device) and GATT-Client
+     */
     public void disconnect() {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
@@ -226,7 +243,10 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.disconnect();
     }
 
-    // Closing GATT-Service after a disconnect
+
+    /**
+     * Closing GATT-Service after a disconnect
+     */
     public void close() {
         if (mBluetoothGatt == null) {
             return;
@@ -235,6 +255,11 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt = null;
     }
 
+
+    /**
+     *
+     * @param id
+     */
     public void subscribe(UUID id) {
         Toast.makeText(this, "Service: SUBSCRIBE" + lookup(id), Toast.LENGTH_SHORT).show();
         /*BluetoothGattService humidityService = mBluetoothGatt.getService(UUID_HUMIDITY_SERVICE);
@@ -281,6 +306,11 @@ public class BluetoothLeService extends Service {
 
     }
 
+
+    /**
+     *
+     * @param o
+     */
     private synchronized void write(Object o) {
         //Toast.makeText(this, "write", Toast.LENGTH_SHORT).show();
         if (sWriteQueue.isEmpty() && !sIsWriting) {
@@ -290,12 +320,21 @@ public class BluetoothLeService extends Service {
         }
     }
 
+
+    /**
+     *
+     */
     private synchronized void nextWrite() {
         if (!sWriteQueue.isEmpty() && !sIsWriting) {
             doWrite(sWriteQueue.poll());
         }
     }
 
+
+    /**
+     *
+     * @param o
+     */
     private synchronized void doWrite(Object o) {
         if (o instanceof BluetoothGattCharacteristic) {
             sIsWriting = true;
@@ -310,7 +349,11 @@ public class BluetoothLeService extends Service {
         }
     }
 
-    // Request a read on a BluetoothGattCharacteristic
+
+    /**
+     * Request a read on a BluetoothGattCharacteristic
+     * @param characteristic
+     */
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
@@ -320,6 +363,11 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.readCharacteristic(characteristic);
     }
 
+
+    /**
+     *
+     * @param characteristic
+     */
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
@@ -328,7 +376,11 @@ public class BluetoothLeService extends Service {
     }
 
 
-    // Enables or disables notification on a given characteristic
+    /**
+     * Enables or disables notification on a given characteristic
+     * @param characteristic
+     * @param enabled
+     */
    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enabled) {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
@@ -336,18 +388,21 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 
         // Specific SensorTag Services.
-        if (OAD_SERVICE_UUID.equals(characteristic.getUuid())) {
+        if (test_UUID.equals(characteristic.getUuid())) {
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    OAD_SERVICE_UUID);
+                    test_UUID);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }
     }
 
-    // Retrieves a list of supported GATT services on the connected device
+
+    /**
+     *  Retrieves a list of supported GATT services on the connected device
+     * @return List of GATT-Services
+     */
     public List<BluetoothGattService> getSupportedGattServices() {
         if (mBluetoothGatt == null) return null;
-
         return mBluetoothGatt.getServices();
     }
 }
