@@ -8,6 +8,15 @@
 
     <string name="StartScanButton">Scan</string>
     <string name="StopScanButton">Stop scanning</string>
+    <string name="gps_not_enabled">GPS is disabled, please activate location services to detect new BLE devices</string>
+    <string name="open_location_settings">Open settings </string>
+    <string name="connect">Connect</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="attention">Attention</string>
+    <string name="location_request_denied">Location information request denied. The application is not able to find new BLE devices.</string>
+    <string name="request_gps_title">Please enable location information services</string>
+    <string name="request_gps_message">The application needs location information to be able to find new BLE devices.</string>
 
     <string name="menu_manage_sensors">Manage Sensors</string>
     <string name="menu_clear_data">Clear Data</string>

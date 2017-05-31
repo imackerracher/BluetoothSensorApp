@@ -4,7 +4,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
  * Bluetooth Connection Main Activity
  *
  * @author Tobias Nusser
- * @version 1.1
+ * @version 1.2
  */
 
 import android.Manifest;
@@ -19,9 +19,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,7 +32,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 
@@ -87,28 +86,41 @@ public class BluetoothMainActivity extends AppCompatActivity {
         bluetoothAdapter = bluetoothManager.getAdapter();
         if (bluetoothAdapter != null) {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-
             // If Bluetooth isn't enabled yet, ask for permission to enable it
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
             }
-            /*
-            final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
 
-            if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                Intent gpsOptionsIntent = new Intent(
-                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(gpsOptionsIntent);
-            } */
+            boolean gps_enabled = isLocationEnabled(this);
+            Log.d(TAG, "Debug: gps_enabled = " + gps_enabled);
+            // If GPS is disabled a prompt shows up to activate GPS in the settings
+            if(!gps_enabled) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setMessage(this.getResources().getString(R.string.gps_not_enabled));
+                dialog.setPositiveButton(this.getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        Intent gpsOptionsIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(gpsOptionsIntent);
+                    }
+                });
+                dialog.setNegativeButton(this.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    }
+                });
+                dialog.show();
+            }
         }
+
         // If Access Coarse Location Permission isn't granted yet, a prompt shows up
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Please enable location information services");
-                builder.setMessage("The application needs location information to be able to find new BLE devices.");
-                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setTitle(getString(R.string.request_gps_title));
+                builder.setMessage(getString(R.string.request_gps_title));
+                builder.setPositiveButton(getString(R.string.ok), null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
@@ -121,12 +133,14 @@ public class BluetoothMainActivity extends AppCompatActivity {
             }
         }
 
+
         // Add scan results to the result adapter and update the listView for the GUI
         listBluetoothDevice = new ArrayList<>();
         adapterLeScanResult = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listBluetoothDevice);
         listViewLE.setAdapter(adapterLeScanResult);
         listViewLE.setOnItemClickListener(scanResultOnItemClickListener);
     }
+
 
     /**
      * ItemClickListener in ListView. Get detailed information about the selected device and either go back or connect to device
@@ -143,12 +157,12 @@ public class BluetoothMainActivity extends AppCompatActivity {
                     new AlertDialog.Builder(BluetoothMainActivity.this)
                             .setTitle(device.getName())
                             .setMessage(msg)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
                             })
-                            .setNeutralButton("Connect", new DialogInterface.OnClickListener() {
+                            .setNeutralButton(getString(R.string.connect), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     final Intent intent = new Intent(BluetoothMainActivity.this, ControlActivity.class);
@@ -165,6 +179,7 @@ public class BluetoothMainActivity extends AppCompatActivity {
                             .show();
                 }
             };
+
 
     /**
      * If a device gets found, method gets invoked and calls the addBluetoothDevice method
@@ -184,16 +199,17 @@ public class BluetoothMainActivity extends AppCompatActivity {
      * @param permissions list of permissions we requested
      * @param grantResults list of permissions which we got from the request
      */
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    System.out.println("Location information granted.");
+                    Log.d(TAG, "Debug: Location Information granted");
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Attention");
-                    builder.setMessage("Location information request denied. The application isn't able to find new BLE devices.");
+                    builder.setTitle(this.getString(R.string.attention));
+                    builder.setMessage(this.getString(R.string.location_request_denied));
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -208,20 +224,25 @@ public class BluetoothMainActivity extends AppCompatActivity {
         }
     }
 
+
     /**
      * Start scan for BLE devices
      */
     public void startScanning() {
         mScanning = true;
-        System.out.println("start scanning");
+        Log.d(TAG, "Debug: Start Scanning");
         startScanningButton.setVisibility(View.INVISIBLE);
         stopScanningButton.setVisibility(View.VISIBLE);
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Debug: StartScan()");
                 bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-                bluetoothLeScanner.startScan(leScanCallback);
+                if (!(bluetoothLeScanner == null)) {
+                    bluetoothLeScanner.startScan(leScanCallback);
+                }
+                else {
+                    Log.d(TAG, "Debug: BLE Scanner Object empty");
+                }
             }
         });
     }
@@ -232,18 +253,22 @@ public class BluetoothMainActivity extends AppCompatActivity {
      */
     public void stopScanning() {
         mScanning = false;
-        System.out.println("stopping scanning");
+        Log.d(TAG, "Debug: Stop Scanning");
         startScanningButton.setVisibility(View.VISIBLE);
         stopScanningButton.setVisibility(View.INVISIBLE);
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                bluetoothLeScanner.stopScan(leScanCallback);
+                if (!(bluetoothLeScanner == null)) {
+                    bluetoothLeScanner.stopScan(leScanCallback);
+                }
+                else {
+                    Log.d(TAG, "Debug: BLE Scanner Object empty");
+                }
             }
         });
     }
 
-    // Add the scanned device to the listBluetoothDevice list
 
     /**
      * Adds the scanned BLE devices to the BLE device list
@@ -254,5 +279,23 @@ public class BluetoothMainActivity extends AppCompatActivity {
             listBluetoothDevice.add(device);
             listViewLE.invalidateViews();
         }
+    }
+
+
+    /**
+     * Checks if Location Services are enabled
+     * @param context of the current state of the application
+     * @return boolean if GPS is enabled = true otherwise false
+     */
+    public static boolean isLocationEnabled(Context context) {
+        int locationMode;
+        try {
+            locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
+
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return locationMode != Settings.Secure.LOCATION_MODE_OFF;
     }
 }
