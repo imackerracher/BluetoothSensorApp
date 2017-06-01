@@ -29,6 +29,10 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
 
         private int startInSec = 60*60*24*365 + 60*60*24*150; //How many seconds behind the first Jan 2016 do we start.
 
+        public void setPointsPerMinute(int p){pointsPerMinute = p;}
+
+        public void setStartInSec(int s){startInSec = s;}
+
         public MyXAxisValueFormatter(BarLineChartBase<?> chart) {
             this.chart = chart;
         }
