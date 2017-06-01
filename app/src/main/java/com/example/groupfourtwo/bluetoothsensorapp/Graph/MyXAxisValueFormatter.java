@@ -25,6 +25,10 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
 
         private BarLineChartBase<?> chart;
 
+        private int pointsPerMinute = 6; //How many Datapoints do we Draw per  minute
+
+        private int startInSec = 60*60*24*365 + 60*60*24*150; //How many seconds behind the first Jan 2016 do we start.
+
         public MyXAxisValueFormatter(BarLineChartBase<?> chart) {
             this.chart = chart;
         }
@@ -33,7 +37,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         public String getFormattedValue(float value, AxisBase axis) {
 
 
-            int sec = (int) value*60;
+            int sec = (int) value*60/pointsPerMinute + startInSec;
 
             int minutes = determineMinutes(sec);
 
@@ -50,10 +54,10 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
             String monthName = mMonths[month % mMonths.length];
             String yearName = String.valueOf(year);
 
-            if (chart.getVisibleXRange() > 30*300 ) {
+            if (chart.getVisibleXRange() > 30*300*pointsPerMinute ) {
 
                 return monthName + " " + yearName;
-            } else if (chart.getVisibleXRange() > 30*6 ) {
+            } else if (chart.getVisibleXRange() > 30*50*pointsPerMinute ) {
 
                 int dayOfMonth = determineDayOfMonth(days, month + 12 * (year - 2016));
 

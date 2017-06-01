@@ -39,7 +39,7 @@ public class DrawGraph {
 
         /*referenz in main.xml*/
         lineChart = (LineChart) activity.findViewById(R.id.lineChart);
-
+        
 
         Legend l = lineChart.getLegend();
         l.setEnabled(false); //The Legend is DISABLED
@@ -114,8 +114,10 @@ public class DrawGraph {
         lineDataSets.add(lineDataSet2);
         lineDataSets.add(lineDataSet3);
 
-
         lineChart.setData(new LineData(lineDataSets));
+
+
+
 
 
         //## Restraining what's visible
