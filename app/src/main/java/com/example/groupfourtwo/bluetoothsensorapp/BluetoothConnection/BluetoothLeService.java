@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.SensortagUUIDs.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.Conversions.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -101,7 +102,7 @@ public class BluetoothLeService extends Service {
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
         }
 
@@ -119,7 +120,31 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+            String action = new String();
+
+            final byte[] raw = characteristic.getValue();
+            float[] data = new float[3];
+            Float val = 0.0f;
+            UUID id = characteristic.getUuid();
+            if (id.equals(UUID_HUM_DATA)) {
+                data = conversionHum(raw);
+                action = ACTION_HUM_DATA;
+                val = data[0];
+            } else if (id.equals(UUID_IR_TEMP_DATA)) {
+                data = conversionIRTemp(raw);
+                action = ACTION_TEMP_DATA;
+                val = data[0];
+            } else if (id.equals(UUID_BAROMETER_DATA)) {
+                data = conversionBaro(raw);
+                action = ACTION_BARO_DATA;
+                val = data[0];
+            } else if (id.equals(UUID_LUXMETER_DATA)) {
+                data = conversionLux(raw);
+                action = ACTION_LUX_DATA;
+                val = data[0];
+            }
+
+            broadcastUpdate(action, characteristic, val.toString());
         }
     };
 
@@ -129,20 +154,20 @@ public class BluetoothLeService extends Service {
 
     }
 
-    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
+    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic, final String data) {
         final Intent intent = new Intent(action);
 
-        final byte[] data = characteristic.getValue();
 
-        if (data != null && data.length > 0) {
-            final StringBuilder stringBuilder = new StringBuilder(data.length);
-            for(byte byteChar : data) {
+        /*if (raw != null && raw.length > 0) {
+            final StringBuilder stringBuilder = new StringBuilder(raw.length);
+            for(byte byteChar : raw) {
                 stringBuilder.append(String.format("%02X ", byteChar));
 
                 Log.v(TAG, String.format("%02X ", byteChar));
             }
-            intent.putExtra(EXTRA_DATA, lookup(characteristic.getUuid()) + "\n" + stringBuilder.toString());
-        }
+
+        }*/
+        intent.putExtra(EXTRA_DATA, data);
         sendBroadcast(intent);
     }
 
