@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 
+import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.Data.Record;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -24,17 +26,45 @@ import java.util.ArrayList;
 public class DrawGraph {
 
 
-    Context c;
-    public DrawGraph(Context context) {
-        c = context;
+    private Context context;
+    private DataManager.Measure measure1, measure2;
+    private DataManager.Interval interval;
+    private long begin;
+    private Record record;
+
+    public DrawGraph(Context context , DataManager.Measure measure1, DataManager.Measure measure2,
+                     DataManager.Interval interval, long begin) {
+        this.context = context;
+        this.measure1 = measure1;
+        this.measure2 = measure2;
+        this.interval = interval;
+        this.begin = begin;
+        record = null;
     }
 
-    private int datapointCount = 10801;
+
+    public DrawGraph(Context context , DataManager.Measure measure1, DataManager.Measure measure2,
+                     Record record) {
+        this.context = context;
+        begin = record.getBegin();
+        long end = record.getEnd();
+
+        int step = DataManager.Interval.HOUR.step;
+        if (end - begin > DataManager.Interval.HOUR.length)
+            step = DataManager.Interval.DAY.step;
+        if (end - begin > DataManager.Interval.DAY.length)
+            step = DataManager.Interval.WEEK.step;
+    }
+
+
+    private int datapointCount = 18001; //(int) (interval.length / interval.step); doesn't work???
 
     public void draw(Activity activity) {
 
         LineChart lineChart;
 
+
+        long offset = 1723680000000l;
 
 
         /*referenz in main.xml*/
@@ -53,7 +83,11 @@ public class DrawGraph {
         //Choose between TOP, BOTTOM, BOTH_SIDED, TOP_INSIDE or BOTTOM_INSIDE
         xAxis.setTextSize(10f);
 
-        xAxis.setValueFormatter(new MyXAxisValueFormatter(lineChart));
+
+        MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
+        x.setPointsPerMinute(6);
+        x.setStartInSec(60*60*24*365 + 60*60*24*150);
+        xAxis.setValueFormatter(x);
 
 
 
@@ -70,10 +104,18 @@ public class DrawGraph {
         Float[] yAxes = new Float[numDataPoints]; //static
 
 
+        DataManager dataManager = DataManager.getInstance(context);
+            dataManager.open();
 
+        ArrayList<Float> yAxes2;
         /*1 testdataset*/
 
+        if( record == null)
+            yAxes2 = dataManager.getValuesFromInterval(measure1, interval, begin);
+        else
+            yAxes2 = dataManager.getValuesFromRecord(measure1, record);
 
+        dataManager.close();
         /*y = sin(x) data with gaps*/
         for (int i = 0; i < gapPosition; i++)
             yAxes[i] = (float) i;
@@ -130,4 +172,6 @@ public class DrawGraph {
         lineChart.setBackgroundColor(Color.WHITE); //BackgroundColour
 
     }
+
+
 }

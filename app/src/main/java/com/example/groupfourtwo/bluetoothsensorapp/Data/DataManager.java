@@ -40,8 +40,8 @@ public class DataManager {
         DAY (86400000, 10000),
         WEEK (604800000, 60000);
 
-        private final int length;
-        private final int step;
+        public final int length;
+        public final int step;
 
         Interval(int length, int step) {
             this.length = length;
@@ -171,7 +171,7 @@ public class DataManager {
      * @param begin     the start point of the interval
      * @return  all values in the interval, empty list if no entry was found
      */
-    private ArrayList<Float> getValuesFromInterval(Measure measure, Interval interval, long begin) {
+    public ArrayList<Float> getValuesFromInterval(Measure measure, Interval interval, long begin) {
         long end = begin + interval.length;
 
         String[] select = {DatabaseContract.MeasurementData.COLUMN_TIME, measure.column};

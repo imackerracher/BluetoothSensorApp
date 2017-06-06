@@ -16,7 +16,7 @@ public class HumidityActivity extends AppCompatActivity {
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        DrawGraph drawGraph = new DrawGraph(this);
+        DrawGraph drawGraph = new DrawGraph(this,null,null,null);
         drawGraph.draw(this);
 
     }

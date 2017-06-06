@@ -18,7 +18,7 @@ public class BrigthnessActivity extends AppCompatActivity {
 
 
 
-        DrawGraph drawGraph = new DrawGraph(this);
+        DrawGraph drawGraph = new DrawGraph(this,null,null,null);
         drawGraph.draw(this);
 
     }

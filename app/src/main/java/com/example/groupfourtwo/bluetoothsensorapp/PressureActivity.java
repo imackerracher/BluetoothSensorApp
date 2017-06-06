@@ -6,7 +6,6 @@ import android.os.Bundle;
 import com.example.groupfourtwo.bluetoothsensorapp.Graph.DrawGraph;
 
 
-import com.example.groupfourtwo.bluetoothsensorapp.Graph.DrawGraph;
 
 public class PressureActivity extends AppCompatActivity {
 
@@ -14,11 +13,11 @@ public class PressureActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_pressure);
-        setContentView(R.layout.activity_temperature); //TODO: crashes with activity_pressure
+        setContentView(R.layout.activity_temperature);
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        DrawGraph drawGraph = new DrawGraph(this);
+        DrawGraph drawGraph = new DrawGraph(this,null,null,null);
         drawGraph.draw(this);
 
     }
