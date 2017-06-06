@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.Color;
 
 import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.Data.Interval;
+import com.example.groupfourtwo.bluetoothsensorapp.Data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.Data.Record;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.github.mikephil.charting.charts.LineChart;
@@ -17,6 +19,8 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 
+import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.*;
+
 /**
  * Created by kim on 23.05.17.
  */
@@ -27,13 +31,13 @@ public class DrawGraph {
 
 
     private Context context;
-    private DataManager.Measure measure1, measure2;
-    private DataManager.Interval interval;
+    private Measure measure1, measure2;
+    private Interval interval;
     private long begin;
     private Record record;
 
-    public DrawGraph(Context context , DataManager.Measure measure1, DataManager.Measure measure2,
-                     DataManager.Interval interval, long begin) {
+    public DrawGraph(Context context , Measure measure1, Measure measure2,
+                     Interval interval, long begin) {
         this.context = context;
         this.measure1 = measure1;
         this.measure2 = measure2;
@@ -43,17 +47,17 @@ public class DrawGraph {
     }
 
 
-    public DrawGraph(Context context , DataManager.Measure measure1, DataManager.Measure measure2,
+    public DrawGraph(Context context , Measure measure1, Measure measure2,
                      Record record) {
         this.context = context;
         begin = record.getBegin();
         long end = record.getEnd();
 
-        int step = DataManager.Interval.HOUR.step;
-        if (end - begin > DataManager.Interval.HOUR.length)
-            step = DataManager.Interval.DAY.step;
-        if (end - begin > DataManager.Interval.DAY.length)
-            step = DataManager.Interval.WEEK.step;
+        int step = HOUR.step;
+        if (end - begin > HOUR.length)
+            step = DAY.step;
+        if (end - begin > DAY.length)
+            step = WEEK.step;
     }
 
 
