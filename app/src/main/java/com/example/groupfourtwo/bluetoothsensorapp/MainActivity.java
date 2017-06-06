@@ -1,6 +1,9 @@
 package com.example.groupfourtwo.bluetoothsensorapp;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
 
@@ -26,6 +30,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private DataManager dataManager;
+
+
 
     //Values to be displayed in the homescreen next to the sensor icons
     TextView currentTemperature;
@@ -68,6 +74,8 @@ public class MainActivity extends AppCompatActivity
         currentHumidity = (TextView) findViewById(R.id.textViewCurrentHumidity);
 
         setCurrentSensorValues();
+
+        registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
     }
 
     @Override
@@ -173,5 +181,52 @@ public class MainActivity extends AppCompatActivity
         currentBrightness.setText("970 hPa");
         currentPressure.setText("10000 lm");
         currentHumidity.setText("55 %");
+    }
+
+    public void setTemperature(String t) {
+        currentTemperature.setText(t + "°C");
+    }
+
+    public void setBrightness(String t) {
+        currentBrightness.setText(t + "lm");
+    }
+
+    public void setHumidity(String t) {
+        currentHumidity.setText(t + "%");
+    }
+
+    public void setPressure(String t) {
+        currentPressure.setText(t + "hPa");
+    }
+
+
+    private final BroadcastReceiver bleDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            Log.d(LOG_TAG, "Broadcast received.");
+            if (BluetoothLeService.ACTION_TEMP_DATA.equals(action)) {
+                setTemperature(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+
+            } else if (BluetoothLeService.ACTION_HUM_DATA.equals(action)) {
+                setHumidity(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+
+            } else if (BluetoothLeService.ACTION_BARO_DATA.equals(action)) {
+                setPressure(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+
+            } else if (BluetoothLeService.ACTION_LUX_DATA.equals(action)) {
+                setBrightness(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+            }
+        }
+    };
+
+    private static IntentFilter makeBleDataIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_TEMP_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_HUM_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_BARO_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_LUX_DATA);
+        return intentFilter;
+
     }
 }

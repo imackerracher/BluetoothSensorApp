@@ -71,9 +71,9 @@ class SensortagUUIDs {
 
     static {
         gattServices.add(UUID_IR_TEMP_SERV);
-        //gattServices.add(UUID_HUM_SERV);
-        //gattServices.add(UUID_BAROMETER_SERV);
-        //gattServices.add(UUID_LUXMETER_SERV);
+        gattServices.add(UUID_HUM_SERV);
+        gattServices.add(UUID_BAROMETER_SERV);
+        gattServices.add(UUID_LUXMETER_SERV);
 
         data.put(UUID_IR_TEMP_SERV, UUID_IR_TEMP_DATA);
         data.put(UUID_HUM_SERV, UUID_HUM_DATA);
