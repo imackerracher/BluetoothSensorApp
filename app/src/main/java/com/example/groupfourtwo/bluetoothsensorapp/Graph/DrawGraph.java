@@ -96,7 +96,7 @@ public class DrawGraph {
          */
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
         x.setPointsPerMinute(60/(interval.step/1000));
-        x.setStartInSec(60*60*24*365 + 60*60*24*150);
+        x.setStartInSec((begin - offset) ); //+
         xAxis.setValueFormatter(x);
 
         /**

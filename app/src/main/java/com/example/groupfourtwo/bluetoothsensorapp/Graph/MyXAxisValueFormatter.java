@@ -25,13 +25,13 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
 
         private BarLineChartBase<?> chart;
 
-        private int pointsPerMinute = 6; //How many Datapoints do we Draw per  minute
+        private int pointsPerMinute; //How many Datapoints do we Draw per  minute
 
-        private int startInSec = 60*60*24*365 + 60*60*24*150; //How many seconds behind the first Jan 2016 do we start.
+        private long startInMilSec; //How many milliseconds behind the first Jan 2016 do we start.
 
         public void setPointsPerMinute(int p){pointsPerMinute = p;}
 
-        public void setStartInSec(int s){startInSec = s;}
+        public void setStartInSec(long s){startInMilSec = s;}
 
         public MyXAxisValueFormatter(BarLineChartBase<?> chart) {
             this.chart = chart;
@@ -41,7 +41,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         public String getFormattedValue(float value, AxisBase axis) {
 
 
-            int sec = (int) value*60/pointsPerMinute + startInSec;
+            int sec = (int) value*60/pointsPerMinute + (int) (startInMilSec/1000l);
 
             int minutes = determineMinutes(sec);
 
