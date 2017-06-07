@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.HOUR;
+import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.WEEK;
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Measure.TEMPERATURE;
 
 public class TemperatureActivity extends AppCompatActivity {
@@ -24,7 +25,7 @@ public class TemperatureActivity extends AppCompatActivity {
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        Interval interval = HOUR;
+        Interval interval = WEEK;
         Measure measure1 = TEMPERATURE;
         long begin = 1000l;
 

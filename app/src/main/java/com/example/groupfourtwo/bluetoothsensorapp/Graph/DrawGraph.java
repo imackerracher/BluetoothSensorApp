@@ -12,9 +12,12 @@ import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
@@ -96,9 +99,22 @@ public class DrawGraph {
         x.setStartInSec(60*60*24*365 + 60*60*24*150);
         xAxis.setValueFormatter(x);
 
+        /**
+         * Generate Y-Axis format
+         * Per default, all data that is added to the chart plots against the left YAxis of the
+         * chart. If not further specified and enabled, the right YAxis is adjusted to represent
+         * the same scale as the left axis.
+         */
 
+        YAxis leftAxis = lineChart.getAxisLeft();
+        YAxis rightAxis = lineChart.getAxisRight();
 
+        rightAxis.setEnabled(false);
 
+        leftAxis.setAxisMinimum(0f); // start at zero
+        leftAxis.setTextSize(12f);
+        MyYAxisValueFormatter y = new MyYAxisValueFormatter(measure1);
+        leftAxis.setValueFormatter(y);
 
 
 
