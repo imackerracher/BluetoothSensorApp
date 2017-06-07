@@ -61,9 +61,9 @@ public class DrawGraph {
     }
 
 
-    private int datapointCount = 18001; //(int) (interval.length / interval.step); doesn't work???
-
     public void draw(Activity activity) {
+
+        int dataPointCount = (interval.length / interval.step);
 
         LineChart lineChart;
 
@@ -88,8 +88,11 @@ public class DrawGraph {
         xAxis.setTextSize(10f);
 
 
+        /**
+         * Generate the Values on the X-Axis
+         */
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
-        x.setPointsPerMinute(6);
+        x.setPointsPerMinute(60/(interval.step/1000));
         x.setStartInSec(60*60*24*365 + 60*60*24*150);
         xAxis.setValueFormatter(x);
 
@@ -97,22 +100,20 @@ public class DrawGraph {
 
 
 
-        int numDataPoints = datapointCount;
-        int gapSize = datapointCount/10;
-        int gapPosition = datapointCount/3;
 
 
 
-        /* deklaration of the Value-Lists */
-   //     ArrayList<String> xAxes = new ArrayList<>();
-        Float[] yAxes = new Float[numDataPoints]; //static
+        /* Generating empty y-Value Array */
+        Float[] yAxes = new Float[dataPointCount]; //static
 
 
+        /**
+         * Access to Database NOT USED
+         */
         DataManager dataManager = DataManager.getInstance(context);
             dataManager.open();
 
         ArrayList<Float> yAxes2;
-        /*1 testdataset*/
 
         if( record == null)
             yAxes2 = dataManager.getValuesFromInterval(measure1, interval, begin);
@@ -120,19 +121,30 @@ public class DrawGraph {
             yAxes2 = dataManager.getValuesFromRecord(measure1, record);
 
         dataManager.close();
-        /*y = sin(x) data with gaps*/
+
+
+
+
+        /**
+         * Some Data generated for testing USED
+         */
+
+        int numDataPoints = dataPointCount;
+        int gapSize = dataPointCount/10;
+        int gapPosition = dataPointCount/3;
+
+
         for (int i = 0; i < gapPosition; i++)
             yAxes[i] = (float) i;
-            //yAxes2[i] = (float) Math.sin((float) i / 300);
 
         for (int i = gapPosition + gapSize; i < numDataPoints; i++)
             yAxes[i] = (float) i;
-            //yAxes2[i] = (float) Math.sin((float) i / 300);
 
 
 
-
-        /* split the graph in sections */
+        /**
+        * Split the graph in section
+        * */
         ArrayList<Entry> yAxes2_1 = new ArrayList<>();
         ArrayList<Entry> yAxes2_2 = new ArrayList<>();
 
@@ -146,6 +158,11 @@ public class DrawGraph {
             yAxes2_2.add(new Entry(i, yAxes[i]));
         }
 
+
+
+        /**
+        * Generate the lineDataSets for Visualisation
+        * */
         ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
@@ -166,8 +183,10 @@ public class DrawGraph {
 
 
 
-        //## Restraining what's visible
-        lineChart.setVisibleXRangeMaximum((float) datapointCount); // allow 10800 values to be displayed at once on the x-axis, not more
+        /**
+         * Restraining what's visible
+         **/
+        lineChart.setVisibleXRangeMaximum((float) dataPointCount);
         lineChart.setVisibleXRangeMinimum(10f);
 
         // lineChart.animateX(3000); // Animation that shows the values from left to right
