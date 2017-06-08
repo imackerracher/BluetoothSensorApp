@@ -136,6 +136,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        stopService(gattServiceIntent);
         Log.d(LOG_TAG, "onDestroy");
     }
 

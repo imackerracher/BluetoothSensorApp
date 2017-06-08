@@ -28,6 +28,8 @@ public class DatabaseUpdateService extends Service {
     private Sensor sensor = new Sensor(2,"dummySensor",123123);
     private Record record = new Record(3,sensor,user,123,12345);
 
+    private String sensorAddress;
+
     private Float temp;
     private Float humidity;
     private Float pressure;
@@ -76,6 +78,7 @@ public class DatabaseUpdateService extends Service {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         handler.removeCallbacks(runnable);
         Log.d(TAG, "onDestroy() , service stopped...");
     }
@@ -97,7 +100,6 @@ public class DatabaseUpdateService extends Service {
             handler.postDelayed(this, 1000);
         }
     };
-
     public void setTemp(float t) {
         //Log.d(TAG, "setTemp");
         temp = t;
@@ -113,6 +115,11 @@ public class DatabaseUpdateService extends Service {
 
     public void setHumidity(float t) {
         humidity = t;
+    }
+
+    public void setSensorAddress(String s) {
+        Log.d(TAG, "setSensorAddress" + s);
+        sensorAddress = s;
     }
 
 
