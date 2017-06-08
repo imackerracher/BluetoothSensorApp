@@ -6,10 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.DatabaseContract.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.*;
@@ -45,17 +45,17 @@ public class DataManager {
     /**
      * A cache of all records that have been referenced in this session.
      */
-    private RecordHashMap records  = new RecordHashMap();
+    private LongSparseArray<Record> records  = new LongSparseArray<>();
 
     /**
      * A cache of all sensors that have been referenced in this session.
      */
-    private SensorHashMap sensors = new SensorHashMap();
+    private LongSparseArray<Sensor> sensors = new LongSparseArray<>();
 
     /**
      * A cache of all users that have been referenced in this session.
      */
-    private UserHashMap users = new UserHashMap();
+    private LongSparseArray<User> users = new LongSparseArray<>();
 
 
     /**
@@ -167,6 +167,63 @@ public class DataManager {
 
 
     /**
+     * Find and return a record with the given key from the cache
+     * If no object was found, fetch record from database and insert it into the map.
+     *
+     * @param key  id of the record to search
+     * @return  the record with the given id
+     */
+    public Record findRecord(long key) {
+        Record record = records.get(key);
+        if (record == null) // wanted sensor not in map -> search in database
+            record = searchRecord(key);
+        if (record != null) { // wanted sensor was found -> cache and return
+            records.put(record.getId(), record);
+            Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
+        }
+        return record;
+    }
+
+
+    /**
+     * Find and return a sensor with the given key from the cache.
+     * If no object was found, fetch sensor from database and insert it into the map.
+     *
+     * @param key  id of the sensor to search
+     * @return  the sensor with the given id
+     */
+    public Sensor findSensor(long key) {
+        Sensor sensor = sensors.get(key);
+        if (sensor == null) // wanted sensor not in map -> search in database
+            sensor = searchSensor(key);
+        if (sensor != null) { // wanted sensor was found -> cache and return
+            sensors.put(sensor.getId(), sensor);
+            Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
+        }
+        return sensor;
+    }
+
+
+    /**
+     * Find and return a user with the given key from the cache.
+     * If no object was found, fetch user from database and insert it into the map.
+     *
+     * @param key  id of the user to search
+     * @return  the user with the given id
+     */
+    public User findUser(long key) {
+        User user = users.get(key);
+        if (user == null) // wanted user not in map -> search in database
+            user = searchUser(key);
+        if (user != null) { // wanted user was found -> cache and return it
+            users.put(user.getId(), user);
+            Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
+        }
+        return user;
+    }
+
+
+    /**
      * Get the measurement that was inserted lastly into the database.
      *
      * @return  the measurement lastly inserted
@@ -250,49 +307,6 @@ public class DataManager {
 
         ArrayList<Float> data = cursorToList(cursor, measure.column, begin, end, step);
         cursor.close();
-        return data;
-    }
-
-
-    /**
-     * Fill a List with all values that a cursor contains. Group if multiple values at a time.
-     *
-     * @param cursor  the cursor pointing to the database
-     * @param column  the column of values to retrieve
-     * @param begin   the start point of data
-     * @param end     the end point of data
-     * @param step    the temporal resolution of results
-     * @return  a list of values from the cursor
-     */
-    private ArrayList<Float> cursorToList(Cursor cursor, String column,
-                                          long begin, long end, int step) {
-        int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
-        int indexValue = cursor.getColumnIndex(column);
-
-        // The length of the requested interval determines number of data points.
-        int duration = (int) (end - begin);
-        ArrayList<Float> data = new ArrayList<>(duration / step);
-
-        if (!cursor.moveToFirst())
-            return data;
-
-        // Fill list with values from cursor according to timeline.
-        for (long i = begin; i < end; i += step) {
-            int noOfValues = 0;
-            float sum = 0f;
-            // Take arithmetic mean of all values that are in one step size.
-            while (!cursor.isAfterLast()  &&  cursor.getLong(indexTime) < i + step) {
-                sum += cursor.getFloat(indexValue);
-                ++noOfValues;
-                cursor.moveToNext();
-            }
-            // Save value or else mark as missing.
-            if (noOfValues == 0)
-                data.add(null);
-            else
-                data.add(sum / noOfValues);
-        }
-
         return data;
     }
 
@@ -528,6 +542,49 @@ public class DataManager {
 
 
     /**
+     * Fill a List with all values that a cursor contains. Group if multiple values at a time.
+     *
+     * @param cursor  the cursor pointing to the database
+     * @param column  the column of values to retrieve
+     * @param begin   the start point of data
+     * @param end     the end point of data
+     * @param step    the temporal resolution of results
+     * @return  a list of values from the cursor
+     */
+    private ArrayList<Float> cursorToList(Cursor cursor, String column,
+                                          long begin, long end, int step) {
+        int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
+        int indexValue = cursor.getColumnIndex(column);
+
+        // The length of the requested interval determines number of data points.
+        int duration = (int) (end - begin);
+        ArrayList<Float> data = new ArrayList<>(duration / step);
+
+        if (!cursor.moveToFirst())
+            return data;
+
+        // Fill list with values from cursor according to timeline.
+        for (long i = begin; i < end; i += step) {
+            int noOfValues = 0;
+            float sum = 0f;
+            // Take arithmetic mean of all values that are in one step size.
+            while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + step) {
+                sum += cursor.getFloat(indexValue);
+                ++noOfValues;
+                cursor.moveToNext();
+            }
+            // Save value or else mark as missing.
+            if (noOfValues == 0)
+                data.add(null);
+            else
+                data.add(sum / noOfValues);
+        }
+
+        return data;
+    }
+
+
+    /**
      * Retrieve the measured values and meta data of a whole measurement from a database request.
      *
      * @param cursor  cursor pointing to the desired entry
@@ -544,7 +601,7 @@ public class DataManager {
         int indexTemperature = cursor.getColumnIndex(MeasurementData.COLUMN_TEMPERATURE);
 
         long id = cursor.getLong(indexID);
-        Record record = records.getOrPut(cursor.getLong(indexRecord));
+        Record record = findRecord(cursor.getLong(indexRecord));
         long time = cursor.getLong(indexTime);
         float brightness = cursor.getFloat(indexBrightness);
         float distance = cursor.getFloat(indexDistance);
@@ -571,8 +628,8 @@ public class DataManager {
         int indexEnd = cursor.getColumnIndex(RecordData.COLUMN_END);
 
         long id = cursor.getLong(indexID);
-        Sensor sensor = sensors.getOrPut(cursor.getLong(indexSensor));
-        User user = users.getOrPut(cursor.getLong(indexUser));
+        Sensor sensor = findSensor(cursor.getLong(indexSensor));
+        User user = findUser(cursor.getLong(indexUser));
         long begin = cursor.getLong(indexBegin);
         long end = cursor.getLong(indexEnd);
 
@@ -622,7 +679,7 @@ public class DataManager {
      * @param id  the id of the wanted measurement
      * @return  the wanted measurement
      */
-    private Measurement findMeasurement(long id) {
+    private Measurement searchMeasurement(long id) {
         String[] select = {MeasurementData._ID,
                 MeasurementData.COLUMN_RECORD_ID,
                 MeasurementData.COLUMN_TIME,
@@ -653,7 +710,7 @@ public class DataManager {
      * @param id  the id of the wanted record
      * @return  the wanted record
      */
-    private Record findRecord(long id) {
+    private Record searchRecord(long id) {
         String[] select = {RecordData._ID,
                 RecordData.COLUMN_SENSOR_ID,
                 RecordData.COLUMN_USER_ID,
@@ -683,7 +740,7 @@ public class DataManager {
      * @param id  the id of the wanted sensor
      * @return  the wanted sensor
      */
-    private Sensor findSensor(long id) {
+    private Sensor searchSensor(long id) {
         String[] select = {SensorData._ID,
                 SensorData.COLUMN_NAME,
                 SensorData.COLUMN_KNOWN_SINCE};
@@ -711,7 +768,7 @@ public class DataManager {
      * @param id  the id of the wanted user
      * @return  the wanted user
      */
-    private User findUser(long id) {
+    private User searchUser(long id) {
         String[] select = {UserData._ID,
                 UserData.COLUMN_NAME};
 
@@ -793,77 +850,5 @@ public class DataManager {
         Log.d(LOG_TAG, "Updated user: " + id);
 
         users.put(id, user);
-    }
-
-
-    /**
-     * Adds automatic inserting to a HashMap of records in case the item was not found.
-     */
-    public class RecordHashMap extends HashMap<Long, Record> {
-        /**
-         * Find and return a record with the given key in the map.
-         * If no object was found, fetch record from database and insert it into the map.
-         *
-         * @param key  id of the record to search
-         * @return  the record with the given id
-         */
-        public Record getOrPut(long key) {
-            Record record = this.get(key);
-            if (record == null) // wanted sensor not in map -> search in database
-                record = findRecord(key);
-            if (record != null) { // wanted sensor was found -> cache and return
-                records.put(record.getId(), record);
-                Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
-            }
-            return record;
-        }
-    }
-
-
-    /**
-     * Adds automatic inserting to a HashMap of sensors in case the item was not found.
-     */
-    public class SensorHashMap extends HashMap<Long, Sensor> {
-        /**
-         * Find and return a sensor with the given key in the map.
-         * If no object was found, fetch sensor from database and insert it into the map.
-         *
-         * @param key  id of the sensor to search
-         * @return  the sensor with the given id
-         */
-        public Sensor getOrPut(long key) {
-            Sensor sensor = this.get(key);
-            if (sensor == null) // wanted sensor not in map -> search in database
-                sensor = findSensor(key);
-            if (sensor != null) { // wanted sensor was found -> cache and return
-                sensors.put(sensor.getId(), sensor);
-                Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
-            }
-            return sensor;
-        }
-    }
-
-
-    /**
-     * Adds automatic inserting to a HashMap of users in case the item was not found.
-     */
-    public class UserHashMap extends HashMap<Long, User> {
-        /**
-         * Find and return a user with the given key in the map.
-         * If no object was found, fetch user from database and insert it into the map.
-         *
-         * @param key  id of the user to search
-         * @return  the user with the given id
-         */
-        public User getOrPut(long key) {
-            User user = this.get(key);
-            if (user == null) // wanted user not in map -> search in database
-                user = findUser(key);
-            if (user != null) { // wanted user was found -> cache and return it
-                users.put(user.getId(), user);
-                Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
-            }
-            return user;
-        }
     }
 }
