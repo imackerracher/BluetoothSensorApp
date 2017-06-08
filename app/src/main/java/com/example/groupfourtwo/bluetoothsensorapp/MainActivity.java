@@ -133,11 +133,11 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    /*@Override
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(LOG_TAG, "onDestroy");
-    }*/
+    }
 
     @Override
     protected void onResume() {

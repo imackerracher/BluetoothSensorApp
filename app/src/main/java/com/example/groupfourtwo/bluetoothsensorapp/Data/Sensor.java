@@ -90,4 +90,15 @@ public class Sensor {
 
         this.name = name;
     }
+
+
+    /**
+     * Derive a device's bluetooth address in a number format instead from a string.
+     *
+     * @param s  the address of the device as a hexadecimal string.
+     * @return  the parsed address as a long
+     */
+    public static long parseAddress(String s) {
+        return Long.parseLong(s.replaceAll(":", ""), 16);
+    }
 }

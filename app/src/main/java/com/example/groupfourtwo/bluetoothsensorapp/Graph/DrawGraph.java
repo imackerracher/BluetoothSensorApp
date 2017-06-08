@@ -142,7 +142,7 @@ public class DrawGraph {
 
         ArrayList<Float> yAxes2;
 
-        if( record == null)
+        if (record == null)
             yAxes2 = dataManager.getValuesFromInterval(measure1, interval, begin);
         else
             yAxes2 = dataManager.getValuesFromRecord(measure1, record);
