@@ -26,7 +26,7 @@ public class BrigthnessActivity extends AppCompatActivity {
 
         Interval interval = WEEK;
         Measure measure1 = BRIGHTNESS;
-        long begin = 1723680000000l + 1000l*(60l*60l*24l*365l); // 1.Jan.2017
+        long begin = 1723680000000l + 1000l*(60l*60l*24l*366l); // 1.Jan.2017
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
         drawGraph.draw(this);
