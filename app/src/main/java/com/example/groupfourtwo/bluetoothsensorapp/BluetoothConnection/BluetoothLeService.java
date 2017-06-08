@@ -3,7 +3,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
 /**
  * Bluetooth Low Energy Connection Service Activity
  *
- * @author Tobias Nusser
+ * @author Tobias Nusser, Patrick Reichle
  * @version 1.0
  */
 
@@ -80,6 +80,7 @@ public class BluetoothLeService extends Service {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             Log.d(TAG, "onServiceConnected()");
             mDatabaseUpdateService = ((DatabaseUpdateService.LocalBinder) service).getService();
+            mDatabaseUpdateService.setSensorAddress((mBluetoothGatt.getDevice().getAddress()));
         }
 
         @Override
@@ -385,7 +386,9 @@ public class BluetoothLeService extends Service {
         unbindService(mServiceConnection);
     }
     public void onDestroy() {
+        super.onDestroy();
         Log.d(TAG, "onDestroy() , BLEservice stopped");
+        close();
         unbind();
     }
 

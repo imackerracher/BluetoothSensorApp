@@ -61,6 +61,7 @@ public class BluetoothMainActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_activity_main);
         listViewLE = (ListView)findViewById(R.id.lelist);

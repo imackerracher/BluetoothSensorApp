@@ -3,7 +3,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
 /**
  * Bluetooth Connection Control Activity
  *
- * @author Tobias Nusser
+ * @author Tobias Nusser, Patrick Reichle
  * @version 1.0
  */
 
