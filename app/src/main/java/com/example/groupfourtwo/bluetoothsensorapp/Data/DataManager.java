@@ -69,7 +69,8 @@ public class DataManager {
 
 
     /**
-     * Get the global instance of the Data Manager object.
+     * Get an own instance of the Data Manager object.
+     * Note: Use getInstance because of using application context.
      *
      * @param context  the context of the calling activity
      * @return  the instance of the data manager

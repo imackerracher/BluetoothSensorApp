@@ -19,11 +19,6 @@ class DatabaseHelper extends SQLiteOpenHelper {
     /* debugging only */
     private static final String LOG_TAG = DatabaseHelper.class.getSimpleName();
 
-    /**
-     * The singleton object of DatabaseHelper.
-     */
-    private static DatabaseHelper instance;
-
 
     /**
      * Creates a new helper object of an SQLite database.
@@ -37,16 +32,14 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
 
     /**
-     * Return the global helper to manage creating a new or connecting to an existing database.
-     * If no object exists yet a new one is created (singleton pattern).
+     * Returns a database helper to manage creating a new or connecting to an existing database.
+     * Note: getInstance is used because of using application context.
      *
      * @param context the context of the calling activity
-     * @return  the instance
+     * @return  a new database connection helper
      */
     static synchronized DatabaseHelper getInstance(Context context) {
-            // as database helper is global, use application context instead of activity context.
-            DatabaseHelper newInstance = new DatabaseHelper(context.getApplicationContext());
-        return newInstance;
+        return new DatabaseHelper(context.getApplicationContext());
     }
 
 
