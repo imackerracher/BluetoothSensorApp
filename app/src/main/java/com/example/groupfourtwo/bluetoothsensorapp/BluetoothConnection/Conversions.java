@@ -24,7 +24,7 @@ public class Conversions {
     public static float[] conversionBaro(final byte[] value) {
         if (value.length > 4) {
             Integer val = twentyFourBitUnsignedAtOffset(value, 2);
-            return new float[]{(float) (val / 100.0), 0, 0};
+            return new float[]{(float) (val / 10000.0), 0, 0};
         } else {
             int m;
             int e;
@@ -36,7 +36,7 @@ public class Conversions {
             double output;
             double magnitude = pow(2.0f, e);
             output = (m * magnitude);
-            return new float[]{(float) (output / 100.0f), 0, 0};
+            return new float[]{(float) (output / 10000.0f), 0, 0};
         }
 
     }

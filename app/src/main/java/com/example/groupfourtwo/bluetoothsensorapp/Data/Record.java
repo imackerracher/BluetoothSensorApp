@@ -46,7 +46,7 @@ public class Record {
      * @param begin    when the record started
      * @param end      when the record ended, MIN_VALUE if running
      */
-    Record(long id, Sensor sensor, User user, long begin, long end) {
+    public Record(long id, Sensor sensor, User user, long begin, long end) {
 
         Objects.requireNonNull(sensor, "Sensor must not be null.");
         Objects.requireNonNull(user, "User must not be null.");

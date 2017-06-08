@@ -64,8 +64,9 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        dataManager = DataManager.getInstance(this);
-        Log.d(LOG_TAG, "Created new data manager object.");
+        //dataManager = DataManager.getInstance(this);
+        //Log.d(LOG_TAG, "Created new data manager object.");
+
 
         //Tie the values in content_main.xml to the textviews in this file
         currentTemperature = (TextView) findViewById(R.id.textViewCurrentTemperature);
@@ -132,23 +133,27 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
+    /*@Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy");
+    }*/
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        Log.d(LOG_TAG, "Opening connection to Database...");
-        dataManager.open();
+        registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
+        //Log.d(LOG_TAG, "Opening connection to Database...");
+        //dataManager.open();
     }
 
 
     @Override
     protected void onStop() {
         super.onStop();
-
-        Log.d(LOG_TAG, "Closing connection to Database...");
-        dataManager.close();
+        unregisterReceiver(bleDataReceiver);
+        //Log.d(LOG_TAG, "Closing connection to Database...");
+        //dataManager.close();
     }
 
 
@@ -183,20 +188,20 @@ public class MainActivity extends AppCompatActivity
         currentHumidity.setText("55 %");
     }
 
-    public void setTemperature(String t) {
-        currentTemperature.setText(t + "°C");
+    public void setTemperature(Float t) {
+        currentTemperature.setText(t.toString() + "°C");
     }
 
-    public void setBrightness(String t) {
-        currentBrightness.setText(t + "lm");
+    public void setBrightness(Float t) {
+        currentBrightness.setText(t.toString() + "lm");
     }
 
-    public void setHumidity(String t) {
-        currentHumidity.setText(t + "%");
+    public void setHumidity(Float t) {
+        currentHumidity.setText(t.toString() + "%");
     }
 
-    public void setPressure(String t) {
-        currentPressure.setText(t + "hPa");
+    public void setPressure(Float t) {
+        currentPressure.setText(t.toString() + "hPa");
     }
 
 
@@ -204,18 +209,18 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            Log.d(LOG_TAG, "Broadcast received.");
+            //Log.d(LOG_TAG, "Broadcast received.");
             if (BluetoothLeService.ACTION_TEMP_DATA.equals(action)) {
-                setTemperature(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                setTemperature(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
 
             } else if (BluetoothLeService.ACTION_HUM_DATA.equals(action)) {
-                setHumidity(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                setHumidity(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
 
             } else if (BluetoothLeService.ACTION_BARO_DATA.equals(action)) {
-                setPressure(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                setPressure(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
 
             } else if (BluetoothLeService.ACTION_LUX_DATA.equals(action)) {
-                setBrightness(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                setBrightness(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
             }
         }
     };

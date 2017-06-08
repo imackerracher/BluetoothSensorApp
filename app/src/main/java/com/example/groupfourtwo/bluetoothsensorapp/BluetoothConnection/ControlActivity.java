@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
@@ -47,19 +48,14 @@ public class ControlActivity extends AppCompatActivity {
     private BluetoothLeService mBluetoothLeService;
 
 
-    private UUID testid = UUID.fromString("F000AA20-0451-4000-B000-000000000000");
-
     TextView textViewState;
-    private ExpandableListView mGattServicesList;
-
-    private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
-            new ArrayList<>();
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
+            Log.d(TAG,"onServiceConnected");
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
                 // Unable to initialize Bluetooth
@@ -71,6 +67,7 @@ public class ControlActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            Log.d(TAG,"onServiceDisconnected");
             mBluetoothLeService = null;
         }
     };
@@ -92,7 +89,6 @@ public class ControlActivity extends AppCompatActivity {
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 updateConnectionState("GATT_DISCONNECTED");
-                clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                for (UUID id : gattServices) {
@@ -104,9 +100,7 @@ public class ControlActivity extends AppCompatActivity {
         }
     };
 
-    private void clearUI() {
-        mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
-    }
+
 
     private void updateConnectionState(final String st) {
         runOnUiThread(new Runnable() {
@@ -132,6 +126,7 @@ public class ControlActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_activity_control);
 
@@ -155,6 +150,7 @@ public class ControlActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG,"onResume");
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
@@ -164,6 +160,7 @@ public class ControlActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        Log.d(TAG,"onPause");
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
     }
@@ -171,8 +168,9 @@ public class ControlActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy()");
         unbindService(mServiceConnection);
-        mBluetoothLeService = null;
+        //mBluetoothLeService = null;
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {

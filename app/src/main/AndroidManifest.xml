@@ -52,6 +52,7 @@
             android:name=".BluetoothConnection.ControlActivity"
             android:parentActivityName=".BluetoothConnection.BluetoothMainActivity"/>
         <service android:name=".BluetoothConnection.BluetoothLeService" android:enabled="true"/>
+        <service android:name=".BluetoothConnection.DatabaseUpdateService" android:enabled="true"/>
     </application>
 
 </manifest>

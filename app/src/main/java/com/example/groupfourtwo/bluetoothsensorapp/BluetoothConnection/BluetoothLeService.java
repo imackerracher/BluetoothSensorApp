@@ -19,13 +19,17 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
+
+
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -45,6 +49,7 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
+    private DatabaseUpdateService mDatabaseUpdateService;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -55,8 +60,6 @@ public class BluetoothLeService extends Service {
     private static final Queue<Object> sWriteQueue = new ConcurrentLinkedQueue<Object>();
     private static boolean sIsWriting = false;
 
-    private BluetoothGattCharacteristic humidityConf;
-    BluetoothGattCharacteristic humidityCharacteristic;
 
     public final static String ACTION_GATT_CONNECTED = "company.bluettest2.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED = "company.bluettest2.ACTION_GATT_DISCONNECTED";
@@ -70,6 +73,25 @@ public class BluetoothLeService extends Service {
 
     // Test UUIDs
     public static final UUID OAD_SERVICE_UUID = UUID.fromString("f000ffc0-0451-4000-b000-000000000000");
+    //For database update
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            Log.d(TAG, "onServiceConnected()");
+            mDatabaseUpdateService = ((DatabaseUpdateService.LocalBinder) service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mDatabaseUpdateService = null;
+        }
+    };
+
+    @Override
+    public int onStartCommand (Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
 
     // Implements callback methods for GATT events
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -82,11 +104,14 @@ public class BluetoothLeService extends Service {
                 broadcastUpdate(intentAction);
                 // Discover available GATT Services
                 mBluetoothGatt.discoverServices();
+                bind();
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
+                Log.d(TAG,"DISCONNECTED");
+                unbind();
             }
         }
 
@@ -94,11 +119,12 @@ public class BluetoothLeService extends Service {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+                Log.d(TAG,"onServicesDiscovered");
             } else {
                 // Debug status
             }
         }
-
+        //Not needed, characteristics are read via notifications
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -120,33 +146,38 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            //Log.d(TAG, "DATA AVAILABLE");
             String action = new String();
-
             final byte[] raw = characteristic.getValue();
-            float[] data = new float[3];
+            float[] data;
             Float val = 0.0f;
             UUID id = characteristic.getUuid();
             if (id.equals(UUID_HUM_DATA)) {
                 data = conversionHum(raw);
                 action = ACTION_HUM_DATA;
                 val = data[0];
+                mDatabaseUpdateService.setHumidity(val);
             } else if (id.equals(UUID_IR_TEMP_DATA)) {
                 data = conversionIRTemp(raw);
                 action = ACTION_TEMP_DATA;
                 val = data[0];
+                mDatabaseUpdateService.setTemp(val);
             } else if (id.equals(UUID_BAROMETER_DATA)) {
                 data = conversionBaro(raw);
                 action = ACTION_BARO_DATA;
                 val = data[0];
+                mDatabaseUpdateService.setPressure(val);
             } else if (id.equals(UUID_LUXMETER_DATA)) {
                 data = conversionLux(raw);
                 action = ACTION_LUX_DATA;
                 val = data[0];
+                mDatabaseUpdateService.setBrightness(val);
             }
 
-            broadcastUpdate(action, characteristic, val.toString());
+            broadcastUpdate(action, characteristic, val);
         }
     };
+
 
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
@@ -154,19 +185,8 @@ public class BluetoothLeService extends Service {
 
     }
 
-    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic, final String data) {
+    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic, final float data) {
         final Intent intent = new Intent(action);
-
-
-        /*if (raw != null && raw.length > 0) {
-            final StringBuilder stringBuilder = new StringBuilder(raw.length);
-            for(byte byteChar : raw) {
-                stringBuilder.append(String.format("%02X ", byteChar));
-
-                Log.v(TAG, String.format("%02X ", byteChar));
-            }
-
-        }*/
         intent.putExtra(EXTRA_DATA, data);
         sendBroadcast(intent);
     }
@@ -187,8 +207,9 @@ public class BluetoothLeService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
+        Log.d(TAG,"onUnbind()");
         // Closing GATT-Service
-        close();
+        //close();
         return super.onUnbind(intent);
     }
 
@@ -284,7 +305,6 @@ public class BluetoothLeService extends Service {
     }
 
     private synchronized void write(Object o) {
-        //Toast.makeText(this, "write", Toast.LENGTH_SHORT).show();
         if (sWriteQueue.isEmpty() && !sIsWriting) {
             doWrite(o);
         } else {
@@ -317,7 +337,6 @@ public class BluetoothLeService extends Service {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
         }
-        Toast.makeText(this, "read", Toast.LENGTH_SHORT).show();
 
         mBluetoothGatt.readCharacteristic(characteristic);
     }
@@ -354,5 +373,21 @@ public class BluetoothLeService extends Service {
 
         return mBluetoothGatt.getServices();
     }
+
+    public void bind() {
+        Log.d(TAG,"bind()");
+        Intent databaseServiceIntent = new Intent(this, DatabaseUpdateService.class);
+        bindService(databaseServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    public void unbind() {
+        Log.d(TAG,"unbind()");
+        unbindService(mServiceConnection);
+    }
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy() , BLEservice stopped");
+        unbind();
+    }
+
 }
 
