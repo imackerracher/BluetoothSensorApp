@@ -22,6 +22,7 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static android.graphics.Color.BLUE;
@@ -133,7 +134,11 @@ public class DrawGraph {
          * Access to Database NOT USED so far
          */
         DataManager dataManager = DataManager.getInstance(context);
+        try {
             dataManager.open();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         ArrayList<Float> yAxes2;
 

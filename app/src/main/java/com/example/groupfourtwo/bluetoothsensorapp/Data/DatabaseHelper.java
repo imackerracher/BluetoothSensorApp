@@ -44,10 +44,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
      * @return  the instance
      */
     static synchronized DatabaseHelper getInstance(Context context) {
-        if (instance == null)
             // as database helper is global, use application context instead of activity context.
-            instance = new DatabaseHelper(context.getApplicationContext());
-        return instance;
+            DatabaseHelper newInstance = new DatabaseHelper(context.getApplicationContext());
+        return newInstance;
     }
 
 
