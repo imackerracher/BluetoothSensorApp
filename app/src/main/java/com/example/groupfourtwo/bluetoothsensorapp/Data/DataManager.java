@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,7 +28,7 @@ public class DataManager {
     private static final String LOG_TAG = DataManager.class.getSimpleName();
 
     /**
-     * Single data manager object, to access and operate on the database.
+     * The single data manager object, to access and operate on the database.
      */
     private static DataManager instance;
 
@@ -74,11 +75,9 @@ public class DataManager {
      * @return  the instance of the data manager
      */
     public static synchronized DataManager getInstance(Context context) {
-        if (instance == null) {
-            instance = new DataManager(context.getApplicationContext());
-            Log.d(LOG_TAG, "Created new data manager object.");
-        }
-        return instance;
+        DataManager newInstance = new DataManager(context.getApplicationContext());
+        Log.d(LOG_TAG, "Created new data manager object.");
+        return newInstance;
     }
 
 
@@ -86,14 +85,14 @@ public class DataManager {
      * Open the connection to an SQLite database.
      * If there is no existing database yet, a new one is created.
      */
-    public synchronized void open() {
+    public synchronized void open() throws IOException {
         try {
             database = dbHelper.getWritableDatabase();
             Log.d(LOG_TAG, "Successfully opened database from: " + database.getPath());
         }
         catch (SQLiteException e) {
             Log.e(LOG_TAG, "Error while opening database", e);
-            throw e;
+            throw new IOException(e);
         }
     }
 
