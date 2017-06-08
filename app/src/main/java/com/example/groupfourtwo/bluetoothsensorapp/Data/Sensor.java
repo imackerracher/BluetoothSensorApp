@@ -28,6 +28,17 @@ public class Sensor {
 
 
     /**
+     * Derive a device's bluetooth address as a number format instead from a string.
+     *
+     * @param s  the address of the device as a hexadecimal string.
+     * @return  the parsed address as a long
+     */
+    public static long parseAddress(String s) {
+        return Long.parseLong(s.replaceAll(":", ""), 16);
+    }
+
+
+    /**
      * Constructs a new sensor object. Either by firstly connecting or loading from database.
      *
      * @param id          unique MAC address
@@ -89,16 +100,5 @@ public class Sensor {
             throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
 
         this.name = name;
-    }
-
-
-    /**
-     * Derive a device's bluetooth address in a number format instead from a string.
-     *
-     * @param s  the address of the device as a hexadecimal string.
-     * @return  the parsed address as a long
-     */
-    public static long parseAddress(String s) {
-        return Long.parseLong(s.replaceAll(":", ""), 16);
     }
 }
