@@ -1,25 +1,19 @@
 package com.example.groupfourtwo.bluetoothsensorapp;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.Data.Interval;
+import com.example.groupfourtwo.bluetoothsensorapp.Data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.Graph.DrawGraph;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager.Interval.HOUR;
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager.Measure.TEMPERATURE;
+
+import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.HOUR;
+import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.WEEK;
+import static com.example.groupfourtwo.bluetoothsensorapp.Data.Measure.TEMPERATURE;
 
 public class TemperatureActivity extends AppCompatActivity {
 
@@ -31,9 +25,9 @@ public class TemperatureActivity extends AppCompatActivity {
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        DataManager.Interval interval = HOUR;
-        DataManager.Measure measure1 = TEMPERATURE;
-        long begin = 1000l;
+        Interval interval = WEEK;
+        Measure measure1 = TEMPERATURE;
+        long begin = 1723680000000l + 1000l*(60l*60l*24l*365l+ 60l*60l*24l*150l); //150 days after 1.Jan.2017
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
         drawGraph.draw(this);
