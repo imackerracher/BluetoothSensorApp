@@ -11,7 +11,14 @@ public enum Interval {
     DAY (86400000, 10000),
     WEEK (604800000, 60000);
 
+    /**
+     * The length of the selected interval in milliseconds.
+     */
     public final int length;
+
+    /**
+     * The temporal resolution in which multiple data is merged to one point in the graph.
+     */
     public final int step;
 
     Interval(int length, int step) {

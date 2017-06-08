@@ -1,5 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.Data;
 
+import static com.example.groupfourtwo.bluetoothsensorapp.Data.DatabaseContract.*;
+
 /**
  * Sets predefined parameters for each type of data collected by the application.
  *
@@ -7,12 +9,15 @@ package com.example.groupfourtwo.bluetoothsensorapp.Data;
  */
 
 public enum Measure {
-    BRIGHTNESS (DatabaseContract.MeasurementData.COLUMN_BRIGHTNESS),
-    DISTANCE (DatabaseContract.MeasurementData.COLUMN_DISTANCE),
-    HUMIDITY (DatabaseContract.MeasurementData.COLUMN_HUMIDITY),
-    PRESSURE (DatabaseContract.MeasurementData.COLUMN_PRESSURE),
-    TEMPERATURE (DatabaseContract.MeasurementData.COLUMN_TEMPERATURE);
+    BRIGHTNESS (MeasurementData.COLUMN_BRIGHTNESS),
+    DISTANCE (MeasurementData.COLUMN_DISTANCE),
+    HUMIDITY (MeasurementData.COLUMN_HUMIDITY),
+    PRESSURE (MeasurementData.COLUMN_PRESSURE),
+    TEMPERATURE (MeasurementData.COLUMN_TEMPERATURE);
 
+    /**
+     * The column of the database the measure is stored in.
+     */
     public final String column;
 
     Measure(String column) {
