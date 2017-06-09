@@ -24,6 +24,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static android.graphics.Color.BLUE;
 import static android.graphics.Color.GRAY;
@@ -32,7 +33,11 @@ import static android.graphics.Color.YELLOW;
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.*;
 
 /**
+ * Contains methods and parameters that are used to draw the graph
  * Created by kim on 23.05.17.
+ * @author kim
+ * @version 1.0
+ *
  */
 
 //Ideas: make the parts with missing Values White or Red.
@@ -45,7 +50,7 @@ public class DrawGraph {
     private Interval interval;
     private long begin;
     private Record record;
-    private int backgroundColour = Color.YELLOW;
+    private int backgroundColour = Color.WHITE;
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
                      Interval interval, long begin) {
@@ -79,10 +84,10 @@ public class DrawGraph {
         LineChart lineChart;
 
 
-        long offset = 1723680000000l;
+        long offset = 1723680000000l; // time in milliseconds to 1.Jan 2016
 
 
-        /*referenz in main.xml*/
+        /*reference in main.xml*/
         lineChart = (LineChart) activity.findViewById(R.id.lineChart);
         
 
@@ -134,6 +139,7 @@ public class DrawGraph {
          * Access to Database NOT USED so far
          */
         DataManager dataManager = DataManager.getInstance(context);
+
         try {
             dataManager.open();
         } catch (IOException e) {
@@ -142,11 +148,14 @@ public class DrawGraph {
 
         ArrayList<Float> yAxes2;
 
-        if (record == null)
+        if (record == null) {
             yAxes2 = dataManager.getValuesFromInterval(measure1, interval, begin);
-        else
+            System.out.println("0000000000000000000000000000000000000000000000000000000000000000000000000000000");
+            System.out.println(yAxes2.get(1));
+        }else {
             yAxes2 = dataManager.getValuesFromRecord(measure1, record);
-
+            System.out.println("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEE");
+        }
         dataManager.close();
 
 
@@ -163,30 +172,32 @@ public class DrawGraph {
 
                 /* Generating empty y-Value Array */
         ArrayList<Float> yAxes = new ArrayList<>(); //static
+        Random randomGenerator = new Random();
+
 
         for (int i = 0; i < gapPosition; i++)
-            yAxes.add( (float) i);
+            yAxes.add( (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
 
         for (int i = gapPosition; i < gapPosition + gapSize; i++)
             yAxes.add(null);
 
 
         for (int i = gapPosition + gapSize; i < numDataPoints; i++)
-            yAxes.add( (float) i);
+            yAxes.add(  (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
 
 
 
         /**
-        * Split the graph in section
+        * Copy graph in Entry-List
         * */
         ArrayList<Entry> yAxes2_1 = new ArrayList<>();
         ArrayList<Entry> yAxes2_2 = new ArrayList<>();
 
-        for (int i = 0; i < numDataPoints; i++) {
-            if(yAxes.get(i) != null)
-                yAxes2_1.add(new Entry(i, yAxes.get(i)));
 
 
+        for (int i = 0; i < dataPointCount; i++) {
+            if(yAxes2.get(i) != null)
+                yAxes2_1.add(new Entry(i  , yAxes.get(i) ));
         }
 
 
@@ -226,7 +237,7 @@ public class DrawGraph {
         //lineChart.animateX(1000); // Animation that shows the values from left to right
 
         lineDataSet2.setDrawValues(true); //Default is true
-        lineDataSet2.setDrawCircles(true); //Default is true
+        lineDataSet2.setDrawCircles(false); //Default is true
         lineChart.setMaxVisibleValueCount(20);
 
         lineChart.setDrawBorders(true); //Border arround the Graph
