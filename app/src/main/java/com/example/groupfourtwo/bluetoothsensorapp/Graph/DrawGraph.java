@@ -84,7 +84,8 @@ public class DrawGraph {
         LineChart lineChart;
 
 
-        long offset = 1723680000000l; // time in milliseconds to 1.Jan 2016
+        long offset =  1448841600000l; // time in milliseconds to 1.Jan 2016
+        long offset2 = 1723680000000l;
 
 
         /*reference in main.xml*/
@@ -154,7 +155,6 @@ public class DrawGraph {
             System.out.println(yAxes2.get(1));
         }else {
             yAxes2 = dataManager.getValuesFromRecord(measure1, record);
-            System.out.println("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEE");
         }
         dataManager.close();
 
@@ -175,7 +175,9 @@ public class DrawGraph {
         Random randomGenerator = new Random();
 
 
-        for (int i = 0; i < gapPosition; i++)
+        yAxes.add(null);
+
+        for (int i = 1; i < gapPosition; i++)
             yAxes.add( (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
 
         for (int i = gapPosition; i < gapPosition + gapSize; i++)
@@ -196,8 +198,10 @@ public class DrawGraph {
 
 
         for (int i = 0; i < dataPointCount; i++) {
-            if(yAxes2.get(i) != null)
-                yAxes2_1.add(new Entry(i  , yAxes.get(i) ));
+            if(yAxes2.get(i) != null) {
+                yAxes2_1.add(new Entry(i, yAxes.get(i)));
+                System.out.println("+");
+            }
         }
 
 
