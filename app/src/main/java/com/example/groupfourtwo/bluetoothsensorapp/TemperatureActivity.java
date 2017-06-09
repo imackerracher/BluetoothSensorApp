@@ -29,7 +29,7 @@ public class TemperatureActivity extends AppCompatActivity {
         Measure measure1 = TEMPERATURE;
 
         long begin = System.currentTimeMillis()- 1000l*60*60*24*10; //vor über einer Woche
-        begin = System.currentTimeMillis()- 1000l*60*60*24*8; //vor 7 Tagen
+        begin = System.currentTimeMillis()- 1000l*60*60*24*1; //vor X Tagen
 
 
 

@@ -561,7 +561,8 @@ public class DataManager {
         ArrayList<Float> data = new ArrayList<>(duration / step);
 
         if (!cursor.moveToFirst())
-            //return data;
+        {//return data;
+        }
 
         // Fill list with values from cursor according to timeline.
         for (long i = begin; i < end; i += step) {

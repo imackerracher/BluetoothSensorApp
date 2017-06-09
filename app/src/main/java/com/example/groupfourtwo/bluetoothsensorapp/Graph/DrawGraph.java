@@ -199,7 +199,7 @@ public class DrawGraph {
 
         for (int i = 0; i < dataPointCount; i++) {
             if(yAxes2.get(i) != null) {
-                yAxes2_1.add(new Entry(i, yAxes.get(i)));
+                yAxes2_1.add(new Entry(i, yAxes2.get(i)));
                 System.out.println("+");
             }
         }

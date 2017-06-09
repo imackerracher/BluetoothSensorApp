@@ -25,7 +25,7 @@ public class HumidityActivity extends AppCompatActivity {
 
         Interval interval = DAY;
         Measure measure1 = HUMIDITY;
-        long begin = 1723680000000l + 1000l*(60l*60l*24l*365l); // 1.Jan.2017
+        long begin = System.currentTimeMillis()- 1000l*60*60*24*1; ; // 1.Jan.2016
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
         drawGraph.draw(this);

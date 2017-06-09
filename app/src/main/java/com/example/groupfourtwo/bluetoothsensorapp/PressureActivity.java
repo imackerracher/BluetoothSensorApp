@@ -26,7 +26,7 @@ public class PressureActivity extends AppCompatActivity {
 
         Interval interval = HOUR;
         Measure measure1 = PRESSURE;
-        long begin = 1723680000000l ; // 1.Jan.2016
+        long begin = System.currentTimeMillis()- 1000l*60*60*24*1; ; // 1.Jan.2016
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
         drawGraph.draw(this);
