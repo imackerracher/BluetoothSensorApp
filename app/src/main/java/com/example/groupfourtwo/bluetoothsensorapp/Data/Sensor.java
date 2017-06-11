@@ -48,8 +48,9 @@ public class Sensor {
     public Sensor(long id, String name, long knownSince) {
 
         Objects.requireNonNull(name, "Name must not be null.");
-        if (name.trim().length() == 0 || name.length() > 50)
+        if (name.trim().length() == 0 || name.length() > 50) {
             throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
+        }
 
         this.id = id;
         this.name = name;
@@ -96,8 +97,9 @@ public class Sensor {
     void setName(String name) {
         Objects.requireNonNull(name, "Name must not be null.");
 
-        if (name.trim().length() == 0 || name.length() > 50)
+        if (name.trim().length() == 0 || name.length() > 50) {
             throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
+        }
 
         this.name = name;
     }

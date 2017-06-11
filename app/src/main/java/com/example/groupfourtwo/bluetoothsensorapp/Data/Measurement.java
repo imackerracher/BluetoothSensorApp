@@ -187,9 +187,9 @@ public class Measurement {
      * @param id  the measurement's actual id
      */
     void setId(long id) {
-        if (this.id > 0)
+        if (this.id > 0) {
             throw new IllegalStateException("Id cannot be set after being assigned by database");
-
+        }
         this.id = id;
     }
 }
