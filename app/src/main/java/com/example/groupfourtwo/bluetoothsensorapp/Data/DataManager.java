@@ -175,8 +175,9 @@ public class DataManager {
      */
     public Record findRecord(long key) {
         Record record = records.get(key);
-        if (record == null) // wanted sensor not in map -> search in database
+        if (record == null) { // wanted sensor not in map -> search in database
             record = searchRecord(key);
+        }
         if (record != null) { // wanted sensor was found -> cache and return
             records.put(record.getId(), record);
             Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
@@ -194,8 +195,9 @@ public class DataManager {
      */
     public Sensor findSensor(long key) {
         Sensor sensor = sensors.get(key);
-        if (sensor == null) // wanted sensor not in map -> search in database
+        if (sensor == null) { // wanted sensor not in map -> search in database
             sensor = searchSensor(key);
+        }
         if (sensor != null) { // wanted sensor was found -> cache and return
             sensors.put(sensor.getId(), sensor);
             Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
@@ -213,8 +215,9 @@ public class DataManager {
      */
     public User findUser(long key) {
         User user = users.get(key);
-        if (user == null) // wanted user not in map -> search in database
+        if (user == null) { // wanted user not in map -> search in database
             user = searchUser(key);
+        }
         if (user != null) { // wanted user was found -> cache and return it
             users.put(user.getId(), user);
             Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
@@ -242,8 +245,9 @@ public class DataManager {
         Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
                 null, null, null, null, MeasurementData._ID + " DESC");
 
-        if (!cursor.moveToFirst()) // empty cursor -> not a single entry in database
+        if (!cursor.moveToFirst()) { // empty cursor -> not a single entry in database
             return null;
+        }
 
         Measurement measurement = cursorToMeasurement(cursor);
         cursor.close();
@@ -298,12 +302,18 @@ public class DataManager {
         long begin = record.getBegin();
         long end = record.getEnd();
 
-        // Decide how many values will be summaried to one datapoint.
+        // Record is still running, take all values received so far.
+        if (end == Long.MIN_VALUE)
+            end = System.currentTimeMillis();
+
+        // Decide how many values will be summarized to one data point.
         int step = HOUR.step;
-        if (end - begin > HOUR.length)
+        if (end - begin > HOUR.length) {
             step = DAY.step;
-        if (end - begin > DAY.length)
+        }
+        if (end - begin > DAY.length) {
             step = WEEK.step;
+        }
 
         ArrayList<Float> data = cursorToList(cursor, measure.column, begin, end, step);
         cursor.close();
@@ -406,8 +416,9 @@ public class DataManager {
      * @param measurement  the measurement to save
      */
     public void saveMeasurement(Measurement measurement) {
-        if (measurement.getId() != -1)
+        if (measurement.getId() != -1) {
             throw new IllegalArgumentException("Measurement was already inserted some other time.");
+        }
 
         ContentValues values = new ContentValues();
 
@@ -433,8 +444,6 @@ public class DataManager {
      * @param record  the record to save
      */
     public void saveRecord(Record record) {
-        record.stop();
-
         ContentValues values = new ContentValues();
 
         values.put(RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());
@@ -560,11 +569,12 @@ public class DataManager {
         int duration = (int) (end - begin);
         ArrayList<Float> data = new ArrayList<>(duration / step);
 
-        if (!cursor.moveToFirst())
-        {//return data;
+        // Cursor might be empty. Return nothing if no entries were found.
+        if (!cursor.moveToFirst()) {
+            // return data;
         }
 
-        // Fill list with values from cursor according to timeline.
+        // Fill list with values from cursor according to resolution of data points.
         for (long i = begin; i < end; i += step) {
             int noOfValues = 0;
             float sum = 0f;
@@ -575,10 +585,11 @@ public class DataManager {
                 cursor.moveToNext();
             }
             // Save value or else mark as missing.
-            if (noOfValues == 0)
-                data.add(null);
-            else
+            if (noOfValues > 0) {
                 data.add(sum / noOfValues);
+            } else {
+                data.add(null);
+            }
         }
 
         return data;
