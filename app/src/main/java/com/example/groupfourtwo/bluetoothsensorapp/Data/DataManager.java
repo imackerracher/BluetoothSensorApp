@@ -111,7 +111,7 @@ public class DataManager {
      *
      * @return  a list of all saved records
      */
-    ArrayList<Record> getAllRecords() {
+    public ArrayList<Record> getAllRecords() {
         String[] select = {RecordData._ID,
                 RecordData.COLUMN_SENSOR_ID,
                 RecordData.COLUMN_USER_ID,
@@ -142,7 +142,7 @@ public class DataManager {
      *
      * @return  a list of all saved sensors
      */
-    ArrayList<Sensor> getAllSensors() {
+    public ArrayList<Sensor> getAllSensors() {
         String[] select = {SensorData._ID,
                 SensorData.COLUMN_NAME,
                 SensorData.COLUMN_KNOWN_SINCE};
