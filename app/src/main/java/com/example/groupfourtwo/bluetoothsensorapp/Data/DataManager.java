@@ -303,8 +303,9 @@ public class DataManager {
         long end = record.getEnd();
 
         // Record is still running, take all values received so far.
-        if (end == Long.MIN_VALUE)
+        if (record.isRunning()) {
             end = System.currentTimeMillis();
+        }
 
         // Decide how many values will be summarized to one data point.
         int step = HOUR.step;
