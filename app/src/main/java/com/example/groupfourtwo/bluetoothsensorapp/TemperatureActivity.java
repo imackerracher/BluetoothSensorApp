@@ -28,8 +28,7 @@ public class TemperatureActivity extends AppCompatActivity {
         Interval interval = WEEK;
         Measure measure1 = TEMPERATURE;
 
-        long begin = System.currentTimeMillis()- 1000l*60*60*24*10; //vor über einer Woche
-        begin = System.currentTimeMillis()- 1000l*60*60*24*1; //vor X Tagen
+        long begin = System.currentTimeMillis()- interval.length;
 
 
 

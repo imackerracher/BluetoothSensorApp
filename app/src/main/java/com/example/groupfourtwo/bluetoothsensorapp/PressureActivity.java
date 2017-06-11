@@ -20,13 +20,13 @@ public class PressureActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_pressure);
-        setContentView(R.layout.activity_temperature);
+        setContentView(R.layout.activity_pressure);
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        Interval interval = HOUR;
+        Interval interval = DAY;
         Measure measure1 = PRESSURE;
-        long begin = System.currentTimeMillis()- 1000l*60*60*24*1; ; // 1.Jan.2016
+        long begin = System.currentTimeMillis()- interval.length;
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
         drawGraph.draw(this);

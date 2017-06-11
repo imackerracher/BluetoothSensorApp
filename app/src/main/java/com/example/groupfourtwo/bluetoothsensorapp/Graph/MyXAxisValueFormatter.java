@@ -8,6 +8,7 @@ import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.text.DecimalFormat;
+import java.util.TimeZone;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.R.id.lineChart;
 import static java.security.AccessController.getContext;
@@ -18,6 +19,8 @@ import static java.security.AccessController.getContext;
 
 public class MyXAxisValueFormatter implements IAxisValueFormatter {
 
+        private int timezone = TimeZone.getDefault().getRawOffset(); // 2 is Berlin sommertime-- 1 is Berlin wintertime
+        private int dstSavings = TimeZone.getDefault().getDSTSavings();
 
         protected String[] mMonths = new String[]{
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -41,7 +44,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         public String getFormattedValue(float value, AxisBase axis) {
 
 
-            int sec = (int) value*60/pointsPerMinute + (int) (startInMilSec/1000l);
+            int sec = (int) value*60/pointsPerMinute + (int) (startInMilSec/1000l) +  (timezone + dstSavings)/1000;
 
             int minutes = determineMinutes(sec);
 

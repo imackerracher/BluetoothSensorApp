@@ -9,6 +9,7 @@ import com.example.groupfourtwo.bluetoothsensorapp.Data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.Graph.DrawGraph;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.DAY;
+import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.HOUR;
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.WEEK;
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Measure.BRIGHTNESS;
 import static com.example.groupfourtwo.bluetoothsensorapp.Data.Measure.TEMPERATURE;
@@ -24,9 +25,9 @@ public class BrigthnessActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
 
-        Interval interval = WEEK;
+        Interval interval = HOUR;
         Measure measure1 = BRIGHTNESS;
-        long begin = System.currentTimeMillis()- 1000l*60*60*24*1; ; // 1.Jan.2016
+        long begin = System.currentTimeMillis()- interval.length;
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
         drawGraph.draw(this);

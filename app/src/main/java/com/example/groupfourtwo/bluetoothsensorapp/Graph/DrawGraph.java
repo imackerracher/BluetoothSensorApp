@@ -125,7 +125,9 @@ public class DrawGraph {
 
         rightAxis.setEnabled(false);
 
-        leftAxis.setAxisMinimum(0f); // start at zero
+        if(measure1 != Measure.PRESSURE)
+            leftAxis.setAxisMinimum(0f); // start at zero
+
         leftAxis.setTextSize(12f);
         MyYAxisValueFormatter y = new MyYAxisValueFormatter(measure1);
         leftAxis.setValueFormatter(y);
@@ -196,13 +198,13 @@ public class DrawGraph {
         ArrayList<Entry> yAxes2_2 = new ArrayList<>();
 
 
+        yAxes2_1.add(0,new Entry(0,0));
 
-        for (int i = 0; i < dataPointCount; i++) {
-            if(yAxes2.get(i) != null) {
+        for (int i = 1; i < dataPointCount; i++) {
+            if(yAxes2.get(i) != null)
                 yAxes2_1.add(new Entry(i, yAxes2.get(i)));
-                System.out.println("+");
-            }
         }
+
 
 
         /**
@@ -244,7 +246,7 @@ public class DrawGraph {
         lineDataSet2.setDrawCircles(false); //Default is true
         lineChart.setMaxVisibleValueCount(20);
 
-        lineChart.setDrawBorders(true); //Border arround the Graph
+        lineChart.setDrawBorders(true); //Border around the Graph
         lineChart.setBorderColor( Color.BLACK);
         lineChart.setBorderWidth(2f);
         lineChart.setNoDataText("Sorry, there is no Data in this time slot");
