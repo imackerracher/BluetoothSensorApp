@@ -51,6 +51,7 @@ public class DrawGraph {
     private long begin;
     private Record record;
     private int backgroundColour = Color.WHITE;
+    private boolean allNull = true;
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
                      Interval interval, long begin) {
@@ -197,15 +198,20 @@ public class DrawGraph {
         ArrayList<Entry> yAxes2_1 = new ArrayList<>();
         ArrayList<Entry> yAxes2_2 = new ArrayList<>();
 
+        for (int i = 0; i < dataPointCount; i++)
+            if (yAxes2.get(i) != null)
+                allNull = false;
 
-        yAxes2_1.add(0,new Entry(0,0));
-
-        for (int i = 1; i < dataPointCount; i++) {
+        for (int i = 0; i < dataPointCount; i++) {
             if(yAxes2.get(i) != null)
                 yAxes2_1.add(new Entry(i, yAxes2.get(i)));
         }
 
 
+
+
+        if(allNull)
+            return;
 
         /**
         * Generate the lineDataSets for Visualisation
