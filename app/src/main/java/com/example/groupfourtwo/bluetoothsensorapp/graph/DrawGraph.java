@@ -43,7 +43,7 @@ public class DrawGraph {
     private long begin;
     private Record record;
     private int backgroundColour = Color.WHITE;
-    private boolean allNull = true;
+    /*private boolean allNull = true;*/
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
                      Interval interval, long begin) {
@@ -78,7 +78,6 @@ public class DrawGraph {
 
 
         long offset =  1448841600000l; // time in milliseconds to 1.Jan 2016
-        long offset2 = 1723680000000l;
 
 
         /*reference in main.xml*/
@@ -132,7 +131,7 @@ public class DrawGraph {
 
 
         /**
-         * Access to Database NOT USED so far
+         * Access to Database USED
          */
         DataManager dataManager = DataManager.getInstance(context);
 
@@ -146,18 +145,17 @@ public class DrawGraph {
 
         if (record == null) {
             yAxes2 = dataManager.getValuesFromInterval(measure1, interval, begin);
-            System.out.println("0000000000000000000000000000000000000000000000000000000000000000000000000000000");
-            System.out.println(yAxes2.get(1));
         }else {
             yAxes2 = dataManager.getValuesFromRecord(measure1, record);
         }
         dataManager.close();
 
-
+        if(yAxes2 == null)
+            return;
 
 
         /**
-         * Some Data generated for testing USED
+         * Some Data generated for testing NOT USED
          */
 
         int numDataPoints = dataPointCount;
@@ -182,17 +180,21 @@ public class DrawGraph {
         for (int i = gapPosition + gapSize; i < numDataPoints; i++)
             yAxes.add(  (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
 
+        /************************************/
+
 
 
         /**
         * Copy graph in Entry-List
         * */
         ArrayList<Entry> yAxes2_1 = new ArrayList<>();
-        ArrayList<Entry> yAxes2_2 = new ArrayList<>();
 
+
+        /*
         for (int i = 0; i < dataPointCount; i++)
             if (yAxes2.get(i) != null)
                 allNull = false;
+        */
 
         for (int i = 0; i < dataPointCount; i++) {
             if(yAxes2.get(i) != null)
@@ -201,9 +203,10 @@ public class DrawGraph {
 
 
 
-
+        /*
         if(allNull)
             return;
+        */
 
         /**
         * Generate the lineDataSets for Visualisation
