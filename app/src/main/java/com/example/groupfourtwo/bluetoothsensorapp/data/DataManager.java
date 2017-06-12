@@ -566,14 +566,14 @@ public class DataManager {
         int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
         int indexValue = cursor.getColumnIndex(column);
 
+        // Cursor might be empty. Return nothing if no entries were found.
+        if (!cursor.moveToFirst()) {
+            return null;
+        }
+
         // The length of the requested interval determines number of data points.
         int duration = (int) (end - begin);
         ArrayList<Float> data = new ArrayList<>(duration / step);
-
-        // Cursor might be empty. Return nothing if no entries were found.
-        if (!cursor.moveToFirst()) {
-            // return data;
-        }
 
         // Fill list with values from cursor according to resolution of data points.
         for (long i = begin; i < end; i += step) {
