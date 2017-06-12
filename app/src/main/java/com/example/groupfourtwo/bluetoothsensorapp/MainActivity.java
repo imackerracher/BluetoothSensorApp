@@ -20,14 +20,14 @@ import android.widget.TextView;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private DataManager dataManager;
-
-
 
     //Values to be displayed in the homescreen next to the sensor icons
     TextView currentTemperature;
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
         currentPressure = (TextView) findViewById(R.id.textViewCurrentPressure);
         currentHumidity = (TextView) findViewById(R.id.textViewCurrentHumidity);
 
-        setCurrentSensorValues();
+        setLatestSensorValues();
 
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
     }
@@ -178,28 +178,35 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    //Sets the values in the homescreen next to the sensor icon to the current/last measured value
-    public void setCurrentSensorValues() {
-        currentTemperature.setText("30°C");
-        currentBrightness.setText("970 hPa");
-        currentPressure.setText("10000 lm");
-        currentHumidity.setText("55 %");
+    //Sets the values in the home screen next to the sensor icon to the last measured value
+    public void setLatestSensorValues() {
+        DataManager dataManager = DataManager.getInstance(this);
+        try {
+            dataManager.open();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Measurement measurement = dataManager.getLatestMeasurement();
+        setTemperature(measurement.getTemperature());
+        setBrightness(measurement.getBrightness());
+        setPressure(measurement.getPressure());
+        setHumidity(measurement.getHumidity());
     }
 
     public void setTemperature(Float t) {
-        currentTemperature.setText(t.toString() + "°C");
+        currentTemperature.setText(t.toString() + " °C");
     }
 
     public void setBrightness(Float t) {
-        currentBrightness.setText(t.toString() + "lm");
+        currentBrightness.setText(t.toString() + " lm");
     }
 
     public void setHumidity(Float t) {
-        currentHumidity.setText(t.toString() + "%");
+        currentHumidity.setText(t.toString() + " %");
     }
 
     public void setPressure(Float t) {
-        currentPressure.setText(t.toString() + "hPa");
+        currentPressure.setText(t.toString() + " hPa");
     }
 
 

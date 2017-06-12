@@ -61,11 +61,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="25dp"
-        android:layout_marginTop="33dp"
+        android:layout_marginTop="0dp"
         android:text="@string/not_available"
         android:textSize="30sp"
         app:layout_constraintLeft_toRightOf="@+id/imageButtonTemperature"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/imageButtonTemperature"
+        app:layout_constraintBottom_toBottomOf="@+id/imageButtonTemperature"
+        android:layout_marginBottom="0dp" />
 
 
     <TextView
@@ -77,7 +79,9 @@
         android:text="@string/not_available"
         android:textSize="30sp"
         app:layout_constraintLeft_toRightOf="@+id/imageButtonPressure"
-        app:layout_constraintTop_toTopOf="@+id/imageButtonPressure" />
+        app:layout_constraintTop_toTopOf="@+id/imageButtonPressure"
+        app:layout_constraintBottom_toBottomOf="@+id/imageButtonPressure"
+        android:layout_marginBottom="0dp" />
 
     <TextView
         android:id="@+id/textViewCurrentBrightness"
@@ -88,7 +92,9 @@
         android:text="@string/not_available"
         android:textSize="30sp"
         app:layout_constraintLeft_toRightOf="@+id/imageButtonBrightness"
-        app:layout_constraintTop_toTopOf="@+id/imageButtonBrightness" />
+        app:layout_constraintTop_toTopOf="@+id/imageButtonBrightness"
+        app:layout_constraintBottom_toBottomOf="@+id/imageButtonBrightness"
+        android:layout_marginBottom="0dp" />
 
     <TextView
         android:id="@+id/textViewCurrentHumidity"
@@ -99,7 +105,9 @@
         android:text="@string/not_available"
         android:textSize="30sp"
         app:layout_constraintLeft_toRightOf="@+id/imageButtonHumidity"
-        app:layout_constraintTop_toTopOf="@+id/imageButtonHumidity" />
+        app:layout_constraintTop_toTopOf="@+id/imageButtonHumidity"
+        app:layout_constraintBottom_toBottomOf="@+id/imageButtonHumidity"
+        android:layout_marginBottom="0dp" />
 
 
 
