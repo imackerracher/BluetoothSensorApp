@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.util.LongSparseArray;
 
+import com.github.mikephil.charting.data.Entry;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -265,7 +267,7 @@ public class DataManager {
      * @param begin     the start point of the interval
      * @return  all values in the interval, empty list if no entry was found
      */
-    public ArrayList<Float> getValuesFromInterval(Measure measure, Interval interval, long begin) {
+    public ArrayList<Entry> getValuesFromInterval(Measure measure, Interval interval, long begin) {
         long end = begin + interval.length;
 
         String[] select = {MeasurementData.COLUMN_TIME, measure.column};
@@ -277,7 +279,7 @@ public class DataManager {
         Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
                 where, null, null, null, MeasurementData.COLUMN_TIME);
 
-        ArrayList<Float> data = cursorToList(cursor, measure.column, begin, end, interval.step);
+        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end, interval.step);
         cursor.close();
         return data;
     }
@@ -290,7 +292,7 @@ public class DataManager {
      * @param record   the record to analyse
      * @return  all values of the record, empty list if no entry was found
      */
-    public ArrayList<Float> getValuesFromRecord(Measure measure, Record record) {
+    public ArrayList<Entry> getValuesFromRecord(Measure measure, Record record) {
         String[] select = {MeasurementData.COLUMN_TIME, measure.column};
 
         String where = MeasurementData.COLUMN_RECORD_ID + " = " + record.getId();
@@ -316,7 +318,7 @@ public class DataManager {
             step = WEEK.step;
         }
 
-        ArrayList<Float> data = cursorToList(cursor, measure.column, begin, end, step);
+        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end, step);
         cursor.close();
         return data;
     }
@@ -561,8 +563,8 @@ public class DataManager {
      * @param step    the temporal resolution of results
      * @return  a list of values from the cursor
      */
-    private ArrayList<Float> cursorToList(Cursor cursor, String column,
-                                          long begin, long end, int step) {
+    private ArrayList<Entry> cursorToList(Cursor cursor, String column,
+                                              long begin, long end, int step) {
         int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
         int indexValue = cursor.getColumnIndex(column);
 
@@ -571,12 +573,12 @@ public class DataManager {
             return null;
         }
 
-        // The length of the requested interval determines number of data points.
+        // The length of the requested interval determines maximum number of data points.
         int duration = (int) (end - begin);
-        ArrayList<Float> data = new ArrayList<>(duration / step);
+        ArrayList<Entry> data = new ArrayList<>(duration / step);
 
         // Fill list with values from cursor according to resolution of data points.
-        for (long i = begin; i < end; i += step) {
+        for (long i = begin, j = 0; i < end; i += step, ++j) {
             int noOfValues = 0;
             float sum = 0f;
             // Take arithmetic mean of all values that are in one step size.
@@ -587,9 +589,7 @@ public class DataManager {
             }
             // Save value or else mark as missing.
             if (noOfValues > 0) {
-                data.add(sum / noOfValues);
-            } else {
-                data.add(null);
+                data.add(new Entry(j, sum / noOfValues));
             }
         }
 
