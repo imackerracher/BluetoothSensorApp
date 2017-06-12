@@ -11,6 +11,8 @@ import java.util.Objects;
 
 public class Sensor {
 
+    public static final Sensor SENSOR_DUMMY = new Sensor(0, "Dummy Sensor", 0);
+
     /**
      * The unique identifier according to the sensor's bluetooth MAC address.
      */
@@ -50,6 +52,10 @@ public class Sensor {
         Objects.requireNonNull(name, "Name must not be null.");
         if (name.trim().length() == 0 || name.length() > 50) {
             throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
+        }
+
+        if (id < 0) {
+            throw new IllegalArgumentException("Id must not be negative.");
         }
 
         this.id = id;

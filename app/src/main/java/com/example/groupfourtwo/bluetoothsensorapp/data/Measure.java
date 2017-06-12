@@ -1,5 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.data;
 
+import static android.graphics.Color.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
 
 /**
@@ -9,18 +10,24 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.
  */
 
 public enum Measure {
-    BRIGHTNESS (MeasurementData.COLUMN_BRIGHTNESS),
-    DISTANCE (MeasurementData.COLUMN_DISTANCE),
-    HUMIDITY (MeasurementData.COLUMN_HUMIDITY),
-    PRESSURE (MeasurementData.COLUMN_PRESSURE),
-    TEMPERATURE (MeasurementData.COLUMN_TEMPERATURE);
+    BRIGHTNESS (MAGENTA, MeasurementData.COLUMN_BRIGHTNESS),
+    DISTANCE (BLACK, MeasurementData.COLUMN_DISTANCE),
+    HUMIDITY (BLUE, MeasurementData.COLUMN_HUMIDITY),
+    PRESSURE (GRAY, MeasurementData.COLUMN_PRESSURE),
+    TEMPERATURE (RED, MeasurementData.COLUMN_TEMPERATURE);
+
+    /**
+     * The color that is used to draw the graph.
+     */
+    public final int color;
 
     /**
      * The column of the database the measure is stored in.
      */
     public final String column;
 
-    Measure(String column) {
+    Measure(int color, String column) {
+        this.color = color;
         this.column = column;
     }
 }

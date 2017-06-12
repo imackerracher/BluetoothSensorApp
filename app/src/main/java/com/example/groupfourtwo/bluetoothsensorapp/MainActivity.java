@@ -188,6 +188,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
         Measurement measurement = dataManager.getLatestMeasurement();
+        dataManager.close();
 
         if (measurement != null) {
             setTemperature(measurement.getTemperature());

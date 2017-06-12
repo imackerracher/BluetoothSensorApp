@@ -11,6 +11,8 @@ import java.util.Objects;
 
 public class User {
 
+    public static final User USER_DUMMY = new User(0, "Dummy User");
+
     /**
      * The unique id of the user.
      */
@@ -32,6 +34,10 @@ public class User {
         Objects.requireNonNull(name, "Name must not be null.");
         if (name.length() == 0 || name.length() > 50) {
             throw new IllegalArgumentException("Name must be between 1 and 50 characters long.");
+        }
+
+        if (id < 0) {
+            throw new IllegalArgumentException("Id must not be negative.");
         }
 
         this.id = id;

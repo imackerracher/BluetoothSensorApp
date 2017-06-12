@@ -11,6 +11,9 @@ import java.util.Objects;
 
 public class Record {
 
+    public static final Record RECORD_DUMMY = new Record(
+            0, Sensor.SENSOR_DUMMY, User.USER_DUMMY, Long.MIN_VALUE, Long.MAX_VALUE);
+
     /**
      * The unique identifier of the recording session.
      */
@@ -51,9 +54,6 @@ public class Record {
         Objects.requireNonNull(sensor, "Sensor must not be null.");
         Objects.requireNonNull(user, "User must not be null.");
 
-        if (id <= 0) {
-            throw new IllegalArgumentException("Id must be positive.");
-        }
         if (end > Long.MIN_VALUE && end < begin) {
             throw new IllegalArgumentException("End cannot lay in past of begin.");
         }

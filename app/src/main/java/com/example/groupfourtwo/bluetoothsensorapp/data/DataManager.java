@@ -183,6 +183,8 @@ public class DataManager {
         if (record != null) { // wanted sensor was found -> cache and return
             records.put(record.getId(), record);
             Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
+        } else {
+            record = Record.RECORD_DUMMY;
         }
         return record;
     }
@@ -203,6 +205,8 @@ public class DataManager {
         if (sensor != null) { // wanted sensor was found -> cache and return
             sensors.put(sensor.getId(), sensor);
             Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
+        } else {
+            sensor = Sensor.SENSOR_DUMMY;
         }
         return sensor;
     }
@@ -223,6 +227,8 @@ public class DataManager {
         if (user != null) { // wanted user was found -> cache and return it
             users.put(user.getId(), user);
             Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
+        } else {
+            user = User.USER_DUMMY;
         }
         return user;
     }
