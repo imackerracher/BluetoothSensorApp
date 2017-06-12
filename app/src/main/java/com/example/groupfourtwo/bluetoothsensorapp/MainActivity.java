@@ -188,10 +188,13 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
         Measurement measurement = dataManager.getLatestMeasurement();
-        setTemperature(measurement.getTemperature());
-        setBrightness(measurement.getBrightness());
-        setPressure(measurement.getPressure());
-        setHumidity(measurement.getHumidity());
+
+        if (measurement != null) {
+            setTemperature(measurement.getTemperature());
+            setBrightness(measurement.getBrightness());
+            setPressure(measurement.getPressure());
+            setHumidity(measurement.getHumidity());
+        }
     }
 
     public void setTemperature(Float t) {
