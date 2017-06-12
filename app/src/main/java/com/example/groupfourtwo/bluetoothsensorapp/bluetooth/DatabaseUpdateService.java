@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
+package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,12 +7,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothLeService;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Measurement;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Record;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.User;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Sensor;
+import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
+import com.example.groupfourtwo.bluetoothsensorapp.data.User;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
 
 import java.io.IOException;
 

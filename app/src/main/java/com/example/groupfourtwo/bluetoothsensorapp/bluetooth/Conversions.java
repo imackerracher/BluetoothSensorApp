@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
+package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
 import static java.lang.Math.pow;
 

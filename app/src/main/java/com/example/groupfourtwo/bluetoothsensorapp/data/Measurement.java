@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Data;
+package com.example.groupfourtwo.bluetoothsensorapp.data;
 
 import java.util.Objects;
 

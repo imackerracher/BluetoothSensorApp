@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
+package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
 /**
  * Bluetooth Connection Main Activity

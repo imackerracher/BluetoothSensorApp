@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
+package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
 /**
  * Bluetooth Low Energy Connection Service Activity
@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,11 +33,10 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.SensortagUUIDs.*;
-import static com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.Conversions.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.Conversions.*;
 
 import java.util.List;
-import java.util.UUID;
 
 // Service for managing connection and data communication with a Gatt server hosted on BLE device
 public class BluetoothLeService extends Service {

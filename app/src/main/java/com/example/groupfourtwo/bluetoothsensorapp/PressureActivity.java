@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Interval;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Measure;
-import com.example.groupfourtwo.bluetoothsensorapp.Graph.DrawGraph;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
+import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.DAY;
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.HOUR;
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.Measure.PRESSURE;
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.Measure.TEMPERATURE;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.PRESSURE;
 
 
 public class PressureActivity extends AppCompatActivity {

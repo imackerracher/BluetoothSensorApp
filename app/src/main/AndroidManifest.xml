@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BrigthnessActivity"
+            android:name=".BrightnessActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ClearDataActivity"
@@ -38,7 +38,7 @@
             android:name=".HumidityActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".BluetoothConnection.BluetoothMainActivity"
+            android:name=".bluetooth.BluetoothMainActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ManageSensorsActivity"
@@ -50,10 +50,10 @@
             android:name=".TemperatureActivity"
             android:parentActivityName=".MainActivity"></activity>
         <activity
-            android:name=".BluetoothConnection.ControlActivity"
-            android:parentActivityName=".BluetoothConnection.BluetoothMainActivity"/>
-        <service android:name=".BluetoothConnection.BluetoothLeService" android:enabled="true"/>
-        <service android:name=".BluetoothConnection.DatabaseUpdateService" android:enabled="true"/>
+            android:name=".bluetooth.ControlActivity"
+            android:parentActivityName=".bluetooth.BluetoothMainActivity"/>
+        <service android:name=".bluetooth.BluetoothLeService" android:enabled="true"/>
+        <service android:name=".bluetooth.DatabaseUpdateService" android:enabled="true"/>
     </application>
 
 </manifest>

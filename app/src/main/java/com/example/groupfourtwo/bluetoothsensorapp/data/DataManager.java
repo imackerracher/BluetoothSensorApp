@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Data;
+package com.example.groupfourtwo.bluetoothsensorapp.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,8 +11,8 @@ import android.util.LongSparseArray;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.DatabaseContract.*;
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 
 /**
  * Central interface between persistent data of the database and the running application.

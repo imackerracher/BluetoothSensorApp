@@ -1,17 +1,10 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Graph;
-
-import android.content.Context;
-import android.widget.Toast;
+package com.example.groupfourtwo.bluetoothsensorapp.graph;
 
 import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
-import java.text.DecimalFormat;
 import java.util.TimeZone;
-
-import static com.example.groupfourtwo.bluetoothsensorapp.R.id.lineChart;
-import static java.security.AccessController.getContext;
 
 /**
  * Created by kim on 23.05.17.

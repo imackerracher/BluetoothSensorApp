@@ -8,21 +8,22 @@ import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.HUMIDITY;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.BRIGHTNESS;
 
-public class HumidityActivity extends AppCompatActivity {
+public class BrightnessActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_humidity);
+        setContentView(R.layout.activity_brightness);
 
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        Interval interval = DAY;
-        Measure measure1 = HUMIDITY;
+
+        Interval interval = HOUR;
+        Measure measure1 = BRIGHTNESS;
         long begin = System.currentTimeMillis()- interval.length;
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);

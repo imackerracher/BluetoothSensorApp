@@ -1,6 +1,6 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Data;
+package com.example.groupfourtwo.bluetoothsensorapp.data;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.DatabaseContract.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
 
 /**
  * Sets predefined parameters for each type of data collected by the application.

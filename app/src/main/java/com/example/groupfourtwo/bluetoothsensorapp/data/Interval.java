@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Data;
+package com.example.groupfourtwo.bluetoothsensorapp.data;
 
 /**
  * Sets predefined parameters for each possible interval to be displayed.

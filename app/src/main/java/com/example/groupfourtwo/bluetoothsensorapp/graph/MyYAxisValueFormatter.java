@@ -1,14 +1,8 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Graph;
+package com.example.groupfourtwo.bluetoothsensorapp.graph;
 
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Measure;
-import com.github.mikephil.charting.charts.BarLineChartBase;
-import com.github.mikephil.charting.charts.LineChart;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.text.DecimalFormat;
 

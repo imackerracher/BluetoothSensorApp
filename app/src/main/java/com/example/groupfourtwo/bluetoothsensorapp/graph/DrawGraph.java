@@ -1,15 +1,13 @@
-package com.example.groupfourtwo.bluetoothsensorapp.Graph;
+package com.example.groupfourtwo.bluetoothsensorapp.graph;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.icu.text.DateFormat;
-import android.icu.text.RelativeDateTimeFormatter;
 
-import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Interval;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Measure;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.Record;
+import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -18,19 +16,13 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static android.graphics.Color.BLUE;
-import static android.graphics.Color.GRAY;
-import static android.graphics.Color.GREEN;
-import static android.graphics.Color.YELLOW;
-import static com.example.groupfourtwo.bluetoothsensorapp.Data.Interval.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 
 /**
  * Contains methods and parameters that are used to draw the graph

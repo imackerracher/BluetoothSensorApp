@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,11 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothLeService;
-import com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothMainActivity;
-import com.example.groupfourtwo.bluetoothsensorapp.Data.DataManager;
-
-import org.w3c.dom.Text;
+import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
+import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -167,7 +163,7 @@ public class MainActivity extends AppCompatActivity
 
 
     public void changeToBrightness(View view) {
-        Intent intent = new Intent(this, BrigthnessActivity.class);
+        Intent intent = new Intent(this, BrightnessActivity.class);
         startActivity(intent);
     }
 

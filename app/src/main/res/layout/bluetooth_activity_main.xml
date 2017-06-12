@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.BluetoothMainActivity">
+    tools:context="com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity">
 
     <Button
         android:id="@+id/StartScanButton"

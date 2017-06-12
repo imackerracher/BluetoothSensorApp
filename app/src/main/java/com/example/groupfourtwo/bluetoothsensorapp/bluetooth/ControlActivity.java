@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
+package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
 /**
  * Bluetooth Connection Control Activity
@@ -8,7 +8,6 @@ package com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection;
  */
 
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -20,20 +19,13 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.ExpandableListView;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
-import static com.example.groupfourtwo.bluetoothsensorapp.BluetoothConnection.SensortagUUIDs.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
 
-import java.util.HashSet;
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class ControlActivity extends AppCompatActivity {
 
