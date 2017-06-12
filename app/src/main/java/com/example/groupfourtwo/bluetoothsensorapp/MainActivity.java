@@ -23,6 +23,7 @@ import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -194,19 +195,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setTemperature(Float t) {
-        currentTemperature.setText(t.toString() + " °C");
+        currentTemperature.setText(String.format(Locale.ENGLISH, "%.2f °C", t));
     }
 
     public void setBrightness(Float t) {
-        currentBrightness.setText(t.toString() + " lm");
+        currentBrightness.setText(String.format(Locale.ENGLISH, "%.2f lm", t));
     }
 
     public void setHumidity(Float t) {
-        currentHumidity.setText(t.toString() + " %");
+        currentHumidity.setText(String.format(Locale.ENGLISH, "%.2f %%", t));
     }
 
     public void setPressure(Float t) {
-        currentPressure.setText(t.toString() + " hPa");
+        currentPressure.setText(String.format(Locale.ENGLISH, "%.2f hPa", t));
     }
 
 
