@@ -22,7 +22,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static com.example.groupfourtwo.bluetoothsensorapp.R.id.end;
+import static com.example.groupfourtwo.bluetoothsensorapp.R.id.right;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
+import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT;
 
 /**
  * Contains methods and parameters that are used to draw the graph
@@ -42,6 +45,7 @@ public class DrawGraph {
     private Interval interval;
     private long begin;
     private Record record;
+    private int step;
     private int backgroundColour = Color.WHITE;
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
@@ -61,7 +65,8 @@ public class DrawGraph {
         begin = record.getBegin();
         long end = record.getEnd();
 
-        int step = HOUR.step;
+        this.step = HOUR.step;
+
         if (end - begin > HOUR.length)
             step = DAY.step;
         if (end - begin > DAY.length)
@@ -71,11 +76,15 @@ public class DrawGraph {
 
     public void draw(Activity activity) {
 
-        int dataPointCount = (interval.length / interval.step);
+        int dataPointCount; // maximal number of dataPoints that can be displayed
+
+        if (record == null)
+            dataPointCount = (interval.length / interval.step);
+        else
+            dataPointCount = ((int) (begin - end) / step);
+
 
         LineChart lineChart;
-
-
         long offset =  1448841600000l; // time in milliseconds to 1.Jan 2016
 
 
@@ -100,8 +109,8 @@ public class DrawGraph {
          * Generate the Values on the X-Axis
          */
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
-        x.setPointsPerMinute(60/(interval.step/1000));
-        x.setStartInSec((begin - offset) );
+        x.setPointsPerMinute(60/(interval.step/1000)); // Maximal number of data points per minute
+        x.setStartInSec((begin - offset) ); // The start in milliseconds since 1st Jan 2016 in UTC
         xAxis.setValueFormatter(x);
 
         /**
@@ -113,21 +122,28 @@ public class DrawGraph {
 
         YAxis leftAxis = lineChart.getAxisLeft();
         YAxis rightAxis = lineChart.getAxisRight();
-
-
+        MyYAxisValueFormatter y1 = new MyYAxisValueFormatter(measure1);
+        MyYAxisValueFormatter y2 = new MyYAxisValueFormatter(measure2);
         rightAxis.setEnabled(false);
 
+
+        /*
         if(measure1 != Measure.PRESSURE)
             leftAxis.setAxisMinimum(0f); // start at zero
+        */
 
         leftAxis.setTextSize(12f);
-        MyYAxisValueFormatter y1 = new MyYAxisValueFormatter(measure1);
         leftAxis.setValueFormatter(y1);
 
-        MyYAxisValueFormatter y2 = new MyYAxisValueFormatter(measure2);
-        rightAxis.setValueFormatter(y2);
 
 
+        if(measure2 != null) {
+            rightAxis.setEnabled(true);
+            rightAxis.setValueFormatter(y2);
+            rightAxis.setDrawGridLines(false); // no grid lines
+            rightAxis.setAxisMinimum(0f);
+            //rightAxis.setAxisMaximum(20f);
+        }
 
 
 
@@ -210,10 +226,10 @@ public class DrawGraph {
         lineDataSet1.setColors(createColorArray(yAxes1, measure1));
 
         LineDataSet lineDataSet2 = new LineDataSet(yAxes2,"2");
-        if (measure2 != null)
+        if (measure2 != null) {
             lineDataSet2.setColors(createColorArray(yAxes2, measure2));
-
-
+            lineDataSet2.setAxisDependency(RIGHT);
+        }
 
 
 
@@ -288,8 +304,6 @@ public class DrawGraph {
 
             i++;
         }
-
-
 
         return colorArray;
     }
