@@ -43,7 +43,6 @@ public class DrawGraph {
     private long begin;
     private Record record;
     private int backgroundColour = Color.WHITE;
-    /*private boolean allNull = true;*/
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
                      Interval interval, long begin) {
@@ -102,7 +101,7 @@ public class DrawGraph {
          */
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
         x.setPointsPerMinute(60/(interval.step/1000));
-        x.setStartInSec((begin - offset) ); //+
+        x.setStartInSec((begin - offset) );
         xAxis.setValueFormatter(x);
 
         /**
@@ -141,72 +140,56 @@ public class DrawGraph {
             e.printStackTrace();
         }
 
-        ArrayList<Float> yAxes2;
+        ArrayList<Entry> yAxes;
 
         if (record == null) {
-            yAxes2 = dataManager.getValuesFromInterval(measure1, interval, begin);
+            yAxes = dataManager.getValuesFromInterval(measure1, interval, begin);
+            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+            System.out.println(yAxes.get(0).getX());
+            System.out.println(yAxes.get(0).getY());
         }else {
-            yAxes2 = dataManager.getValuesFromRecord(measure1, record);
+            System.out.println("000000000000000000000000000000000000000000000000000000000000000000000000");
+            yAxes = dataManager.getValuesFromRecord(measure1, record);
+            System.out.println(yAxes.get(0).getY());
         }
         dataManager.close();
 
-        if(yAxes2 == null)
+        if(yAxes == null)
             return;
 
 
         /**
          * Some Data generated for testing NOT USED
          */
+        /***************************************/
 
         int numDataPoints = dataPointCount;
         int gapSize = dataPointCount/10;
         int gapPosition = dataPointCount/3;
 
-
                 /* Generating empty y-Value Array */
-        ArrayList<Float> yAxes = new ArrayList<>(); //static
+        ArrayList<Float> yAxesTest = new ArrayList<>();
+
+        /* genarate data for Testing************/
         Random randomGenerator = new Random();
-
-
-        yAxes.add(null);
+        yAxesTest.add(null);
 
         for (int i = 1; i < gapPosition; i++)
-            yAxes.add( (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
+            yAxesTest.add( (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
 
         for (int i = gapPosition; i < gapPosition + gapSize; i++)
-            yAxes.add(null);
+            yAxesTest.add(null);
 
 
         for (int i = gapPosition + gapSize; i < numDataPoints; i++)
-            yAxes.add(  (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
+            yAxesTest.add(  (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
 
         /************************************/
 
 
 
-        /**
-        * Copy graph in Entry-List
-        * */
-        ArrayList<Entry> yAxes2_1 = new ArrayList<>();
 
 
-        /*
-        for (int i = 0; i < dataPointCount; i++)
-            if (yAxes2.get(i) != null)
-                allNull = false;
-        */
-
-        for (int i = 0; i < dataPointCount; i++) {
-            if(yAxes2.get(i) != null)
-                yAxes2_1.add(new Entry(i, yAxes2.get(i)));
-        }
-
-
-
-        /*
-        if(allNull)
-            return;
-        */
 
         /**
         * Generate the lineDataSets for Visualisation
@@ -214,9 +197,9 @@ public class DrawGraph {
         ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
-        LineDataSet lineDataSet2 = new LineDataSet(yAxes2_1, "1");
+        LineDataSet lineDataSet2 = new LineDataSet(yAxes, "1");
 
-        lineDataSet2.setColors(createColorArray(yAxes2_1, measure1));
+        lineDataSet2.setColors(createColorArray(yAxes, measure1));
 
 
 
@@ -250,7 +233,7 @@ public class DrawGraph {
         lineChart.setDrawBorders(true); //Border around the Graph
         lineChart.setBorderColor( Color.BLACK);
         lineChart.setBorderWidth(2f);
-        lineChart.setNoDataText("Sorry, there is no Data in this time slot");
+        //lineChart.setNoDataText("Sorry, there is no Data in this time slot");
 
         lineChart.setKeepScreenOn(true);
         lineChart.setKeepPositionOnRotation(true);
