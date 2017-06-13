@@ -114,15 +114,18 @@ public class DrawGraph {
         YAxis leftAxis = lineChart.getAxisLeft();
         YAxis rightAxis = lineChart.getAxisRight();
 
+
         rightAxis.setEnabled(false);
 
         if(measure1 != Measure.PRESSURE)
             leftAxis.setAxisMinimum(0f); // start at zero
 
         leftAxis.setTextSize(12f);
-        MyYAxisValueFormatter y = new MyYAxisValueFormatter(measure1);
-        leftAxis.setValueFormatter(y);
+        MyYAxisValueFormatter y1 = new MyYAxisValueFormatter(measure1);
+        leftAxis.setValueFormatter(y1);
 
+        MyYAxisValueFormatter y2 = new MyYAxisValueFormatter(measure2);
+        rightAxis.setValueFormatter(y2);
 
 
 
@@ -140,21 +143,27 @@ public class DrawGraph {
             e.printStackTrace();
         }
 
-        ArrayList<Entry> yAxes;
+        ArrayList<Entry> yAxes1;
+        ArrayList<Entry> yAxes2;
 
         if (record == null) {
-            yAxes = dataManager.getValuesFromInterval(measure1, interval, begin);
-            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-            System.out.println(yAxes.get(0).getX());
-            System.out.println(yAxes.get(0).getY());
+            yAxes1 = dataManager.getValuesFromInterval(measure1, interval, begin);
         }else {
-            System.out.println("000000000000000000000000000000000000000000000000000000000000000000000000");
-            yAxes = dataManager.getValuesFromRecord(measure1, record);
-            System.out.println(yAxes.get(0).getY());
+            yAxes1 = dataManager.getValuesFromRecord(measure1, record);
         }
+
+        if (measure2 != null) {
+            if (record == null) {
+                yAxes2 = dataManager.getValuesFromInterval(measure2, interval, begin);
+            } else {
+                yAxes2 = dataManager.getValuesFromRecord(measure2, record);
+            }
+        } else
+            yAxes2 = null;
+
         dataManager.close();
 
-        if(yAxes == null)
+        if(yAxes1 == null)
             return;
 
 
@@ -197,9 +206,12 @@ public class DrawGraph {
         ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
-        LineDataSet lineDataSet2 = new LineDataSet(yAxes, "1");
+        LineDataSet lineDataSet1 = new LineDataSet(yAxes1, "1");
+        lineDataSet1.setColors(createColorArray(yAxes1, measure1));
 
-        lineDataSet2.setColors(createColorArray(yAxes, measure1));
+        LineDataSet lineDataSet2 = new LineDataSet(yAxes2,"2");
+        lineDataSet2.setColors(createColorArray(yAxes2, measure2));
+
 
 
 
@@ -209,6 +221,7 @@ public class DrawGraph {
         //setLineColor(lineDataSet3, measure1);
 
 
+        lineDataSets.add(lineDataSet1);
         lineDataSets.add(lineDataSet2);
         //lineDataSets.add(lineDataSet3);
 
@@ -226,8 +239,9 @@ public class DrawGraph {
 
         //lineChart.animateX(1000); // Animation that shows the values from left to right
 
-        lineDataSet2.setDrawValues(true); //Default is true
-        lineDataSet2.setDrawCircles(false); //Default is true
+        lineDataSet1.setDrawValues(true); //Default is true
+        lineDataSet1.setDrawCircles(false); //Default is true
+        lineDataSet2.setDrawCircles(false);
         lineChart.setMaxVisibleValueCount(20);
 
         lineChart.setDrawBorders(true); //Border around the Graph

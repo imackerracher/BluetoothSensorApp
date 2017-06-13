@@ -10,6 +10,7 @@ import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.BRIGHTNESS;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.TEMPERATURE;
 
 public class TemperatureActivity extends AppCompatActivity {
@@ -24,12 +25,13 @@ public class TemperatureActivity extends AppCompatActivity {
 
         Interval interval = DAY;
         Measure measure1 = TEMPERATURE;
+        Measure measure2 = BRIGHTNESS;
 
         long begin = System.currentTimeMillis()- interval.length;
 
 
 
-        DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
+        DrawGraph drawGraph = new DrawGraph(this,measure1,measure2,interval,begin);
         drawGraph.draw(this);
     }
 }
