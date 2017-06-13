@@ -101,7 +101,19 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.measurements_settings) {
+            Intent intent = new Intent(this, MeasurementsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.timespan_settings) {
+            Intent intent = new Intent(this, TimespanActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.sensor_settings) {
+            Intent intent = new Intent(this, SensorSettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
