@@ -3,6 +3,7 @@ package com.example.groupfourtwo.bluetoothsensorapp;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,6 +15,9 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.HUMIDITY;
 
 public class HumidityActivity extends AppCompatActivity {
+
+    private final static String TAG = MeasurementsActivity.class.getSimpleName();
+    private static final int SENSOR_SELECTION_REQUEST = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +64,23 @@ public class HumidityActivity extends AppCompatActivity {
         }
         if (id == R.id.sensor_settings) {
             Intent intent = new Intent(this, SensorSettingsActivity.class);
-            startActivity(intent);
+            intent.putExtra("prevActivity", "HumidityActivity");
+            startActivityForResult(intent, SENSOR_SELECTION_REQUEST);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == SENSOR_SELECTION_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                String returnValue = data.getStringExtra("sensor_selection");
+                Log.d(TAG, "result: " + returnValue);
+            }
+        }
     }
 
 }

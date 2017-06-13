@@ -31,5 +31,11 @@
     <string name="select_time_span_settings">Select time span</string>
     <string name="select_sensors_settings">Select sensors</string>
     <string name="stored_measurements_text">Stored measurements</string>
+    <string name="activated_sensors_text">Activated sensors</string>
+    <string name="humidity_sensor">Humidity sensor</string>
+    <string name="brightness_sensor">Brightness sensor</string>
+    <string name="temperature_sensor">Temperature sensor</string>
+    <string name="pressure_sensor">Pressure sensor</string>
+    <string name="save_and_display_sensors">Save and display sensors</string>
 
 </resources>
