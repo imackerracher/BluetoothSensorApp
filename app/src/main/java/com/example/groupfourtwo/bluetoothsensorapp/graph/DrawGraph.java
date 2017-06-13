@@ -210,7 +210,8 @@ public class DrawGraph {
         lineDataSet1.setColors(createColorArray(yAxes1, measure1));
 
         LineDataSet lineDataSet2 = new LineDataSet(yAxes2,"2");
-        lineDataSet2.setColors(createColorArray(yAxes2, measure2));
+        if (measure2 != null)
+            lineDataSet2.setColors(createColorArray(yAxes2, measure2));
 
 
 
