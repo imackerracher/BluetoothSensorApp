@@ -2,16 +2,32 @@ package com.example.groupfourtwo.bluetoothsensorapp;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 /**
- * Created by Tobias-PC on 13.06.2017.
+ * @author Tobias Nusser
+ * @version 1.0
  */
 
 public class SensorSettingsActivity extends AppCompatActivity {
+
+    private final static String TAG = MeasurementsActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_settings);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.mtoolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
     }
 }

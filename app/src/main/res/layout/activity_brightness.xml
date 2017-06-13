@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.example.groupfourtwo.bluetoothsensorapp.BrightnessActivity">
 
+
     <com.github.mikephil.charting.charts.LineChart
         android:layout_width="0dp"
         android:layout_height="400dp"
