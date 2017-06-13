@@ -50,6 +50,15 @@
             android:name=".TemperatureActivity"
             android:parentActivityName=".MainActivity"></activity>
         <activity
+            android:name=".MeasurementsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".TimespanActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SensorSettingsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".bluetooth.ControlActivity"
             android:parentActivityName=".bluetooth.BluetoothMainActivity"/>
         <service android:name=".bluetooth.BluetoothLeService" android:enabled="true"/>
