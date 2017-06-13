@@ -141,7 +141,7 @@ public class DrawGraph {
             rightAxis.setEnabled(true);
             rightAxis.setValueFormatter(y2);
             rightAxis.setDrawGridLines(false); // no grid lines
-            rightAxis.setAxisMinimum(0f);
+            //rightAxis.setAxisMinimum(0f);
             //rightAxis.setAxisMaximum(20f);
         }
 
