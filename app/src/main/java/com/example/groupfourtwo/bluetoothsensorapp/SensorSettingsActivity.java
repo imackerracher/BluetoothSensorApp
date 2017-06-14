@@ -213,6 +213,8 @@ public class SensorSettingsActivity extends AppCompatActivity {
                     sensor_res = "BrightnessActivity";
                 } else if (pressureSwitch.isChecked() && !(prevPres))  {
                     sensor_res = "PressureActivity";
+                } else {
+                    sensor_res="";
                 }
                 Intent intent = new Intent();
                 intent.putExtra("sensor_selection",sensor_res);
