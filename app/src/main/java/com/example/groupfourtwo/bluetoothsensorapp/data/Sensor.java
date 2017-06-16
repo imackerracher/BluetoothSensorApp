@@ -1,6 +1,9 @@
 package com.example.groupfourtwo.bluetoothsensorapp.data;
 
+import java.util.Locale;
 import java.util.Objects;
+
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
 /**
  * Wrapper for information about the sensor chip generating a measurement.
@@ -108,5 +111,27 @@ public class Sensor {
         }
 
         this.name = name;
+    }
+
+
+    /**
+     * Convert the numeric id of the sensor into a hexadecimal string representation.
+     * Every two digits (one Byte) are separated by a colon.
+     *
+     * @return  a string with the sensors mac address
+     */
+    private String getAddress() {
+        StringBuilder address = new StringBuilder(String.format("%H", id));
+
+        for (int i = 2; i <= 14; i += 3) {
+            address.insert(i, ' ');
+        }
+        return address.toString();
+    }
+
+
+    @Override
+    public String toString() {
+        return  String.format(Locale.ENGLISH, "%s%n%s%n%tD", name, getAddress(), knownSince);
     }
 }
