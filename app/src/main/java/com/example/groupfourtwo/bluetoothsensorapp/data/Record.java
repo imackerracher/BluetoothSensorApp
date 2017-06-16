@@ -1,5 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.data;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -147,5 +148,24 @@ public class Record {
         }
 
         end = System.currentTimeMillis();
+    }
+
+
+    @Override
+    public String toString() {
+        boolean endsOnBegin = String.format("%tF", begin).equals(String.format("%tF", end));
+
+        String endFormatted;
+
+        if (isRunning()) {
+            endFormatted = "(running)";
+        } else if (endsOnBegin) {
+            endFormatted = String.format(Locale.ENGLISH, "–  %tT", end);
+        } else {
+            endFormatted = String.format(Locale.ENGLISH, "–  %tF  %<tT", end);
+        }
+
+        return  String.format(Locale.ENGLISH, "# %d%n%s%n%tF  %<tT  %s",
+                              id, sensor.getName(), begin, endFormatted);
     }
 }

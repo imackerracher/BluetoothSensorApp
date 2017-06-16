@@ -12,6 +12,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
+import com.example.groupfourtwo.bluetoothsensorapp.data.User;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,15 +32,6 @@ import static android.R.attr.id;
 public class MeasurementsActivity extends AppCompatActivity {
 
     private final static String TAG = MeasurementsActivity.class.getSimpleName();
-    String [] measurements = {
-            "Messung 1",
-            "Messung 2",
-            "Messung 3",
-            "Messung 4",
-            "Messung 5",
-            "Messung 6",
-    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +48,16 @@ public class MeasurementsActivity extends AppCompatActivity {
             }
         });
 
+        DataManager dataManager = DataManager.getInstance(this);
+        try {
+            dataManager.open();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        List<Record> recordList = dataManager.getAllRecords();
+        dataManager.close();
 
-        List<String> measureList = new ArrayList<>(Arrays.asList(measurements));
-
-        final ListAdapter myAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1 , measureList);
+        final ListAdapter myAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1 , recordList);
         ListView listView = (ListView) findViewById(R.id.measurements_listview);
         listView.setAdapter(myAdapter);
 
