@@ -121,10 +121,10 @@ public class Sensor {
      * @return  a string with the sensors mac address
      */
     private String getAddress() {
-        StringBuilder address = new StringBuilder(String.format("%H", id));
+        StringBuilder address = new StringBuilder(String.format("%012X", id));
 
-        for (int i = 2; i <= 14; i += 3) {
-            address.insert(i, ' ');
+        for (int i = 2; i < address.length(); i += 3) {
+            address.insert(i, ':');
         }
         return address.toString();
     }
@@ -132,6 +132,6 @@ public class Sensor {
 
     @Override
     public String toString() {
-        return  String.format(Locale.ENGLISH, "%s%n%s%n%tD", name, getAddress(), knownSince);
+        return  String.format(Locale.ENGLISH, "%s%n%s%n%tF", name, getAddress(), knownSince);
     }
 }
