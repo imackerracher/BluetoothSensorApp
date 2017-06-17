@@ -54,7 +54,7 @@ public class MeasurementsActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        List<Sensor> recordList = dataManager.getAllSensors();
+        List<Record> recordList = dataManager.getAllRecords();
         dataManager.close();
 
         final ListAdapter myAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1 , recordList);
