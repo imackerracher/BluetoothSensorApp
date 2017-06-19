@@ -114,11 +114,7 @@ public class DataManager {
      * @return  a list of all saved records
      */
     public ArrayList<Record> getAllRecords() {
-        String[] select = {RecordData._ID,
-                RecordData.COLUMN_SENSOR_ID,
-                RecordData.COLUMN_USER_ID,
-                RecordData.COLUMN_BEGIN,
-                RecordData.COLUMN_END};
+        String[] select = RecordData.ALL_COLUMNS;
 
         // SELECT * FROM RECORD ORDER BY ID DESC
         Cursor cursor = database.query(RecordData.TABLE_RECORD, select,
@@ -145,9 +141,7 @@ public class DataManager {
      * @return  a list of all saved sensors
      */
     public ArrayList<Sensor> getAllSensors() {
-        String[] select = {SensorData._ID,
-                SensorData.COLUMN_NAME,
-                SensorData.COLUMN_KNOWN_SINCE};
+        String[] select = SensorData.ALL_COLUMNS;
 
         // SELECT * FROM SENSOR ORDER BY NAME
         Cursor cursor = database.query(SensorData.TABLE_SENSOR, select,
@@ -240,14 +234,7 @@ public class DataManager {
      * @return  the measurement lastly inserted
      */
     public Measurement getLatestMeasurement() {
-        String[] select = {MeasurementData._ID,
-                MeasurementData.COLUMN_RECORD_ID,
-                MeasurementData.COLUMN_TIME,
-                MeasurementData.COLUMN_BRIGHTNESS,
-                MeasurementData.COLUMN_DISTANCE,
-                MeasurementData.COLUMN_HUMIDITY,
-                MeasurementData.COLUMN_PRESSURE,
-                MeasurementData.COLUMN_TEMPERATURE};
+        String[] select = MeasurementData.ALL_COLUMNS;
 
         // SELECT * FROM MEASUREMENT ORDER BY ID DESC
         Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
@@ -610,26 +597,25 @@ public class DataManager {
      * @return  measurement containing the given row
      */
     private Measurement cursorToMeasurement(Cursor cursor) {
-        int indexID = cursor.getColumnIndex(MeasurementData._ID);
-        int indexRecord = cursor.getColumnIndex(MeasurementData.COLUMN_RECORD_ID);
-        int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
-        int indexBrightness = cursor.getColumnIndex(MeasurementData.COLUMN_BRIGHTNESS);
-        int indexDistance = cursor.getColumnIndex(MeasurementData.COLUMN_DISTANCE);
-        int indexHumidity = cursor.getColumnIndex(MeasurementData.COLUMN_HUMIDITY);
-        int indexPressure = cursor.getColumnIndex(MeasurementData.COLUMN_PRESSURE);
-        int indexTemperature = cursor.getColumnIndex(MeasurementData.COLUMN_TEMPERATURE);
-
-        long id = cursor.getLong(indexID);
-        Record record = findRecord(cursor.getLong(indexRecord));
-        long time = cursor.getLong(indexTime);
-        float brightness = cursor.getFloat(indexBrightness);
-        float distance = cursor.getFloat(indexDistance);
-        float humidity = cursor.getFloat(indexHumidity);
-        float pressure = cursor.getFloat(indexPressure);
-        float temperature = cursor.getFloat(indexTemperature);
+        final int indexID = cursor.getColumnIndex(MeasurementData._ID);
+        final int indexRecord = cursor.getColumnIndex(MeasurementData.COLUMN_RECORD_ID);
+        final int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
+        final int indexBrightness = cursor.getColumnIndex(MeasurementData.COLUMN_BRIGHTNESS);
+        final int indexDistance = cursor.getColumnIndex(MeasurementData.COLUMN_DISTANCE);
+        final int indexHumidity = cursor.getColumnIndex(MeasurementData.COLUMN_HUMIDITY);
+        final int indexPressure = cursor.getColumnIndex(MeasurementData.COLUMN_PRESSURE);
+        final int indexTemperature = cursor.getColumnIndex(MeasurementData.COLUMN_TEMPERATURE);
 
         return new Measurement(
-                id, record, time, brightness, distance, humidity, pressure, temperature);
+                cursor.getLong(indexID),
+                findRecord(cursor.getLong(indexRecord)),
+                cursor.getLong(indexTime),
+                cursor.getFloat(indexBrightness),
+                cursor.getFloat(indexDistance),
+                cursor.getFloat(indexHumidity),
+                cursor.getFloat(indexPressure),
+                cursor.getFloat(indexTemperature)
+        );
     }
 
 
@@ -640,19 +626,19 @@ public class DataManager {
      * @return  record object from given row
      */
     private Record cursorToRecord(Cursor cursor) {
-        int indexID = cursor.getColumnIndex(RecordData._ID);
-        int indexSensor = cursor.getColumnIndex(RecordData.COLUMN_SENSOR_ID);
-        int indexUser = cursor.getColumnIndex(RecordData.COLUMN_USER_ID);
-        int indexBegin = cursor.getColumnIndex(RecordData.COLUMN_BEGIN);
-        int indexEnd = cursor.getColumnIndex(RecordData.COLUMN_END);
+        final int indexID = cursor.getColumnIndex(RecordData._ID);
+        final int indexSensor = cursor.getColumnIndex(RecordData.COLUMN_SENSOR_ID);
+        final int indexUser = cursor.getColumnIndex(RecordData.COLUMN_USER_ID);
+        final int indexBegin = cursor.getColumnIndex(RecordData.COLUMN_BEGIN);
+        final int indexEnd = cursor.getColumnIndex(RecordData.COLUMN_END);
 
-        long id = cursor.getLong(indexID);
-        Sensor sensor = findSensor(cursor.getLong(indexSensor));
-        User user = findUser(cursor.getLong(indexUser));
-        long begin = cursor.getLong(indexBegin);
-        long end = cursor.getLong(indexEnd);
-
-        return new Record(id, sensor, user, begin, end);
+        return new Record(
+                cursor.getLong(indexID),
+                findSensor(cursor.getLong(indexSensor)),
+                findUser(cursor.getLong(indexUser)),
+                cursor.getLong(indexBegin),
+                cursor.getLong(indexEnd)
+        );
     }
 
 
@@ -663,15 +649,15 @@ public class DataManager {
      * @return  sensor object from given row
      */
     private Sensor cursorToSensor(Cursor cursor) {
-        int indexID = cursor.getColumnIndex(SensorData._ID);
-        int indexName = cursor.getColumnIndex(SensorData.COLUMN_NAME);
-        int indexKnownSince = cursor.getColumnIndex(SensorData.COLUMN_KNOWN_SINCE);
+        final int indexID = cursor.getColumnIndex(SensorData._ID);
+        final int indexName = cursor.getColumnIndex(SensorData.COLUMN_NAME);
+        final int indexKnownSince = cursor.getColumnIndex(SensorData.COLUMN_KNOWN_SINCE);
 
-        long id = cursor.getLong(indexID);
-        String name = cursor.getString(indexName);
-        long knownSince = cursor.getLong(indexKnownSince);
-
-        return new Sensor(id, name, knownSince);
+        return new Sensor(
+                cursor.getLong(indexID),
+                cursor.getString(indexName),
+                cursor.getLong(indexKnownSince)
+        );
     }
 
 
@@ -682,13 +668,13 @@ public class DataManager {
      * @return  user object from given row
      */
     private User cursorToUser(Cursor cursor) {
-        int indexID = cursor.getColumnIndex(UserData._ID);
-        int indexName = cursor.getColumnIndex(UserData.COLUMN_NAME);
+        final int indexID = cursor.getColumnIndex(UserData._ID);
+        final int indexName = cursor.getColumnIndex(UserData.COLUMN_NAME);
 
-        long id = cursor.getLong(indexID);
-        String name = cursor.getString(indexName);
-
-        return new User(id, name);
+        return new User(
+                cursor.getLong(indexID),
+                cursor.getString(indexName)
+        );
     }
 
 
@@ -699,14 +685,7 @@ public class DataManager {
      * @return  the wanted measurement
      */
     private Measurement searchMeasurement(long id) {
-        String[] select = {MeasurementData._ID,
-                MeasurementData.COLUMN_RECORD_ID,
-                MeasurementData.COLUMN_TIME,
-                MeasurementData.COLUMN_BRIGHTNESS,
-                MeasurementData.COLUMN_DISTANCE,
-                MeasurementData.COLUMN_HUMIDITY,
-                MeasurementData.COLUMN_PRESSURE,
-                MeasurementData.COLUMN_TEMPERATURE};
+        String[] select = MeasurementData.ALL_COLUMNS;
 
         // SELECT * FROM MEASUREMENT WHERE ID = id
         Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
@@ -730,11 +709,7 @@ public class DataManager {
      * @return  the wanted record
      */
     private Record searchRecord(long id) {
-        String[] select = {RecordData._ID,
-                RecordData.COLUMN_SENSOR_ID,
-                RecordData.COLUMN_USER_ID,
-                RecordData.COLUMN_BEGIN,
-                RecordData.COLUMN_END};
+        String[] select = RecordData.ALL_COLUMNS;
 
         // SELECT * FROM RECORD WHERE ID = id
         Cursor cursor = database.query(RecordData.TABLE_RECORD, select,
@@ -760,9 +735,7 @@ public class DataManager {
      * @return  the wanted sensor
      */
     private Sensor searchSensor(long id) {
-        String[] select = {SensorData._ID,
-                SensorData.COLUMN_NAME,
-                SensorData.COLUMN_KNOWN_SINCE};
+        String[] select = SensorData.ALL_COLUMNS;
 
         // SELECT * FROM SENSOR WHERE ID = id
         Cursor cursor = database.query(SensorData.TABLE_SENSOR, select,
@@ -788,8 +761,7 @@ public class DataManager {
      * @return  the wanted user
      */
     private User searchUser(long id) {
-        String[] select = {UserData._ID,
-                UserData.COLUMN_NAME};
+        String[] select = UserData.ALL_COLUMNS;
 
         // SELECT * FROM USER WHERE ID = id
         Cursor cursor = database.query(UserData.TABLE_USER, select,
