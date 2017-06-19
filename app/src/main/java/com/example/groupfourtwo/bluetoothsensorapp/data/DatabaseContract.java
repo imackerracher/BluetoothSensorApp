@@ -39,11 +39,23 @@ final class DatabaseContract {
         static final String COLUMN_HUMIDITY = "humidity";
         static final String COLUMN_PRESSURE = "pressure";
         static final String COLUMN_TEMPERATURE = "temperature";
+
+        static final String[] ALL_COLUMNS = {
+                _ID,
+                COLUMN_RECORD_ID,
+                COLUMN_TIME,
+                COLUMN_BRIGHTNESS,
+                COLUMN_DISTANCE,
+                COLUMN_HUMIDITY,
+                COLUMN_PRESSURE,
+                COLUMN_TEMPERATURE
+        };
     }
 
 
     /**
      * Defines the names of the table and columns that contain the metadata of a record.
+     * @see BaseColumns
      */
     static final class RecordData implements BaseColumns {
         static final String TABLE_RECORD = "record";
@@ -51,6 +63,14 @@ final class DatabaseContract {
         static final String COLUMN_USER_ID = "userID";
         static final String COLUMN_BEGIN = "begin";
         static final String COLUMN_END = "end";
+
+        static final String[] ALL_COLUMNS = {
+                _ID,
+                COLUMN_SENSOR_ID,
+                COLUMN_USER_ID,
+                COLUMN_BEGIN,
+                COLUMN_END
+        };
     }
 
 
@@ -62,6 +82,12 @@ final class DatabaseContract {
         static final String TABLE_SENSOR = "sensor";
         static final String COLUMN_NAME = "sensorName";
         static final String COLUMN_KNOWN_SINCE = "knownSince";
+
+        static final String[] ALL_COLUMNS = {
+                _ID,
+                COLUMN_NAME,
+                COLUMN_KNOWN_SINCE
+        };
     }
 
 
@@ -72,6 +98,11 @@ final class DatabaseContract {
     static final class UserData implements BaseColumns {
         static final String TABLE_USER = "user";
         static final String COLUMN_NAME = "userName";
+
+        static final String[] ALL_COLUMNS = {
+                _ID,
+                COLUMN_NAME
+        };
     }
 
 
