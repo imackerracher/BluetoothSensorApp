@@ -10,6 +10,9 @@ public enum Interval {
     HOUR (3600000, 1000),
     DAY (86400000, 10000),
     WEEK (604800000, 60000);
+    //HOUR (3600000, 1000), kills MyXAxisValueFormatter at the moment.
+    //DAY (86400000, 60000),
+    //WEEK (604800000, 600000);
 
     /**
      * The length of the selected interval in milliseconds.

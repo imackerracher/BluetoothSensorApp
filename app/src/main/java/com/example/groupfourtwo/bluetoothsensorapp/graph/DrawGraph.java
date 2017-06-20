@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.R.id.end;
+import static com.example.groupfourtwo.bluetoothsensorapp.R.id.lineChart;
 import static com.example.groupfourtwo.bluetoothsensorapp.R.id.right;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT;
@@ -47,6 +48,7 @@ public class DrawGraph {
     private Record record;
     private int step;
     private int backgroundColour = Color.WHITE;
+    private  LineChart lineChart;
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
                      Interval interval, long begin) {
@@ -84,7 +86,7 @@ public class DrawGraph {
             dataPointCount = ((int) (begin - end) / step);
 
 
-        LineChart lineChart;
+
         long offset =  1448841600000l; // time in milliseconds to 1.Jan 2016
 
 
@@ -115,28 +117,18 @@ public class DrawGraph {
 
         /**
          * Generate Y-Axis format
-         * Per default, all data that is added to the chart plots against the left YAxis of the
-         * chart. If not further specified and enabled, the right YAxis is adjusted to represent
-         * the same scale as the left axis.
          */
 
         YAxis leftAxis = lineChart.getAxisLeft();
         YAxis rightAxis = lineChart.getAxisRight();
         MyYAxisValueFormatter y1 = new MyYAxisValueFormatter(measure1);
         MyYAxisValueFormatter y2 = new MyYAxisValueFormatter(measure2);
-        rightAxis.setEnabled(false);
 
-
-        /*
-        if(measure1 != Measure.PRESSURE)
-            leftAxis.setAxisMinimum(0f); // start at zero
-        */
 
         leftAxis.setTextSize(12f);
         leftAxis.setValueFormatter(y1);
 
-
-
+        rightAxis.setEnabled(false);
         if(measure2 != null) {
             rightAxis.setEnabled(true);
             rightAxis.setValueFormatter(y2);
@@ -179,8 +171,9 @@ public class DrawGraph {
 
         dataManager.close();
 
-        if(yAxes1 == null)
+        if(yAxes1 == null) {
             return;
+        }
 
 
         /**
@@ -263,7 +256,7 @@ public class DrawGraph {
 
         lineChart.setDrawBorders(true); //Border around the Graph
         lineChart.setBorderColor( Color.BLACK);
-        lineChart.setBorderWidth(2f);
+        lineChart.setBorderWidth(1f);
         //lineChart.setNoDataText("Sorry, there is no Data in this time slot");
 
         lineChart.setKeepScreenOn(true);
@@ -307,6 +300,14 @@ public class DrawGraph {
 
         return colorArray;
     }
+
+    public void setMeasure2(Measure measure) {
+        measure2 = measure;
+        lineChart.notifyDataSetChanged(); // let the chart know it's data changed
+        lineChart.invalidate(); // refresh
+    }
+
+
 
 
 }

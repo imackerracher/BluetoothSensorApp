@@ -31,7 +31,9 @@ public class BrightnessActivity extends AppCompatActivity {
         long begin = System.currentTimeMillis()- interval.length;
 
         DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
+
         drawGraph.draw(this);
+
     }
 
 
