@@ -21,7 +21,7 @@ public class HumidityActivity extends AppCompatActivity {
     private final static String TAG = MeasurementsActivity.class.getSimpleName();
     private static final int SENSOR_SELECTION_REQUEST = 3;
     long end = System.currentTimeMillis();
-    long begin = end - HOUR.length;
+    long begin = end - WEEK.length;
     DrawGraph drawGraph = new DrawGraph(this, HUMIDITY, null, begin, end);
 
     @Override

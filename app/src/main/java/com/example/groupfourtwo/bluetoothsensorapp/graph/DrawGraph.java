@@ -100,8 +100,7 @@ public class DrawGraph {
          */
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
 
-        // TODO Funktioniert nicht für grobere Ausschnitte
-        x.setPointsPerMinute(60/(interval.step/1000)); // Maximal number of data points per minute
+        x.setPointsPerHour(3600/(interval.step/1000)); // Maximal number of data points per Hour
         x.setStartInSec((begin - offset) ); // The start in milliseconds since 1st Jan 2016 in UTC
         xAxis.setValueFormatter(x);
 

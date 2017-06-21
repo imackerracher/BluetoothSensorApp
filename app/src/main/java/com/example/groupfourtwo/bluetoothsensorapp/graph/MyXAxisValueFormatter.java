@@ -21,11 +21,11 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
 
         private BarLineChartBase<?> chart;
 
-        private int pointsPerMinute; //How many Datapoints do we Draw per  minute
+        private int pointsPerHour; //How many Datapoints do we Draw per  Hour
 
         private long startInMilSec; //How many milliseconds behind the first Jan 2016 do we start.
 
-        public void setPointsPerMinute(int p){pointsPerMinute = p;}
+        public void setPointsPerHour(int p){pointsPerHour = p;}
 
         public void setStartInSec(long s){startInMilSec = s;}
 
@@ -37,7 +37,7 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
         public String getFormattedValue(float value, AxisBase axis) {
 
 
-            int sec = (int) value*60/pointsPerMinute + (int) (startInMilSec/1000l) +  (timezone + dstSavings)/1000;
+            int sec = (int) value*3600/pointsPerHour + (int) (startInMilSec/1000l) +  (timezone + dstSavings)/1000;
 
             int minutes = determineMinutes(sec);
 
@@ -54,10 +54,10 @@ public class MyXAxisValueFormatter implements IAxisValueFormatter {
             String monthName = mMonths[month % mMonths.length];
             String yearName = String.valueOf(year);
 
-            if (chart.getVisibleXRange() > 30*300*pointsPerMinute ) {
+            if (chart.getVisibleXRange() > 30*5*pointsPerHour ) {
 
                 return monthName + " " + yearName;
-            } else if (chart.getVisibleXRange() > 30*50*pointsPerMinute ) {
+            } else if (chart.getVisibleXRange() > 30*pointsPerHour ) {
 
                 int dayOfMonth = determineDayOfMonth(days, month + 12 * (year - 2016));
 
