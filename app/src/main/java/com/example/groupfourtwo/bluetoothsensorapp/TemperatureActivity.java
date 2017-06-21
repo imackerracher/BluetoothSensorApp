@@ -15,12 +15,17 @@ import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.BRIGHTNESS;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.HUMIDITY;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.PRESSURE;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.TEMPERATURE;
 
 public class TemperatureActivity extends AppCompatActivity {
 
     private final static String TAG = MeasurementsActivity.class.getSimpleName();
     private static final int SENSOR_SELECTION_REQUEST = 2;
+    private long end = System.currentTimeMillis();
+    private long begin = end - HOUR.length;
+    DrawGraph drawGraph = new DrawGraph(this,TEMPERATURE,null,begin, end);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +35,7 @@ public class TemperatureActivity extends AppCompatActivity {
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        Measure measure2 = BRIGHTNESS;
 
-        long end = System.currentTimeMillis();
-        long begin = end - HOUR.length;
-
-
-
-        DrawGraph drawGraph = new DrawGraph(this,TEMPERATURE,measure2,begin, end);
         drawGraph.draw(this);
     }
 
@@ -84,9 +82,30 @@ public class TemperatureActivity extends AppCompatActivity {
         if (requestCode == SENSOR_SELECTION_REQUEST) {
             if (resultCode == RESULT_OK) {
                 String returnValue = data.getStringExtra("sensor_selection");
+                createNewGraph(returnValue);
                 Log.d(TAG, "result: " + returnValue);
+                drawGraph.draw(this);
             }
         }
     }
+
+    private void createNewGraph(String returnValue) {
+        Measure measure;
+
+        switch (returnValue) {
+            case "HumidityActivity": measure = HUMIDITY;
+                break;
+            case "PressureActivity": measure = PRESSURE;
+                break;
+            case "BrightnessActivity": measure = BRIGHTNESS;
+                break;
+            case "TemperatureActivity": measure = TEMPERATURE;
+                break;
+            default: measure = PRESSURE;
+        }
+
+        drawGraph.setMeasure2(measure);
+    }
+
 
 }
