@@ -21,8 +21,12 @@ import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
+import com.example.groupfourtwo.bluetoothsensorapp.data.User;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
@@ -60,9 +64,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //dataManager = DataManager.getInstance(this);
-        //Log.d(LOG_TAG, "Created new data manager object.");
 
 
         //Tie the values in content_main.xml to the textviews in this file

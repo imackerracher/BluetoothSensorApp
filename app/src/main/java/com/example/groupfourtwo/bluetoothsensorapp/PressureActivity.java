@@ -29,12 +29,11 @@ public class PressureActivity extends AppCompatActivity {
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        Interval interval = DAY;
-        Measure measure1 = PRESSURE;
         Measure measure2 = HUMIDITY;
-        long begin = System.currentTimeMillis()- interval.length;
+        long end = System.currentTimeMillis();
+        long begin = end - DAY.length;
 
-        DrawGraph drawGraph = new DrawGraph(this,measure1,measure2,interval,begin);
+        DrawGraph drawGraph = new DrawGraph(this,PRESSURE,measure2,begin,end);
         drawGraph.draw(this);
 
     }

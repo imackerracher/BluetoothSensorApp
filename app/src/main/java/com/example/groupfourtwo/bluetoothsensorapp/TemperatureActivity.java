@@ -30,15 +30,14 @@ public class TemperatureActivity extends AppCompatActivity {
         //Get the intent that started this activity
         Intent intent = getIntent();
 
-        Interval interval = HOUR;
-        Measure measure1 = TEMPERATURE;
         Measure measure2 = BRIGHTNESS;
 
-        long begin = System.currentTimeMillis()- interval.length;
+        long end = System.currentTimeMillis();
+        long begin = end - HOUR.length;
 
 
 
-        DrawGraph drawGraph = new DrawGraph(this,measure1,measure2,interval,begin);
+        DrawGraph drawGraph = new DrawGraph(this,TEMPERATURE,measure2,begin, end);
         drawGraph.draw(this);
     }
 

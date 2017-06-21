@@ -255,13 +255,17 @@ public class DataManager {
     /**
      * Retrieve a list of all values of a certain measure in the given interval.
      *
-     * @param measure   the measure of values to retrieve
-     * @param interval  the interval to retrieve
-     * @param begin     the start point of the interval
-     * @return  all values in the interval, empty list if no entry was found
+     * @param measure  the measure of values to retrieve
+     * @param begin    the start point of the interval
+     * @param end      the end point of the interval
+     * @return  all values in the interval, null if no entry was found
      */
-    public ArrayList<Entry> getValuesFromInterval(Measure measure, Interval interval, long begin) {
-        long end = begin + interval.length;
+    public ArrayList<Entry> getValuesFromInterval(Measure measure, long begin, long end) {
+        if (end <= begin) {
+            throw new IllegalArgumentException("End point must lay in future of begin.");
+        }
+
+        Interval interval = fromLength(end - begin);
 
         String[] select = {MeasurementData.COLUMN_TIME, measure.column};
 
@@ -283,7 +287,7 @@ public class DataManager {
      *
      * @param measure  the measure of values to retrieve
      * @param record   the record to analyse
-     * @return  all values of the record, empty list if no entry was found
+     * @return  all values of the record, null if no entry was found
      */
     public ArrayList<Entry> getValuesFromRecord(Measure measure, Record record) {
         String[] select = {MeasurementData.COLUMN_TIME, measure.column};
@@ -303,15 +307,9 @@ public class DataManager {
         }
 
         // Decide how many values will be summarized to one data point.
-        int step = HOUR.step;
-        if (end - begin > HOUR.length) {
-            step = DAY.step;
-        }
-        if (end - begin > DAY.length) {
-            step = WEEK.step;
-        }
+        Interval interval = fromLength(end - begin);
 
-        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end, step);
+        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end, interval.step);
         cursor.close();
         return data;
     }
@@ -557,18 +555,21 @@ public class DataManager {
      * @return  a list of values from the cursor
      */
     private ArrayList<Entry> cursorToList(Cursor cursor, String column,
-                                              long begin, long end, int step) {
+                                          long begin, long end, int step) {
         int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
         int indexValue = cursor.getColumnIndex(column);
 
-        // Cursor might be empty. Return nothing if no entries were found.
-        if (!cursor.moveToFirst()) {
-            return null;
-        }
+        Log.d(LOG_TAG, "Datenbank liefere " + cursor.getCount() + " Einträge");
 
         // The length of the requested interval determines maximum number of data points.
         int duration = (int) (end - begin);
         ArrayList<Entry> data = new ArrayList<>(duration / step);
+
+        // Cursor might be empty. Return nothing if no entries were found.
+        if (!cursor.moveToFirst()) {
+            Log.d(LOG_TAG, "Hier keine Daten vorhanden.");
+            return data;
+        }
 
         // Fill list with values from cursor according to resolution of data points.
         for (long i = begin, j = 0; i < end; i += step, ++j) {
@@ -586,6 +587,10 @@ public class DataManager {
             }
         }
 
+        Log.d(LOG_TAG, "Soviele Datenpunkte gefunden: " + data.size());
+        for (Entry e : data) {
+            Log.d(LOG_TAG, "Entry: " + e.toString());
+        }
         return data;
     }
 

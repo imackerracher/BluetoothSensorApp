@@ -20,11 +20,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.R.id.end;
-import static com.example.groupfourtwo.bluetoothsensorapp.R.id.lineChart;
-import static com.example.groupfourtwo.bluetoothsensorapp.R.id.right;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT;
 
@@ -45,18 +41,19 @@ public class DrawGraph {
     private Measure measure1, measure2;
     private Interval interval;
     private long begin;
+    private long end;
     private Record record;
-    private int step;
     private int backgroundColour = Color.WHITE;
-    private  LineChart lineChart;
+    private LineChart lineChart;
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
-                     Interval interval, long begin) {
+                     long begin, long end) {
         this.context = context;
         this.measure1 = measure1;
         this.measure2 = measure2;
-        this.interval = interval;
+        interval = fromLength(end - begin);
         this.begin = begin;
+        this.end = end;
         record = null;
     }
 
@@ -65,29 +62,20 @@ public class DrawGraph {
                      Record record) {
         this.context = context;
         begin = record.getBegin();
-        long end = record.getEnd();
-
-        this.step = HOUR.step;
-
-        if (end - begin > HOUR.length)
-            step = DAY.step;
-        if (end - begin > DAY.length)
-            step = WEEK.step;
+        end = record.getEnd();
+        interval = fromLength(end - begin);
     }
 
 
     public void draw(Activity activity) {
 
-        int dataPointCount; // maximal number of dataPoints that can be displayed
-
-        if (record == null)
-            dataPointCount = (interval.length / interval.step);
-        else
-            dataPointCount = ((int) (begin - end) / step);
+        long length = (end - begin);
+        // maximal number of dataPoints that can be displayed
+        int dataPointCount = (int) (length / ((long) (interval.step))) + 1;
 
 
 
-        long offset =  1448841600000l; // time in milliseconds to 1.Jan 2016
+        long offset =  1448841600000L; // time in milliseconds to 1.Jan 2016
 
 
         /*reference in main.xml*/
@@ -111,6 +99,8 @@ public class DrawGraph {
          * Generate the Values on the X-Axis
          */
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
+
+        // TODO Funktioniert nicht für grobere Ausschnitte
         x.setPointsPerMinute(60/(interval.step/1000)); // Maximal number of data points per minute
         x.setStartInSec((begin - offset) ); // The start in milliseconds since 1st Jan 2016 in UTC
         xAxis.setValueFormatter(x);
@@ -155,14 +145,14 @@ public class DrawGraph {
         ArrayList<Entry> yAxes2;
 
         if (record == null) {
-            yAxes1 = dataManager.getValuesFromInterval(measure1, interval, begin);
-        }else {
+            yAxes1 = dataManager.getValuesFromInterval(measure1, begin, end);
+        } else {
             yAxes1 = dataManager.getValuesFromRecord(measure1, record);
         }
 
         if (measure2 != null) {
             if (record == null) {
-                yAxes2 = dataManager.getValuesFromInterval(measure2, interval, begin);
+                yAxes2 = dataManager.getValuesFromInterval(measure2, begin, end);
             } else {
                 yAxes2 = dataManager.getValuesFromRecord(measure2, record);
             }
@@ -171,24 +161,23 @@ public class DrawGraph {
 
         dataManager.close();
 
-        if(yAxes1 == null) {
+        if(yAxes1 == null  ||  yAxes1.isEmpty()) {
             return;
         }
 
 
-        /**
+        /*
          * Some Data generated for testing NOT USED
-         */
-        /***************************************/
+         *
 
         int numDataPoints = dataPointCount;
         int gapSize = dataPointCount/10;
         int gapPosition = dataPointCount/3;
 
-                /* Generating empty y-Value Array */
+                //Generating empty y-Value Array
         ArrayList<Float> yAxesTest = new ArrayList<>();
 
-        /* genarate data for Testing************/
+        // genarate data for Testing ************
         Random randomGenerator = new Random();
         yAxesTest.add(null);
 
@@ -202,7 +191,7 @@ public class DrawGraph {
         for (int i = gapPosition + gapSize; i < numDataPoints; i++)
             yAxesTest.add(  (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
 
-        /************************************/
+        */
 
 
 
@@ -217,11 +206,14 @@ public class DrawGraph {
 
         LineDataSet lineDataSet1 = new LineDataSet(yAxes1, "1");
         lineDataSet1.setColors(createColorArray(yAxes1, measure1));
+        lineDataSets.add(lineDataSet1);
 
         LineDataSet lineDataSet2 = new LineDataSet(yAxes2,"2");
         if (measure2 != null) {
             lineDataSet2.setColors(createColorArray(yAxes2, measure2));
             lineDataSet2.setAxisDependency(RIGHT);
+            lineDataSets.add(lineDataSet2);
+
         }
 
 
@@ -231,9 +223,6 @@ public class DrawGraph {
         //setLineColor(lineDataSet3, measure1);
 
 
-        lineDataSets.add(lineDataSet1);
-        lineDataSets.add(lineDataSet2);
-        //lineDataSets.add(lineDataSet3);
 
 
         lineChart.setData(new LineData(lineDataSets));
@@ -266,32 +255,16 @@ public class DrawGraph {
 
     }
 
-    private int getLineColor(Measure measure) {
-        switch (measure) {
-            case TEMPERATURE:   return Color.RED;
-
-            case HUMIDITY:      return Color.BLUE;
-
-            case BRIGHTNESS:    return Color.MAGENTA;
-
-            case PRESSURE:      return Color.GRAY;
-
-            case DISTANCE:      return Color.BLACK;
-
-            default:            return Color.YELLOW;
-        }
-    }
 
     private int[] createColorArray(ArrayList<Entry> YAxis , Measure measure) {
         int size = YAxis.size();
         int[] colorArray = new int[size];
-        int lineColor = getLineColor(measure);
         int i = 0;
 
 
         while (i < size-1) {
             if(YAxis.get(i).getX() - YAxis.get(i+1).getX() == -1)
-                colorArray[i] = lineColor;
+                colorArray[i] = measure.color;
             else
                 colorArray[i] = backgroundColour;
 

@@ -2,6 +2,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.data;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
@@ -132,6 +133,9 @@ public class Sensor {
 
     @Override
     public String toString() {
-        return  String.format(Locale.ENGLISH, "%s%n%s%n%tF", name, getAddress(), knownSince);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
+        long knownSinceLocale = knownSince + TimeZone.getDefault().getOffset(knownSince);
+
+        return  String.format(Locale.ENGLISH, "%s%n%s%n%tF", name, getAddress(), knownSinceLocale);
     }
 }

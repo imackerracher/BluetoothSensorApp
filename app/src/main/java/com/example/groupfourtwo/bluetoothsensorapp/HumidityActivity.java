@@ -7,12 +7,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.WEEK;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.BRIGHTNESS;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.HUMIDITY;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.PRESSURE;
@@ -22,10 +20,9 @@ public class HumidityActivity extends AppCompatActivity {
 
     private final static String TAG = MeasurementsActivity.class.getSimpleName();
     private static final int SENSOR_SELECTION_REQUEST = 3;
-    Interval interval = WEEK;
-    Measure measure1 = HUMIDITY;
-    long begin = System.currentTimeMillis()- interval.length;
-    DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
+    long end = System.currentTimeMillis();
+    long begin = end - HOUR.length;
+    DrawGraph drawGraph = new DrawGraph(this, HUMIDITY, null, begin, end);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

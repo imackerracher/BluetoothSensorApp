@@ -15,6 +15,7 @@ import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.BRIGHTNESS;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.TEMPERATURE;
 
 public class BrightnessActivity extends AppCompatActivity {
 
@@ -26,11 +27,10 @@ public class BrightnessActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_brightness);
 
-        Interval interval = HOUR;
-        Measure measure1 = BRIGHTNESS;
-        long begin = System.currentTimeMillis()- interval.length;
+        long end = System.currentTimeMillis();
+        long begin = end - HOUR.length;
 
-        DrawGraph drawGraph = new DrawGraph(this,measure1,null,interval,begin);
+        DrawGraph drawGraph = new DrawGraph(this, BRIGHTNESS,TEMPERATURE,begin, end);
 
         drawGraph.draw(this);
 

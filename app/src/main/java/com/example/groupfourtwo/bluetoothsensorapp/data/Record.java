@@ -1,7 +1,10 @@
 package com.example.groupfourtwo.bluetoothsensorapp.data;
 
+import android.util.Log;
+
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 /**
  * Wrapper for information about a continuous set of measurements forming a record.
@@ -11,6 +14,8 @@ import java.util.Objects;
  */
 
 public class Record {
+
+    private static final String LOG_TAG = Record.class.getSimpleName();
 
     public static final Record RECORD_DUMMY = new Record(
             0, Sensor.SENSOR_DUMMY, User.USER_DUMMY, Long.MIN_VALUE, Long.MAX_VALUE);
@@ -153,6 +158,12 @@ public class Record {
 
     @Override
     public String toString() {
+
+//        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
+        Log.d(LOG_TAG, "Default timzone " + TimeZone.getDefault().getDisplayName());
+        long localBegin = begin;// + TimeZone.getDefault().getOffset(begin);
+        long localEnd = end;// + TimeZone.getDefault().getOffset(end);
+
         boolean endsOnBegin = String.format("%tF", begin).equals(String.format("%tF", end));
 
         String endFormatted;
@@ -160,12 +171,12 @@ public class Record {
         if (isRunning()) {
             endFormatted = "(running)";
         } else if (endsOnBegin) {
-            endFormatted = String.format(Locale.ENGLISH, "–  %tT", end);
+            endFormatted = String.format(Locale.ENGLISH, "–  %tT", localEnd);
         } else {
-            endFormatted = String.format(Locale.ENGLISH, "–  %tF  %<tT", end);
+            endFormatted = String.format(Locale.ENGLISH, "–  %tF  %<tT", localEnd);
         }
 
         return  String.format(Locale.ENGLISH, "# %d%n%s%n%tF  %<tT  %s",
-                              id, sensor.getName(), begin, endFormatted);
+                id, sensor.getName(), localBegin, endFormatted);
     }
 }
