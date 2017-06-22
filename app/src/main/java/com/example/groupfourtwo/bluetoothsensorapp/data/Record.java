@@ -147,11 +147,10 @@ public class Record {
     /**
      * Finish the record. May only be called when the record is just running.
      */
-    void stop() {
+    public void stop() {
         if (end > Long.MIN_VALUE) {
             throw new IllegalStateException("Cannot stop a record that was already finished.");
         }
-
         end = System.currentTimeMillis();
     }
 

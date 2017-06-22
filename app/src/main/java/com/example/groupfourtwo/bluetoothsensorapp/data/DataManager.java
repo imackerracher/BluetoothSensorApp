@@ -739,7 +739,7 @@ public class DataManager {
      * @param id  the id of the wanted sensor
      * @return  the wanted sensor
      */
-    private Sensor searchSensor(long id) {
+    public Sensor searchSensor(long id) {
         String[] select = SensorData.ALL_COLUMNS;
 
         // SELECT * FROM SENSOR WHERE ID = id
