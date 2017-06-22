@@ -24,8 +24,9 @@ public class DatabaseUpdateService extends Service {
     private String TAG = "databaseUpdateService";
 
     private User user = new User(1, "dummyUser");
-    private Sensor sensor = new Sensor(2,"dummySensor",123123);
-    private Record record = new Record(3,sensor,user,123,12345);
+    private Sensor sensor;
+    private Record record;
+    private long startTime;
 
     private String sensorAddress;
 
@@ -33,8 +34,8 @@ public class DatabaseUpdateService extends Service {
     private Float humidity;
     private Float pressure;
     private Float brightness;
+    private long UPDATE_INTERVAL = 1000;
 
-    //private Measurement m = Measurement.newMeasurement(record, System.currentTimeMillis(), brightness, 0.0f, humidity, pressure, temp);
 
     private DataManager dataManager;
     // Service Binder
@@ -55,7 +56,7 @@ public class DatabaseUpdateService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind()");
-        handler.removeCallbacks(runnable);
+        //stopUpdating();
         return super.onUnbind(intent);
     }
 
@@ -64,7 +65,7 @@ public class DatabaseUpdateService extends Service {
         super.onCreate();
         dataManager = DataManager.getInstance(this);
         Log.d(TAG, "Created new data manager object.");
-        startUpdating();
+        //startUpdating();
         try {
             dataManager.open();
         } catch (IOException e) {
@@ -78,14 +79,28 @@ public class DatabaseUpdateService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(runnable);
+        dataManager.close();
+        //stopUpdating();
         Log.d(TAG, "onDestroy() , service stopped...");
     }
 
     public void startUpdating() {
         handler.postDelayed(runnable, 0);
+        startTime = System.currentTimeMillis();
+        sensor = dataManager.searchSensor(Sensor.parseAddress(sensorAddress));
+        if (sensor == null) {//sensor not in database -> add new Sensor
+            sensor = new Sensor(Sensor.parseAddress(sensorAddress), "defaultName", startTime);
+            dataManager.saveSensor(sensor);
+        }
+        record = new Record(-1, sensor, user, startTime, Long.MIN_VALUE);
         Log.d(TAG, "startUpdating()");
+    }
 
+    public void stopUpdating() {
+        Log.d(TAG, "stopUpdating()");
+        record.stop();
+        dataManager.saveRecord(record);
+        handler.removeCallbacks(runnable);
     }
     private Handler handler = new Handler();
 
@@ -93,10 +108,16 @@ public class DatabaseUpdateService extends Service {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            if (temp != null  && brightness != null && humidity != null && pressure != null)
+            long t1 = 0;
+            //long t2 = 0;
+            if (temp != null  && brightness != null && humidity != null && pressure != null) {
+                t1 = System.currentTimeMillis();
                 dataManager.saveMeasurement(Measurement.newMeasurement(
-                        record,System.currentTimeMillis(),brightness,0.0f,humidity,pressure,temp));
-            handler.postDelayed(this, 1000);
+                        record, System.currentTimeMillis(), brightness, 0.0f, humidity, pressure, temp));
+                //t2 = System.currentTimeMillis();
+            }
+            handler.postDelayed(this, Math.max(0, UPDATE_INTERVAL - (System.currentTimeMillis() - t1)));
+
         }
     };
     public void setTemp(float t) {

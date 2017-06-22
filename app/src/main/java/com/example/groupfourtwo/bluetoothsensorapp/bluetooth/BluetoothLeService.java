@@ -71,7 +71,7 @@ public class BluetoothLeService extends Service {
 
     // Test UUIDs
     public static final UUID OAD_SERVICE_UUID = UUID.fromString("f000ffc0-0451-4000-b000-000000000000");
-    //For database update
+    //For database updates
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
@@ -79,6 +79,7 @@ public class BluetoothLeService extends Service {
             Log.d(TAG, "onServiceConnected()");
             mDatabaseUpdateService = ((DatabaseUpdateService.LocalBinder) service).getService();
             mDatabaseUpdateService.setSensorAddress((mBluetoothGatt.getDevice().getAddress()));
+            mDatabaseUpdateService.startUpdating();
         }
 
         @Override
@@ -110,7 +111,7 @@ public class BluetoothLeService extends Service {
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
                 Log.d(TAG,"DISCONNECTED");
-                unbind();
+                stopUpdating();
             }
         }
 
@@ -123,6 +124,7 @@ public class BluetoothLeService extends Service {
                 // Debug status
             }
         }
+
         //Not needed, characteristics are read via notifications
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
@@ -131,18 +133,27 @@ public class BluetoothLeService extends Service {
             }
         }
 
+        /**
+         * Called everytime a characteristic was written.
+         */
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             sIsWriting = false;
             nextWrite();
         }
 
+        /**
+         * Called everytime a descriptor was written.
+         */
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             sIsWriting = false;
             nextWrite();
         }
 
+        /**
+         * Is called everytime the value in a subscribed characteristic changes.
+         */
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             //Log.d(TAG, "DATA AVAILABLE");
@@ -212,7 +223,9 @@ public class BluetoothLeService extends Service {
         return super.onUnbind(intent);
     }
 
-    // Initializes a reference to the Bluetoothadapter
+    /**
+     * Initializes a reference to the Bluetoothadapter
+     */
     public boolean initialize() {
         if (bluetoothManager == null) {
             bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -230,7 +243,9 @@ public class BluetoothLeService extends Service {
     }
 
 
-    // Connects to the GATT server hosted on the Bluetooth LE device.
+    /**
+     * Connects to the GATT server hosted on the Bluetooth LE device.
+     */
     public boolean connect(final String address) {
         if (bluetoothAdapter == null || address == null) {
             return false;
@@ -252,14 +267,16 @@ public class BluetoothLeService extends Service {
         }
         // Establish GATT-Server and GATT-Client connection
         mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        Toast.makeText(this, "Debug: Establish connection", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Debug: Establish connection", Toast.LENGTH_SHORT).show();
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
         return true;
     }
 
 
-    // Disconnects a connection between GATT-Server (device) and GATT-Client
+    /**
+     * Disconnects a connection between GATT-Server (device) and GATT-Client
+     */
     public void disconnect() {
         if (bluetoothAdapter == null || mBluetoothGatt == null) {
             return;
@@ -267,7 +284,9 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.disconnect();
     }
 
-    // Closing GATT-Service after a disconnect
+    /**
+     * Closing GATT-Service after a disconnect
+     */
     public void close() {
         if (mBluetoothGatt == null) {
             return;
@@ -276,6 +295,9 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt = null;
     }
 
+    /**
+     * Enable and subscribe a given sensor
+     */
     public void subscribe(UUID id) {
         byte[] b = new byte[1];
         BluetoothGattService service = mBluetoothGatt.getService(id);
@@ -303,6 +325,9 @@ public class BluetoothLeService extends Service {
 
     }
 
+    /**
+     * Add new write request to queue or execute if queue is empty.
+     */
     private synchronized void write(Object o) {
         if (sWriteQueue.isEmpty() && !sIsWriting) {
             doWrite(o);
@@ -311,21 +336,25 @@ public class BluetoothLeService extends Service {
         }
     }
 
+    /**
+     * Start new write after another write has been finished.
+     */
     private synchronized void nextWrite() {
         if (!sWriteQueue.isEmpty() && !sIsWriting) {
             doWrite(sWriteQueue.poll());
         }
     }
 
+    /**
+     * Execute write request.
+     */
     private synchronized void doWrite(Object o) {
         if (o instanceof BluetoothGattCharacteristic) {
             sIsWriting = true;
             mBluetoothGatt.writeCharacteristic((BluetoothGattCharacteristic) o);
-            //Toast.makeText(this, "SERVICE: WRITE_CHARACTERISTIC", Toast.LENGTH_SHORT).show();
         } else if (o instanceof BluetoothGattDescriptor) {
             sIsWriting = true;
             mBluetoothGatt.writeDescriptor((BluetoothGattDescriptor) o);
-            //Toast.makeText(this, "SERVICE: WRITE_DESCRIPTOR", Toast.LENGTH_SHORT).show();
         } else {
             nextWrite();
         }
@@ -379,15 +408,16 @@ public class BluetoothLeService extends Service {
         bindService(databaseServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
-    public void unbind() {
-        Log.d(TAG,"unbind()");
+    public void stopUpdating() {
+        Log.d(TAG,"stopUpdating()");
+        mDatabaseUpdateService.stopUpdating();
         unbindService(mServiceConnection);
     }
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() , BLEservice stopped");
         close();
-        unbind();
+        stopUpdating();
     }
 
 }

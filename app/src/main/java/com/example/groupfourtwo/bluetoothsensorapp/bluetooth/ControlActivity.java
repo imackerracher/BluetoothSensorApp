@@ -19,9 +19,12 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.groupfourtwo.bluetoothsensorapp.MainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
 
@@ -38,6 +41,9 @@ public class ControlActivity extends AppCompatActivity {
 
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private BluetoothLeService mBluetoothLeService;
+
+    //private ProgressBar spinner;
+
 
 
     TextView textViewState;
@@ -77,15 +83,18 @@ public class ControlActivity extends AppCompatActivity {
             boolean mConnected = false;
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
-                updateConnectionState("GATT_CONNECTED");
+                //updateConnectionState("GATT_CONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                updateConnectionState("GATT_DISCONNECTED");
+                //updateConnectionState("GATT_DISCONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                for (UUID id : gattServices) {
                    subscribe(id);
                }
+               Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
+               Intent i = new Intent(context, MainActivity.class);
+               startActivity(i);
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
@@ -126,13 +135,12 @@ public class ControlActivity extends AppCompatActivity {
         String mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
 
-        TextView textViewDeviceName = (TextView)findViewById(R.id.textDeviceName);
-        TextView textViewDeviceAddr = (TextView)findViewById(R.id.textDeviceAddress);
-        textViewState = (TextView)findViewById(R.id.textState);
+        //TextView textViewDeviceName = (TextView)findViewById(R.id.textDeviceName);
+        //TextView textViewDeviceAddr = (TextView)findViewById(R.id.textDeviceAddress);
+        //textViewState = (TextView)findViewById(R.id.textState);
 
-        textViewDeviceName.setText(mDeviceName);
-        textViewDeviceAddr.setText(mDeviceAddress);
-
+        //textViewDeviceName.setText(mDeviceName);
+        //textViewDeviceAddr.setText(mDeviceAddress);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         startService(gattServiceIntent);
@@ -155,6 +163,10 @@ public class ControlActivity extends AppCompatActivity {
         Log.d(TAG,"onPause");
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     @Override
