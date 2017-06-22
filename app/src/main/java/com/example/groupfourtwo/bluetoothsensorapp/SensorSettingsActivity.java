@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
+
 /**
  * @author Tobias Nusser
  * @version 1.0
@@ -17,14 +19,14 @@ import android.widget.Switch;
 
 public class SensorSettingsActivity extends AppCompatActivity {
 
-    private final static String TAG = MeasurementsActivity.class.getSimpleName();
+    private final static String TAG = RecordsActivity.class.getSimpleName();
     private Switch tempSwitch;
     private Switch humiditySwitch;
     private Switch brightSwitch;
     private Switch pressureSwitch;
-    String previous  = "";
+    Measure previous;
     Button saveBtn;
-    String sensor_res;
+    private Measure sensor_res;
     boolean prevTemp = false;
     boolean prevHum = false;
     boolean prevBri = false;
@@ -47,7 +49,7 @@ public class SensorSettingsActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            previous = extras.getString("prevActivity");
+            previous = Measure.valueOf(extras.getString("prevActivity"));
             Log.d(TAG, "Previous Activity " + previous);
         }
 
@@ -58,22 +60,22 @@ public class SensorSettingsActivity extends AppCompatActivity {
         humiditySwitch = (Switch) findViewById(R.id.switch4);
 
         switch (previous) {
-            case "TemperatureActivity":
+            case TEMPERATURE:
                 tempSwitch.setChecked(true);
                 tempSwitch.setClickable(false);
                 prevTemp = true;
                 break;
-            case "BrightnessActivity":
+            case BRIGHTNESS:
                 brightSwitch.setChecked(true);
                 brightSwitch.setClickable(false);
                 prevBri = true;
                 break;
-            case "HumidityActivity":
+            case HUMIDITY:
                 humiditySwitch.setChecked(true);
                 humiditySwitch.setClickable(false);
                 prevHum = true;
                 break;
-            case "PressureActivity":
+            case PRESSURE:
                 pressureSwitch.setChecked(true);
                 pressureSwitch.setClickable(false);
                 prevPres = true;
@@ -205,21 +207,30 @@ public class SensorSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (tempSwitch.isChecked() && !(prevTemp)) {
-                    sensor_res = "TemperatureActivity";
+                    sensor_res = Measure.TEMPERATURE;
                 } else if (humiditySwitch.isChecked() && !(prevHum)) {
-                    sensor_res = "HumidityActivity";
-                    Log.d(TAG, sensor_res);
+                    sensor_res = Measure.HUMIDITY;
+                    Log.d(TAG, String.valueOf(sensor_res));
                 } else if (brightSwitch.isChecked() && !(prevBri)) {
-                    sensor_res = "BrightnessActivity";
+                    sensor_res = Measure.BRIGHTNESS;
                 } else if (pressureSwitch.isChecked() && !(prevPres))  {
-                    sensor_res = "PressureActivity";
+                    sensor_res = Measure.PRESSURE;
                 } else {
-                    sensor_res="";
+                    sensor_res = null;
                 }
-                Intent intent = new Intent();
-                intent.putExtra("sensor_selection",sensor_res);
-                setResult(RESULT_OK, intent);
-                finish();
+                if (sensor_res != null) {
+                    String sensor_resStr = sensor_res.name();
+                    Intent intent = new Intent();
+                    intent.putExtra("sensor_selection", sensor_resStr);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                } else {
+                    String sensor_resStr = "default";
+                    Intent intent = new Intent();
+                    intent.putExtra("sensor_selection", sensor_resStr);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
         });
 

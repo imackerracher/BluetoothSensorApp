@@ -8,8 +8,6 @@ import android.view.View;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -23,7 +21,7 @@ import java.util.Calendar;
 
 public class TimespanActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private final static String TAG = MeasurementsActivity.class.getSimpleName();
+    private final static String TAG = RecordsActivity.class.getSimpleName();
 
     Button btnDatePickerStart, btnTimePickerStart, btnDatePickerEnd, btnTimePickerEnd, btnDisplayTimeframe;
     EditText txtDateStart, txtTimeStart, txtDateEnd, txtTimeEnd;

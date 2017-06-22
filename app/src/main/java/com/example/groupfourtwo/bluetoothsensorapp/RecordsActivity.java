@@ -1,6 +1,5 @@
 package com.example.groupfourtwo.bluetoothsensorapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,12 +13,9 @@ import android.widget.ListView;
 
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
-import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
-import com.example.groupfourtwo.bluetoothsensorapp.data.User;
+
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static android.R.attr.id;
@@ -29,9 +25,9 @@ import static android.R.attr.id;
  * @version 1.0
  */
 
-public class MeasurementsActivity extends AppCompatActivity {
+public class RecordsActivity extends AppCompatActivity {
 
-    private final static String TAG = MeasurementsActivity.class.getSimpleName();
+    private final static String TAG = RecordsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

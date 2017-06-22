@@ -3,13 +3,10 @@ package com.example.groupfourtwo.bluetoothsensorapp;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 
@@ -21,7 +18,7 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.TEMPERATU
 
 public class BrightnessActivity extends AppCompatActivity {
 
-    private final static String TAG = MeasurementsActivity.class.getSimpleName();
+    private final static String TAG = RecordsActivity.class.getSimpleName();
     private static final int SENSOR_SELECTION_REQUEST = 4;
     private long end = System.currentTimeMillis();
     private long begin = end - HOUR.length;
@@ -54,7 +51,7 @@ public class BrightnessActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.measurements_settings) {
-            Intent intent = new Intent(this, MeasurementsActivity.class);
+            Intent intent = new Intent(this, RecordsActivity.class);
             startActivity(intent);
             return true;
         }
@@ -66,7 +63,8 @@ public class BrightnessActivity extends AppCompatActivity {
 
         if (id == R.id.sensor_settings) {
             Intent intent = new Intent(this, SensorSettingsActivity.class);
-            intent.putExtra("prevActivity", "BrightnessActivity");
+            String prevActivity = Measure.BRIGHTNESS.name();
+            intent.putExtra("prevActivity", prevActivity);
             startActivityForResult(intent, SENSOR_SELECTION_REQUEST);
             return true;
         }
@@ -74,35 +72,21 @@ public class BrightnessActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
         if (requestCode == SENSOR_SELECTION_REQUEST) {
             if (resultCode == RESULT_OK) {
                 String returnValue = data.getStringExtra("sensor_selection");
-                createNewGraph(returnValue);
                 Log.d(TAG, "result: " + returnValue);
-                drawGraph.draw(this);
+
+                if (!"default".equals(returnValue)) {
+                    Measure measure = Measure.valueOf(returnValue);
+                    drawGraph.setMeasure2(measure);
+                    drawGraph.draw(this);
+                }
             }
         }
     }
-
-    private void createNewGraph(String returnValue) {
-        Measure measure;
-
-        switch (returnValue) {
-            case "HumidityActivity": measure = HUMIDITY;
-                break;
-            case "PressureActivity": measure = PRESSURE;
-                break;
-            case "BrightnessActivity": measure = BRIGHTNESS;
-                break;
-            case "TemperatureActivity": measure = TEMPERATURE;
-                break;
-            default: measure = PRESSURE;
-        }
-
-        drawGraph.setMeasure2(measure);
-    }
-
 }

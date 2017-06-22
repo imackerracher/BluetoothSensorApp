@@ -50,7 +50,7 @@
             android:name=".TemperatureActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".MeasurementsActivity"
+            android:name=".RecordsActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn"/>
         <activity
