@@ -53,10 +53,10 @@ public class VisualizationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_visualization);
+        setContentView(R.layout.activity_humidity);
 
         end = System.currentTimeMillis();
-        begin = end - DAY.length;
+        begin = end - HOUR.length;
 
         drawGraph = new DrawGraph(this, mainMeasure, addMeasure, begin, end);
 
