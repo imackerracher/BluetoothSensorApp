@@ -4,10 +4,23 @@ package com.example.groupfourtwo.bluetoothsensorapp.graph;
 import android.content.Context;
 import android.widget.TextView;
 
+
 import com.example.groupfourtwo.bluetoothsensorapp.R;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.utils.MPPointF;
+
+import java.text.DecimalFormat;
+
+import static android.graphics.Color.BLACK;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.BRIGHTNESS;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.DISTANCE;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.HUMIDITY;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.PRESSURE;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.TEMPERATURE;
+
 
 /**
  * Created by kim on 23.06.17.
@@ -16,32 +29,51 @@ import com.github.mikephil.charting.highlight.Highlight;
 public class CustomMarkerView extends MarkerView {
     private TextView tvContent;
 
-    public CustomMarkerView (Context context, int layoutResource) {
+    public CustomMarkerView(Context context, int layoutResource) {
         super(context, layoutResource);
-        // this markerview only displays a textview
-        tvContent = (TextView) findViewById(R.id.tvContent);
+        // find your layout components
+        tvContent = (TextView) findViewById( R.id.tvContent );
     }
 
     // callbacks everytime the MarkerView is redrawn, can be used to update the
     // content (user-interface)
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
-        tvContent.setText("Test" + e.getY()); // set the entry-value as the display text
-        System.out.println("kimsDebugging: " + "ICH WAR IM MARKERVIEW" );
+        System.out.println("kimsDebugging: HIGHLICHTCOLOR"+ tvContent.getHighlightColor());
+        DecimalFormat mFormat = new DecimalFormat("###,###,##0.00");
+        tvContent.setText( "" + mFormat.format(e.getY()));
+
+        // this will perform necessary layouting
+        super.refreshContent(e, highlight);
     }
 
-    /*
-    @Override
-    public int getXOffset(float xpos) {
-        // this will center the marker-view horizontally
-        return -(getWidth() / 2);
-    }
+    private MPPointF mOffset;
 
     @Override
-    public int getYOffset(float ypos) {
-        // this will cause the marker-view to be above the selected value
-        return -getHeight();
+    public MPPointF getOffset() {
+
+        if(mOffset == null) {
+            // center the marker horizontally and vertically
+            mOffset = new MPPointF(-(getWidth() / 2), -getHeight());
+        }
+
+        return mOffset;
     }
-    */
+
+    private Measure getMeasure(int color) {
+
+        if (color == HUMIDITY.color)
+            return HUMIDITY;
+        else if (color == PRESSURE.color)
+            return PRESSURE;
+        else if (color == BRIGHTNESS.color)
+            return BRIGHTNESS;
+        else if (color == DISTANCE.color)
+            return DISTANCE;
+        else if (color == TEMPERATURE.color)
+            return TEMPERATURE;
+        return TEMPERATURE;
+    }
+
 
 }

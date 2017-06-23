@@ -11,7 +11,9 @@ import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.IMarker;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -44,7 +46,8 @@ public class DrawGraph {
     private long begin;
     private long end;
     private Record record;
-    private int backgroundColour = Color.WHITE;
+    private int backgroundColour = Color.BLACK;
+    private int textColour = Color.WHITE;
     private LineChart lineChart;
 
     public DrawGraph(Context context , Measure measure1, Measure measure2,
@@ -85,6 +88,7 @@ public class DrawGraph {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         //Choose between TOP, BOTTOM, BOTH_SIDED, TOP_INSIDE or BOTTOM_INSIDE
         xAxis.setTextSize(10f);
+        xAxis.setTextColor(textColour);
 
 
         /**
@@ -108,18 +112,21 @@ public class DrawGraph {
 
         leftAxis.setTextSize(12f);
         leftAxis.setValueFormatter(y1);
+        leftAxis.setTextColor(textColour);
 
         rightAxis.setEnabled(false);
         if(measure2 != null) {
             rightAxis.setEnabled(true);
             rightAxis.setValueFormatter(y2);
             rightAxis.setDrawGridLines(false); // no grid lines
+            rightAxis.setTextColor(textColour);
             //rightAxis.setAxisMinimum(0f);
             //rightAxis.setAxisMaximum(20f);
         }
 
 
-        CustomMarkerView mv = new CustomMarkerView(context, R.layout.marker_view);
+        IMarker mv = new CustomMarkerView(context, R.layout.marker_view);
+
         lineChart.setMarker(mv);
 
 
@@ -199,12 +206,14 @@ public class DrawGraph {
 
         LineDataSet lineDataSet1 = new LineDataSet(yAxes1, "1");
         lineDataSet1.setColors(createColorArray(yAxes1, measure1));
+        lineDataSet1.setHighLightColor(measure1.color);
         lineDataSets.add(lineDataSet1);
 
         LineDataSet lineDataSet2 = new LineDataSet(yAxes2,"2");
         if (measure2 != null) {
             lineDataSet2.setColors(createColorArray(yAxes2, measure2));
             lineDataSet2.setAxisDependency(RIGHT);
+            lineDataSet2.setHighLightColor(measure2.color);
             lineDataSets.add(lineDataSet2);
 
         }
@@ -237,7 +246,7 @@ public class DrawGraph {
         lineChart.setMaxVisibleValueCount(20);
 
         lineChart.setDrawBorders(true); //Border around the Graph
-        lineChart.setBorderColor( Color.BLACK);
+        lineChart.setBorderColor( textColour);
         lineChart.setBorderWidth(1f);
         //lineChart.setNoDataText("Sorry, there is no Data in this time slot");
 

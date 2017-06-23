@@ -24,19 +24,8 @@ public class MyYAxisValueFormatter implements IAxisValueFormatter {
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
         // "value" represents the position of the label on the axis (x or y)
-        switch (measure1) {
-            case TEMPERATURE: return mFormat.format(value) + " °C";
 
-            case HUMIDITY: return mFormat.format(value) + " %";
-
-            case BRIGHTNESS: return mFormat.format(value) + " lm";
-
-            case PRESSURE: return mFormat.format(value) + " hPa";
-
-            case DISTANCE: return mFormat.format(value) + " m";
-
-            default: return "missing measure";
-        }
+        return mFormat.format(value) + measure1.unit;
 
     }
 
