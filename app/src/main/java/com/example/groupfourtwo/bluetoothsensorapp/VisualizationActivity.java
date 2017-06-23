@@ -53,7 +53,7 @@ public class VisualizationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_humidity);
+        setContentView(R.layout.activity_visualization);
 
         end = System.currentTimeMillis();
         begin = end - HOUR.length;

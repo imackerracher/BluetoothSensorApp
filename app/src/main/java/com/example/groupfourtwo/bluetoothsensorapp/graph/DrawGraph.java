@@ -119,6 +119,8 @@ public class DrawGraph {
         }
 
 
+        CustomMarkerView mv = new CustomMarkerView(context, R.layout.marker_view);
+        lineChart.setMarker(mv);
 
 
         /**
