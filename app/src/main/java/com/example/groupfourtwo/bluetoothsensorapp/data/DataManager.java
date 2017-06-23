@@ -265,8 +265,6 @@ public class DataManager {
             throw new IllegalArgumentException("End point must lay in future of begin.");
         }
 
-        Interval interval = fromLength(end - begin);
-
         String[] select = {MeasurementData.COLUMN_TIME, measure.column};
 
         String where = MeasurementData.COLUMN_TIME + " BETWEEN " +
@@ -276,7 +274,7 @@ public class DataManager {
         Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
                 where, null, null, null, MeasurementData.COLUMN_TIME);
 
-        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end, interval.step);
+        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end);
         cursor.close();
         return data;
     }
@@ -306,10 +304,7 @@ public class DataManager {
             end = System.currentTimeMillis();
         }
 
-        // Decide how many values will be summarized to one data point.
-        Interval interval = fromLength(end - begin);
-
-        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end, interval.step);
+        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end);
         cursor.close();
         return data;
     }
@@ -551,32 +546,32 @@ public class DataManager {
      * @param column  the column of values to retrieve
      * @param begin   the start point of data
      * @param end     the end point of data
-     * @param step    the temporal resolution of results
      * @return  a list of values from the cursor
      */
     private ArrayList<Entry> cursorToList(Cursor cursor, String column,
-                                          long begin, long end, int step) {
+                                          long begin, long end) {
         int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
         int indexValue = cursor.getColumnIndex(column);
 
-        Log.d(LOG_TAG, "Datenbank liefere " + cursor.getCount() + " Einträge");
-
-        // The length of the requested interval determines maximum number of data points.
-        int duration = (int) (end - begin);
-        ArrayList<Entry> data = new ArrayList<>(duration / step);
+        Log.d(LOG_TAG, cursor.getCount() + " rows received from database.");
 
         // Cursor might be empty. Return nothing if no entries were found.
         if (!cursor.moveToFirst()) {
-            Log.d(LOG_TAG, "Hier keine Daten vorhanden.");
-            return data;
+            Log.d(LOG_TAG, "No data available.");
+            return null;
         }
 
+        // The length of the requested interval determines maximum possible number of data points.
+        // Memory is allocated generously to avoid reallocation.
+        Interval interval = fromLength(end - begin);
+        ArrayList<Entry> data = new ArrayList<>(interval.points);
+
         // Fill list with values from cursor according to resolution of data points.
-        for (long i = begin, j = 0; i < end; i += step, ++j) {
+        for (long i = begin, j = 0; i < end; i += interval.step, ++j) {
             int noOfValues = 0;
             float sum = 0f;
             // Take arithmetic mean of all values that are in one step size.
-            while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + step) {
+            while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + interval.step) {
                 sum += cursor.getFloat(indexValue);
                 ++noOfValues;
                 cursor.moveToNext();

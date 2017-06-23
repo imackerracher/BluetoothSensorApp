@@ -1,5 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,7 +14,6 @@ import android.widget.ListView;
 
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
-
 
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +32,7 @@ public class RecordsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_measurements);
+        setContentView(R.layout.activity_records);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.mtoolbar);
         setSupportActionBar(toolbar);
@@ -50,17 +50,22 @@ public class RecordsActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        List<Record> recordList = dataManager.getAllRecords();
+        final List<Record> recordList = dataManager.getAllRecords();
         dataManager.close();
 
         final ListAdapter myAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1 , recordList);
-        ListView listView = (ListView) findViewById(R.id.measurements_listview);
+        ListView listView = (ListView) findViewById(R.id.records_listview);
         listView.setAdapter(myAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d(TAG, "On item clicked " + String.valueOf(adapterView.getItemAtPosition(i)));
+                Record record = (Record) adapterView.getItemAtPosition(i);
+                Log.d(TAG, "On item clicked " + record.toString());
+                Intent intent = new Intent();
+                intent.putExtra(VisualizationActivity.RESULT_RECORD, record.getId());
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }

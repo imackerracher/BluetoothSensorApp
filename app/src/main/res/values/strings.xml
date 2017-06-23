@@ -26,11 +26,11 @@
     <string name="menu_about">About</string>
 
     <string name="not_available">Not available</string>
-    <string name="measurements">Records</string>
-    <string name="measurements_settings">Records</string>
+    <string name="records">Records</string>
+    <string name="records_settings">Select record</string>
     <string name="select_time_span_settings">Select time span</string>
-    <string name="select_sensors_settings">Select sensors</string>
-    <string name="stored_measurements_text">Stored records</string>
+    <string name="select_sensors_settings">Select sensor</string>
+    <string name="stored_records_text">Stored records</string>
     <string name="activated_sensors_text">Activated sensors</string>
     <string name="humidity_sensor">Humidity sensor</string>
     <string name="brightness_sensor">Brightness sensor</string>

@@ -12,6 +12,8 @@ import android.widget.Switch;
 
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.*;
+
 /**
  * @author Tobias Nusser
  * @version 1.0
@@ -19,14 +21,15 @@ import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 
 public class SensorSettingsActivity extends AppCompatActivity {
 
-    private final static String TAG = RecordsActivity.class.getSimpleName();
+    private static final String TAG = RecordsActivity.class.getSimpleName();
+
     private Switch tempSwitch;
     private Switch humiditySwitch;
     private Switch brightSwitch;
     private Switch pressureSwitch;
     Measure previous;
+    Measure prevAdditional;
     Button saveBtn;
-    private Measure sensor_res;
     boolean prevTemp = false;
     boolean prevHum = false;
     boolean prevBri = false;
@@ -49,8 +52,12 @@ public class SensorSettingsActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            previous = Measure.valueOf(extras.getString("prevActivity"));
-            Log.d(TAG, "Previous Activity " + previous);
+            previous = Measure.valueOf(extras.getString(VisualizationActivity.MAIN_MEASURE));
+            Log.d(TAG, "Main measure / calling Activity " + previous);
+            String addName = extras.getString(VisualizationActivity.ADD_MEASURE);
+            if (addName != null) {
+                prevAdditional = Measure.valueOf(addName);
+            }
         }
 
 
@@ -59,6 +66,7 @@ public class SensorSettingsActivity extends AppCompatActivity {
         pressureSwitch = (Switch) findViewById(R.id.switch3);
         humiditySwitch = (Switch) findViewById(R.id.switch4);
 
+        // Set the switch for the main measure, cannot be deactivated.
         switch (previous) {
             case TEMPERATURE:
                 tempSwitch.setChecked(true);
@@ -202,35 +210,48 @@ public class SensorSettingsActivity extends AppCompatActivity {
         });
 
 
+        // If there was already a previous additional measure, mark it as activated, too.
+        if (prevAdditional != null) {
+            switch (prevAdditional) {
+                case TEMPERATURE:
+                    tempSwitch.performClick();
+                    break;
+                case BRIGHTNESS:
+                    brightSwitch.performClick();
+                    break;
+                case HUMIDITY:
+                    humiditySwitch.performClick();
+                    break;
+                case PRESSURE:
+                    pressureSwitch.performClick();
+                    break;
+                default:
+                    Log.d(TAG, "Bad prevAdditional measure: " + prevAdditional);
+            }
+        }
+
+
         saveBtn = (Button) findViewById(R.id.saveBtn);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (tempSwitch.isChecked() && !(prevTemp)) {
-                    sensor_res = Measure.TEMPERATURE;
-                } else if (humiditySwitch.isChecked() && !(prevHum)) {
-                    sensor_res = Measure.HUMIDITY;
-                    Log.d(TAG, String.valueOf(sensor_res));
-                } else if (brightSwitch.isChecked() && !(prevBri)) {
-                    sensor_res = Measure.BRIGHTNESS;
-                } else if (pressureSwitch.isChecked() && !(prevPres))  {
-                    sensor_res = Measure.PRESSURE;
+                String sensor_res;
+                if (tempSwitch.isChecked() && !prevTemp) {
+                    sensor_res = TEMPERATURE.name();
+                } else if (humiditySwitch.isChecked() && !prevHum) {
+                    sensor_res = HUMIDITY.name();
+                } else if (brightSwitch.isChecked() && !prevBri) {
+                    sensor_res = BRIGHTNESS.name();
+                } else if (pressureSwitch.isChecked() && !prevPres)  {
+                    sensor_res = PRESSURE.name();
                 } else {
                     sensor_res = null;
                 }
-                if (sensor_res != null) {
-                    String sensor_resStr = sensor_res.name();
-                    Intent intent = new Intent();
-                    intent.putExtra("sensor_selection", sensor_resStr);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } else {
-                    String sensor_resStr = "default";
-                    Intent intent = new Intent();
-                    intent.putExtra("sensor_selection", sensor_resStr);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
+                Intent intent = new Intent();
+                intent.putExtra(VisualizationActivity.RESULT_MEASURE, sensor_res);
+                setResult(RESULT_OK, intent);
+                Log.d(TAG, "New additional measure: " + sensor_res);
+                finish();
             }
         });
 

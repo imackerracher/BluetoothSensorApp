@@ -3,6 +3,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.graph;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
@@ -36,10 +37,10 @@ import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT
 
 public class DrawGraph {
 
+    private static final String LOG_TAG = DrawGraph.class.getSimpleName();
 
     private Context context;
     private Measure measure1, measure2;
-    private Interval interval;
     private long begin;
     private long end;
     private Record record;
@@ -51,24 +52,15 @@ public class DrawGraph {
         this.context = context;
         this.measure1 = measure1;
         this.measure2 = measure2;
-        interval = fromLength(end - begin);
         this.begin = begin;
         this.end = end;
         record = null;
     }
 
 
-    public DrawGraph(Context context , Measure measure1, Measure measure2,
-                     Record record) {
-        this.context = context;
-        begin = record.getBegin();
-        end = record.getEnd();
-        interval = fromLength(end - begin);
-    }
-
-
     public void draw(Activity activity) {
 
+        Interval interval = fromLength(end - begin);
         long length = (end - begin);
         // maximal number of dataPoints that can be displayed
         int dataPointCount = (int) (length / ((long) (interval.step))) + 1;
@@ -274,9 +266,38 @@ public class DrawGraph {
     }
 
     public void setMeasure2(Measure measure) {
-        measure2 = measure;
+        if (measure != measure1) {
+            measure2 = measure;
+        } else {
+            measure2 = null;
+        }
+        Log.d(LOG_TAG, "Measure 2 wurde auf " + measure2 + " gestellt.");
         lineChart.notifyDataSetChanged(); // let the chart know it's data changed
         lineChart.invalidate(); // refresh
+    }
+
+    public void setRecord(Record record) {
+        if (record != null) {
+            this.record = record;
+            begin = record.getBegin();
+            end = record.getEnd();
+            lineChart.notifyDataSetChanged();
+            lineChart.invalidate();
+        }
+    }
+
+    public void setTimeSpan(long begin, long end) {
+        if (end <= begin) {
+            throw new IllegalArgumentException("Begin must lay in the past of end.");
+        }
+        if (end - begin > MONTH.length) {
+            throw new IllegalArgumentException("Time span too long.");
+        }
+        this.end = end;
+        this.begin = end;
+        record = null;
+        lineChart.notifyDataSetChanged();
+        lineChart.invalidate();
     }
 
 

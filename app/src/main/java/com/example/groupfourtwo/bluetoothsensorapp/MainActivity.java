@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    //Values to be displayed in the homescreen next to the sensor icons
+    //Values to be displayed in the home screen next to the sensor icons
     TextView currentTemperature;
     TextView currentBrightness;
     TextView currentPressure;
@@ -122,8 +122,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
-        //Log.d(LOG_TAG, "Opening connection to Database...");
-        //dataManager.open();
     }
 
 
@@ -131,12 +129,10 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         unregisterReceiver(bleDataReceiver);
-        //Log.d(LOG_TAG, "Closing connection to Database...");
-        //dataManager.close();
     }
 
 
-    //Methods that handle the selection of the respective sensor in the homescreen
+    //Methods that handle the selection of the respective sensor in the home screen
     public void changeToTemperature(View view) {
         Intent intent = new Intent(this, TemperatureActivity.class);
         startActivity(intent);

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -12,7 +13,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
+
+
 import java.util.Calendar;
+
+import static com.example.groupfourtwo.bluetoothsensorapp.VisualizationActivity.RESULT_BEGIN;
+import static com.example.groupfourtwo.bluetoothsensorapp.VisualizationActivity.RESULT_END;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.MONTH;
 
 /**
  * @author Tobias Nusser, Ian Mackerracher
@@ -163,18 +170,32 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
         if (v == btnDisplayTimeframe) {
 
-            if (dateStart == false || timeStart == false || dateEnd == false || timeStart == false) {
+            if (!dateStart || !timeStart || !dateEnd || !timeStart) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Select Valid Time Span");
                 builder.setCancelable(true);
                 AlertDialog alert = builder.create();
                 alert.show();
-            }
-            else {
-                //Needs the previous activity
-                Intent intent = new Intent(this, TemperatureActivity.class);
-                startActivity(intent);
+            } else {
+                Calendar begin = Calendar.getInstance();
+                Calendar end = Calendar.getInstance();
+                begin.set(mYearStart, mMonthStart, mDayStart, mHourStart, mMinuteStart);
+                end.set(mYearEnd, mMonthEnd, mDayEnd, mHourEnd, mMinuteEnd);
 
+                if (end.getTimeInMillis() - begin.getTimeInMillis() > MONTH.length) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Time Span is too long, please select again.");
+                    builder.setCancelable(true);
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    return;
+                }
+
+                Intent intent = new Intent();
+                intent.putExtra(RESULT_BEGIN, begin.getTimeInMillis());
+                intent.putExtra(RESULT_END, end.getTimeInMillis());
+                setResult(RESULT_OK, intent);
+                finish();
             }
 
         }

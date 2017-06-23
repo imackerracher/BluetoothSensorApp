@@ -22,14 +22,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.39"
         android:paddingTop="25dp"
-        android:text="@string/stored_measurements_text"
+        android:text="@string/stored_records_text"
         android:textAlignment="center"
         android:textColor="@android:color/background_dark"
         android:textSize="25sp"
         android:textStyle="bold" />
 
     <ListView
-        android:id="@+id/measurements_listview"
+        android:id="@+id/records_listview"
         android:layout_width="match_parent"
         android:layout_height="398dp" />
 </LinearLayout>
