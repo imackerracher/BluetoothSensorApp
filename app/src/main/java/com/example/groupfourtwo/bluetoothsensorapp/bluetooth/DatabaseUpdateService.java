@@ -87,19 +87,18 @@ public class DatabaseUpdateService extends Service {
     public void startUpdating() {
         handler.postDelayed(runnable, 0);
         startTime = System.currentTimeMillis();
-        sensor = dataManager.searchSensor(Sensor.parseAddress(sensorAddress));
+        sensor = dataManager.findSensor(Sensor.parseAddress(sensorAddress));
         if (sensor == null) {//sensor not in database -> add new Sensor
             sensor = new Sensor(Sensor.parseAddress(sensorAddress), "defaultName", startTime);
             dataManager.saveSensor(sensor);
         }
-        record = new Record(-1, sensor, user, startTime, Long.MIN_VALUE);
+        record = dataManager.startRecord(sensor, user);
         Log.d(TAG, "startUpdating()");
     }
 
     public void stopUpdating() {
         Log.d(TAG, "stopUpdating()");
-        record.stop();
-        dataManager.saveRecord(record);
+        dataManager.stopRecord(record);
         handler.removeCallbacks(runnable);
     }
     private Handler handler = new Handler();
