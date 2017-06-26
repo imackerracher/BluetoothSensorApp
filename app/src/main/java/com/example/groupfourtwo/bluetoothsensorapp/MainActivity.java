@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.data.DbExportImport;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity
         setLatestSensorValues();
 
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
+
+        DbExportImport.exportDb(this);
     }
 
     @Override

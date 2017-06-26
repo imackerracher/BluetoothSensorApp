@@ -30,13 +30,15 @@
         </activity>
         <activity
             android:name=".BrightnessActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop" />
         <activity
             android:name=".ClearDataActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".HumidityActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop" />
         <activity
             android:name=".bluetooth.BluetoothMainActivity"
             android:parentActivityName=".MainActivity" />
@@ -45,10 +47,12 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PressureActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop" />
         <activity
             android:name=".TemperatureActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop" />
         <activity
             android:name=".RecordsActivity"
             android:parentActivityName=".MainActivity"
