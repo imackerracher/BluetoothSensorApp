@@ -150,11 +150,13 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void changeToHumidity(View view) {/*
+    public void changeToHumidity(View view) {
+        /*
         Intent intent = new Intent(this, HumidityActivity.class);
         startActivity(intent);*/
-        DbExportImport.exportDb(this);
         Log.d(LOG_TAG, "Datenbank wurde exportiert.");
+
+        DbExportImport.exportDb(this);
     }
 
 
