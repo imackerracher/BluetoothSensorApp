@@ -56,7 +56,7 @@ public class VisualizationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_visualization);
 
         end = System.currentTimeMillis();
-        begin = end - HOUR.length;
+        begin = end - DAY.length;
 
         drawGraph = new DrawGraph(this, mainMeasure, addMeasure, begin, end);
 

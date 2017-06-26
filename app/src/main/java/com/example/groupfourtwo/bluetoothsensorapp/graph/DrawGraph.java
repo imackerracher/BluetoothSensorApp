@@ -112,14 +112,14 @@ public class DrawGraph {
 
         leftAxis.setTextSize(12f);
         leftAxis.setValueFormatter(y1);
-        leftAxis.setTextColor(textColour);
+        leftAxis.setTextColor(measure1.color);
 
         rightAxis.setEnabled(false);
         if(measure2 != null) {
             rightAxis.setEnabled(true);
             rightAxis.setValueFormatter(y2);
             rightAxis.setDrawGridLines(false); // no grid lines
-            rightAxis.setTextColor(textColour);
+            rightAxis.setTextColor(measure2.color);
             //rightAxis.setAxisMinimum(0f);
             //rightAxis.setAxisMaximum(20f);
         }
@@ -241,6 +241,7 @@ public class DrawGraph {
         //lineChart.animateX(1000); // Animation that shows the values from left to right
 
         lineDataSet1.setDrawValues(true); //Default is true
+        lineDataSet1.setValueTextColor(textColour);
         lineDataSet1.setDrawCircles(false); //Default is true
         lineDataSet2.setDrawCircles(false);
         lineChart.setMaxVisibleValueCount(20);
