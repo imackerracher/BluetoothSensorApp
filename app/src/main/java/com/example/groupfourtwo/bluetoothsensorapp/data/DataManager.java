@@ -573,10 +573,13 @@ public class DataManager {
             float sum = 0f;
             // Take arithmetic mean of all values that are in one step size.
             while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + interval.step) {
-                if (measure == HUMIDITY  &&  cursor.getFloat(indexValue) > 100f)
+                float value = cursor.getFloat(indexValue);
+                cursor.moveToNext();
+                if (measure == HUMIDITY  &&  cursor.getFloat(indexValue) > 100f) {
+                    continue;
+                }
                 sum += cursor.getFloat(indexValue);
                 ++noOfValues;
-                cursor.moveToNext();
             }
             // Save value or else mark as missing.
             if (noOfValues > 0) {
