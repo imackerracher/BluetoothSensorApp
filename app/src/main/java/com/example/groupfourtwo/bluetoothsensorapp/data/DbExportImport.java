@@ -21,7 +21,8 @@ public class DbExportImport {
 
     // Directory that files are to be read from and written to
     private static final File DATABASE_DIRECTORY =
-            new File(Environment.getExternalStorageDirectory(), "bluetooth_sensor_app");
+            new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
+                    "bluetooth_sensor_app");
 
     /** File path of Db to be imported **/
     private static final File IMPORT_FILE = new File(DATABASE_DIRECTORY, "sensor_tag");
@@ -46,7 +47,12 @@ public class DbExportImport {
         File file = new File(exportDir, filename);
 
         if (!exportDir.exists()) {
-            exportDir.mkdirs();
+            boolean t = exportDir.mkdirs();
+            if (t) {
+                Log.d(TAG, "directory erstellt");
+            } else {
+                Log.d(TAG, "kein directory erstellt");
+            }
         }
 
         try {/*
