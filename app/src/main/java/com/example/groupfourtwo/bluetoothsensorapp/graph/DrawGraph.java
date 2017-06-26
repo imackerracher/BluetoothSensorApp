@@ -70,7 +70,8 @@ public class DrawGraph {
 
 
 
-        long offset =  1448841600000L; // time in milliseconds to 1.Jan 2016
+        long offset =  1451606400000L ; // time in milliseconds to 1.Jan 2016 UTC = 1451606400000L
+
 
 
         /*reference in main.xml*/
@@ -244,6 +245,7 @@ public class DrawGraph {
         lineDataSet1.setValueTextColor(textColour);
         lineDataSet1.setDrawCircles(false); //Default is true
         lineDataSet2.setDrawCircles(false);
+        lineDataSet2.setValueTextColor(textColour);
         lineChart.setMaxVisibleValueCount(20);
 
         lineChart.setDrawBorders(true); //Border around the Graph
