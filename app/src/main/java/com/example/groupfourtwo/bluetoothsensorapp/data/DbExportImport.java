@@ -44,7 +44,7 @@ public class DbExportImport {
         String filename = "sensor_tag.db";
 
         File exportDir = DATABASE_DIRECTORY;
-        File file = new File(exportDir, filename);
+        File file = new File(Environment.getExternalStorageDirectory(), filename);
 
         if (!exportDir.exists()) {
             boolean t = exportDir.mkdirs();
