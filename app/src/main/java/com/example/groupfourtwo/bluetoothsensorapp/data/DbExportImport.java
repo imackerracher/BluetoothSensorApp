@@ -20,20 +20,14 @@ public class DbExportImport {
     private static final String TAG = DbExportImport.class.getName();
 
     // Directory that files are to be read from and written to
-    private static final File DATABASE_DIRECTORY =
+    private static final File EXTERNAL_DATABASE_DIRECTORY =
             new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
                     "bluetooth_sensor_app");
 
     /** File path of Db to be imported **/
-    private static final File IMPORT_FILE = new File(DATABASE_DIRECTORY, "sensor_tag");
+    private static final File IMPORT_FILE = new File(EXTERNAL_DATABASE_DIRECTORY, "sensor_tag");
 
     private static final String PACKAGE_NAME = "com.example.groupfourtwo.bluetoothsensorapp";
-
-    /** Contains: /data/data/com.example.groupfourtwo.bluetoothsensorapp/databases/sensor_tag **/
-    private static final File DATA_DIRECTORY_DATABASE =
-            new File(Environment.getDataDirectory() +
-                    "/user/0/" + PACKAGE_NAME +
-                    "/databases/" + DB_NAME);
 
 
     /** Saves the application database to the
@@ -43,28 +37,23 @@ public class DbExportImport {
 
         String filename = "sensor_tag.db";
 
-        File exportDir = DATABASE_DIRECTORY;
+        File exportDir = EXTERNAL_DATABASE_DIRECTORY;
         File file = new File(Environment.getExternalStorageDirectory(), filename);
 
         if (!exportDir.exists()) {
-            boolean t = exportDir.mkdirs();
-            if (t) {
-                Log.d(TAG, "directory erstellt");
+            if (exportDir.mkdirs()) {
+                Log.d(TAG, "Created necessary path directories.");
             } else {
-                Log.d(TAG, "kein directory erstellt");
+                Log.d(TAG, "Failed while creating path.");
+                return false;
             }
         }
 
-        try {/*
-            DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
-            File source = new File(dbHelper.getReadableDatabase().getPath());
-            dbHelper.close();
-            */
+        try {
             file.createNewFile();
-            copyFile(DATA_DIRECTORY_DATABASE, file);
+            copyFile(getDatabaseDirectory(context), file);
             return true;
         } catch (IOException e) {
-            Log.e(TAG, "Fehler: ", e);
             e.printStackTrace();
             return false;
         }
@@ -73,10 +62,10 @@ public class DbExportImport {
 
     /** Replaces current database with the IMPORT_FILE if
      * import database is valid and of the correct type **/
-    public  static boolean restoreDb(){
+    public  static boolean restoreDb(Context context){
         if(!SdIsPresent()) return false;
 
-        File exportFile = DATA_DIRECTORY_DATABASE;
+        File exportFile = getDatabaseDirectory(context);
         File importFile = IMPORT_FILE;
 
         if(!checkDbIsValid(importFile)) return false;
@@ -321,4 +310,14 @@ public class DbExportImport {
         }
         cursor.close();
     }
+
+
+    /** Contains: /data/data/com.example.groupfourtwo.bluetoothsensorapp/databases/sensor_tag **/
+    private static File getDatabaseDirectory(Context context) {
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
+        File database = new File(dbHelper.getReadableDatabase().getPath());
+        dbHelper.close();
+        return database;
+    }
+
 }
