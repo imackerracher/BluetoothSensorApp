@@ -575,10 +575,10 @@ public class DataManager {
             while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + interval.step) {
                 float value = cursor.getFloat(indexValue);
                 cursor.moveToNext();
-                if (measure == HUMIDITY  &&  cursor.getFloat(indexValue) > 100f) {
+                if (measure == HUMIDITY  &&  value > 100f) {
                     continue;
                 }
-                sum += cursor.getFloat(indexValue);
+                sum += value;
                 ++noOfValues;
             }
             // Save value or else mark as missing.
