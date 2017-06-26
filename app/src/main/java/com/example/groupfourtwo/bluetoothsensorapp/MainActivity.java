@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity
         setLatestSensorValues();
 
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
-
-        DbExportImport.exportDb(this);
     }
 
     @Override
@@ -152,9 +150,11 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void changeToHumidity(View view) {
+    public void changeToHumidity(View view) {/*
         Intent intent = new Intent(this, HumidityActivity.class);
-        startActivity(intent);
+        startActivity(intent);*/
+        DbExportImport.exportDb(this);
+        Log.d(LOG_TAG, "Datenbank wurde exportiert.");
     }
 
 
