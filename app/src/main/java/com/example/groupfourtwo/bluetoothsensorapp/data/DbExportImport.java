@@ -64,6 +64,7 @@ public class DbExportImport {
             copyFile(DATA_DIRECTORY_DATABASE, file);
             return true;
         } catch (IOException e) {
+            Log.e(TAG, "Fehler: ", e);
             e.printStackTrace();
             return false;
         }
