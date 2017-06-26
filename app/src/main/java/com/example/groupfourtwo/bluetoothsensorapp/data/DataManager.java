@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.HUMIDITY;
 
 /**
  * Central interface between persistent data of the database and the running application.
@@ -274,7 +275,7 @@ public class DataManager {
         Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
                 where, null, null, null, MeasurementData.COLUMN_TIME);
 
-        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end);
+        ArrayList<Entry> data = cursorToList(cursor, measure, begin, end);
         cursor.close();
         return data;
     }
@@ -304,7 +305,7 @@ public class DataManager {
             end = System.currentTimeMillis();
         }
 
-        ArrayList<Entry> data = cursorToList(cursor, measure.column, begin, end);
+        ArrayList<Entry> data = cursorToList(cursor, measure, begin, end);
         cursor.close();
         return data;
     }
@@ -542,16 +543,16 @@ public class DataManager {
     /**
      * Fill a List with all values that a cursor contains. Group if multiple values at a time.
      *
-     * @param cursor  the cursor pointing to the database
-     * @param column  the column of values to retrieve
-     * @param begin   the start point of data
-     * @param end     the end point of data
+     * @param cursor   the cursor pointing to the database
+     * @param measure  the measure of values to retrieve
+     * @param begin    the start point of data
+     * @param end      the end point of data
      * @return  a list of values from the cursor
      */
-    private ArrayList<Entry> cursorToList(Cursor cursor, String column,
+    private ArrayList<Entry> cursorToList(Cursor cursor, Measure measure,
                                           long begin, long end) {
         int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
-        int indexValue = cursor.getColumnIndex(column);
+        int indexValue = cursor.getColumnIndex(measure.column);
 
         Log.d(LOG_TAG, cursor.getCount() + " rows received from database.");
 
@@ -572,6 +573,7 @@ public class DataManager {
             float sum = 0f;
             // Take arithmetic mean of all values that are in one step size.
             while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + interval.step) {
+                if (measure == HUMIDITY  &&  cursor.getFloat(indexValue) > 100f)
                 sum += cursor.getFloat(indexValue);
                 ++noOfValues;
                 cursor.moveToNext();
