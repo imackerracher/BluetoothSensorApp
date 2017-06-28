@@ -21,7 +21,7 @@ final class DatabaseContract {
 
     /**
      * The current version of the database.
-     * Is incremented every time when structural changes are applied to the database.
+     * <p>Is incremented every time when structural changes are applied to the database.
      */
     static final int DB_VERSION = 2;
 

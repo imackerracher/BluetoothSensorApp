@@ -157,11 +157,8 @@ public class Record {
 
     @Override
     public String toString() {
-
-//        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-        Log.d(LOG_TAG, "Default timzone " + TimeZone.getDefault().getDisplayName());
-        long localBegin = begin;// + TimeZone.getDefault().getOffset(begin);
-        long localEnd = end;// + TimeZone.getDefault().getOffset(end);
+        //long localBegin = begin + TimeZone.getDefault().getOffset(begin);
+        //long localEnd = end + TimeZone.getDefault().getOffset(end);
 
         boolean endsOnBegin = String.format("%tF", begin).equals(String.format("%tF", end));
 
@@ -170,12 +167,12 @@ public class Record {
         if (isRunning()) {
             endFormatted = "(running)";
         } else if (endsOnBegin) {
-            endFormatted = String.format(Locale.ENGLISH, "–  %tT", localEnd);
+            endFormatted = String.format(Locale.ENGLISH, "–  %tT", end);
         } else {
-            endFormatted = String.format(Locale.ENGLISH, "–  %tF  %<tT", localEnd);
+            endFormatted = String.format(Locale.ENGLISH, "–  %tF  %<tT", end);
         }
 
         return  String.format(Locale.ENGLISH, "# %d%n%s%n%tF  %<tT  %s",
-                id, sensor.getName(), localBegin, endFormatted);
+                id, sensor.getName(), begin, endFormatted);
     }
 }

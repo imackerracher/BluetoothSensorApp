@@ -73,7 +73,7 @@ public class DataManager {
 
     /**
      * Get an own instance of the Data Manager object.
-     * Note: Use getInstance because of using application context.
+     * <p>Note: Use getInstance because of using application context.
      *
      * @param context  the context of the calling activity
      * @return  the instance of the data manager
@@ -87,7 +87,7 @@ public class DataManager {
 
     /**
      * Open the connection to an SQLite database.
-     * If there is no existing database yet, a new one is created.
+     * <p>If there is no existing database yet, a new one is created.
      */
     public synchronized void open() throws IOException {
         try {
@@ -164,16 +164,18 @@ public class DataManager {
 
 
     /**
-     * Find and return a record with the given key from the cache
-     * If no object was found, fetch record from database and insert it into the map.
+     * Find and return the {@link Record} with the given id.
+     * <p>If not already present in the cache, the record is fetched from the database and
+     * inserted into the former.
+     * If the database contains no matching row, a {@link Record#RECORD_DUMMY} is returned.
      *
-     * @param key  id of the record to search
-     * @return  the record with the given id
+     * @param id  id of the record to search
+     * @return  the record with the given id or dummy if none was found
      */
-    public Record findRecord(long key) {
-        Record record = records.get(key);
+    public Record findRecord(long id) {
+        Record record = records.get(id);
         if (record == null) { // wanted sensor not in map -> search in database
-            record = searchRecord(key);
+            record = searchRecord(id);
         }
         if (record != null) { // wanted sensor was found -> cache and return
             records.put(record.getId(), record);
@@ -186,16 +188,19 @@ public class DataManager {
 
 
     /**
-     * Find and return a sensor with the given key from the cache.
-     * If no object was found, fetch sensor from database and insert it into the map.
+     * Find and return the {@link Sensor} with the given id.
+     * <p>If not already present in the cache, the sensor is fetched from the database and
+     * inserted into the former.
+     * If the database contains no matching row, a {@link Sensor#SENSOR_DUMMY} is returned.
      *
-     * @param key  id of the sensor to search
-     * @return  the sensor with the given id
+     * @param id  id of the sensor to search
+     * @return  the sensor with the given id or dummy if none was found
      */
-    public Sensor findSensor(long key) {
-        Sensor sensor = sensors.get(key);
+    public Sensor findSensor(long id
+    ) {
+        Sensor sensor = sensors.get(id);
         if (sensor == null) { // wanted sensor not in map -> search in database
-            sensor = searchSensor(key);
+            sensor = searchSensor(id);
         }
         if (sensor != null) { // wanted sensor was found -> cache and return
             sensors.put(sensor.getId(), sensor);
@@ -208,16 +213,18 @@ public class DataManager {
 
 
     /**
-     * Find and return a user with the given key from the cache.
-     * If no object was found, fetch user from database and insert it into the map.
+     * Find and return the {@link User} with the given id.
+     * <p>If not already present in the cache, the user is fetched from the database and
+     * inserted into the former.
+     * If the database contains no matching row, a {@link User#USER_DUMMY} is returned.
      *
-     * @param key  id of the user to search
-     * @return  the user with the given id
+     * @param id  id of the sensor to search
+     * @return  the sensor with the given id or dummy if none was found
      */
-    public User findUser(long key) {
-        User user = users.get(key);
+    public User findUser(long id) {
+        User user = users.get(id);
         if (user == null) { // wanted user not in map -> search in database
-            user = searchUser(key);
+            user = searchUser(id);
         }
         if (user != null) { // wanted user was found -> cache and return it
             users.put(user.getId(), user);
@@ -401,7 +408,7 @@ public class DataManager {
 
     /**
      * Insert a new measurement and its information into the database.
-     * Note: id will be ignored by database and replaced with insertion id.
+     * <p>Note: id will be ignored by database and replaced with insertion id.
      *
      * @param measurement  the measurement to save
      */

@@ -67,7 +67,7 @@ public class User {
 
     /**
      * Modify the name of the user.
-     * The name must neither be null nor empty nor longer than 50 characters.
+     * <p>The name must neither be null nor empty nor longer than 50 characters.
      *
      * @param name  the new name
      */

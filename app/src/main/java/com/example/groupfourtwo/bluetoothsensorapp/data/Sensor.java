@@ -100,7 +100,7 @@ public class Sensor {
 
     /**
      * Modify the name of the sensor.
-     * The name must neither be null nor empty nor longer than 50 characters.
+     * <p>The name must neither be null nor empty nor longer than 50 characters.
      *
      * @param name  the new name
      */
@@ -133,9 +133,8 @@ public class Sensor {
 
     @Override
     public String toString() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-        long knownSinceLocale = knownSince + TimeZone.getDefault().getOffset(knownSince);
+        //long knownSinceLocale = knownSince + TimeZone.getDefault().getOffset(knownSince);
 
-        return  String.format(Locale.ENGLISH, "%s%n%s%n%tF", name, getAddress(), knownSinceLocale);
+        return  String.format(Locale.ENGLISH, "%s%n%s%n%tF", name, getAddress(), knownSince);
     }
 }
