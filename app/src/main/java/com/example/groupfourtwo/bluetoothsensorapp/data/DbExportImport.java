@@ -15,30 +15,49 @@ import android.util.Log;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
 
+/**
+ * Provides methods to export, import or merge the application's database from or into
+ * the external storage.
+ *
+ * @author Stefan Erk
+ */
 public class DbExportImport {
 
-    private static final String TAG = DbExportImport.class.getName();
+    private static final String TAG = DbExportImport.class.getSimpleName();
 
-    // Directory that files are to be read from and written to
+    /**
+     * The name of the application directory on the external storage.
+     */
+    private static final String PACKAGE_NAME = "groupfourtwo.bluetoothsensorapp";
+
+    /**
+     * Directory that files are to be read from and written to.
+     */
     private static final File EXTERNAL_DATABASE_DIRECTORY =
             new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-                    "bluetooth_sensor_app");
+                    PACKAGE_NAME);
 
-    /** File path of Db to be imported **/
-    private static final File IMPORT_FILE = new File(EXTERNAL_DATABASE_DIRECTORY, "sensor_tag");
+    /**
+     * The file that is used for a backup, as well as a source to restore the internal database.
+     */
+    private static final File EXPORT_IMPORT_FILE =
+            new File(EXTERNAL_DATABASE_DIRECTORY, "sensor_tag.db");
 
-    private static final String PACKAGE_NAME = "com.example.groupfourtwo.bluetoothsensorapp";
 
-
-    /** Saves the application database to the
-     * export directory under sensor_tag.db **/
-    public static  boolean exportDb(Context context){
-        if(!SdIsPresent()) return false;
-
-        String filename = "sensor_tag.db";
+    /**
+     * Saves the application database to the {@link #EXPORT_IMPORT_FILE}, namely
+     * Documents/groupfourtwo.bluetoothsensorapp/sensor_tag.db
+     *
+     * @param context  the calling activity
+     * @return  whether the export succeeded
+     */
+    public static boolean exportDb(Context context){
+        if(!storageIsPresent()) {
+            return false;
+        }
 
         File exportDir = EXTERNAL_DATABASE_DIRECTORY;
-        File file = new File(Environment.getExternalStorageDirectory(), filename);
+        File exportFile = EXPORT_IMPORT_FILE;
 
         if (!exportDir.exists()) {
             if (exportDir.mkdirs()) {
@@ -50,8 +69,11 @@ public class DbExportImport {
         }
 
         try {
-            file.createNewFile();
-            copyFile(getDatabaseDirectory(context), file);
+            if (!exportFile.exists() && !exportFile.createNewFile()) {
+                Log.d(TAG, "Destination of backup does not exist or could not be created.");
+                return false;
+            }
+            copyFile(getDatabaseFile(context), exportFile);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -60,15 +82,25 @@ public class DbExportImport {
     }
 
 
-    /** Replaces current database with the IMPORT_FILE if
-     * import database is valid and of the correct type **/
-    public  static boolean restoreDb(Context context){
-        if(!SdIsPresent()) return false;
+    /**
+     * Replaces the current database with the {@link #EXPORT_IMPORT_FILE} iff that database
+     * is valid and of the correct type. This deletes all data gathered by the application.
+     *
+     * @param context  the calling activity
+     * @return  whether the operation succeeded
+     */
+    public static boolean restoreDb(Context context){
+        if(!storageIsPresent()) {
+            return false;
+        }
 
-        File exportFile = getDatabaseDirectory(context);
-        File importFile = IMPORT_FILE;
+        File database = getDatabaseFile(context);
+        File importFile = EXPORT_IMPORT_FILE;
 
-        if(!checkDbIsValid(importFile)) return false;
+        if(!checkDbIsValid(importFile)) {
+            Log.d(TAG, "Import database is not valid");
+            return false;
+        }
 
         if (!importFile.exists()) {
             Log.d(TAG, "File does not exist");
@@ -76,8 +108,11 @@ public class DbExportImport {
         }
 
         try {
-            exportFile.createNewFile();
-            copyFile(importFile, exportFile);
+            if (!database.exists()  &&  !database.createNewFile()) {
+                Log.d(TAG, "Internal database could not be attained.");
+                return false;
+            }
+            copyFile(importFile, database);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,30 +121,49 @@ public class DbExportImport {
     }
 
 
-    /** Imports the file at IMPORT_FILE **/
-    protected static boolean importIntoDb(Context ctx){
-        if(!SdIsPresent()) return false;
+    /**
+     * Imports the database that is saved in the IMPORT_EXPORT_FILE into the application database,
+     * such that the two databases are merged into one, while not touching the data already
+     * gathered by the application.
+     * <p>
+     * In the case of conflicts between rows that contain a natural primary key (MAC-Address)
+     * the imported version is ignored and the internal version is kept.
+     * <p>
+     * The operation fails if either the import file is not found or the import database is
+     * in any manner not valid or compatible with the application database.
+     *
+     * @param context  the calling activity
+     * @return  whether the import has succeeded
+     */
+    public static boolean importIntoDb(Context context){
+        if(!storageIsPresent()) return false;
 
-        File importFile = IMPORT_FILE;
+        File importFile = EXPORT_IMPORT_FILE;
 
-        if(!checkDbIsValid(importFile)) return false;
+        if(!checkDbIsValid(importFile)) {
+            return false;
+        }
 
         try{
-            SQLiteDatabase sqlDb = SQLiteDatabase.openDatabase
-                    (importFile.getPath(), null, SQLiteDatabase.OPEN_READONLY);
+            SQLiteDatabase importDb = SQLiteDatabase.openDatabase(
+                    importFile.getPath(), null, SQLiteDatabase.OPEN_READONLY);
 
-            DataManager dataManager = DataManager.getInstance(ctx);
+            DataManager dataManager = DataManager.getInstance(context);
             dataManager.open();
 
-            copySensors(sqlDb, dataManager);
+            /* Import every table into the application database.
+             * Note the order of operations such that a table is imported only after
+             * all tables that it references have already been imported.
+             */
+            importSensors(importDb, dataManager);
 
-            copyUsers(sqlDb, dataManager);
+            importUsers(importDb, dataManager);
 
-            copyRecords(sqlDb, dataManager);
+            importRecords(importDb, dataManager);
 
-            copyMeasurements(sqlDb, dataManager);
+            importMeasurements(importDb, dataManager);
 
-            sqlDb.close();
+            importDb.close();
             dataManager.close();
         } catch( Exception e ){
             e.printStackTrace();
@@ -120,10 +174,29 @@ public class DbExportImport {
     }
 
 
-    /** Given an SQLite database file, this checks if the file
-     * is a valid SQLite database and that it contains all the
-     * columns represented by DbAdapter.ALL_COLUMN_KEYS **/
-    private static boolean checkDbIsValid( File db ){
+    /**
+     * Compares the columns that are contained within a cursor to a given schema.
+     *
+     * @param cursor   the cursor containing the actual table schema
+     * @param columns  the predefined table schema
+     */
+    private static void checkColumns(Cursor cursor, String[] columns) {
+        // Every column should have an index in the table
+        for (String s : columns) {
+            cursor.getColumnIndexOrThrow(s);
+        }
+    }
+
+
+    /**
+     * Given an SQLite database file, this checks whether the file is a valid SQLite database
+     * and that it contains all the tables with their respective columns according to
+     * {@link DatabaseContract.MeasurementData}, {@link DatabaseContract.RecordData},
+     * {@link DatabaseContract.SensorData}, {@link DatabaseContract.UserData}
+     *
+     * @return  whether the given database is valid
+     */
+    private static boolean checkDbIsValid(File db) {
         try{
             SQLiteDatabase sqlDb = SQLiteDatabase.openDatabase
                     (db.getPath(), null, SQLiteDatabase.OPEN_READONLY);
@@ -156,7 +229,7 @@ public class DbExportImport {
 
             sqlDb.close();
         } catch (IllegalArgumentException e) {
-            Log.d(TAG, "Database valid but not the right type");
+            Log.d(TAG, "Database valid but not the right format");
             e.printStackTrace();
             return false;
         } catch (SQLiteException e) {
@@ -164,7 +237,7 @@ public class DbExportImport {
             e.printStackTrace();
             return false;
         } catch (Exception e) {
-            Log.d(TAG, "checkDbIsValid encountered an exception");
+            Log.d(TAG, "checkDbIsValid encountered an unknown exception");
             e.printStackTrace();
             return false;
         }
@@ -173,37 +246,57 @@ public class DbExportImport {
     }
 
 
-    private static void copyFile(File src, File dst) throws IOException {
+    /**
+     * Replaces the data of a given file with the data of another one.
+     *
+     * @param src   the file data is to be read from
+     * @param dest  the file the read data is saved into
+     * @throws IOException  if the transfer happens to trigger an exception
+     */
+    private static void copyFile(File src, File dest) throws IOException {
         FileChannel inChannel = new FileInputStream(src).getChannel();
-        FileChannel outChannel = new FileOutputStream(dst).getChannel();
+        FileChannel outChannel = new FileOutputStream(dest).getChannel();
         try {
             inChannel.transferTo(0, inChannel.size(), outChannel);
+            outChannel.truncate(inChannel.size());
         } finally {
             if (inChannel != null) {
                 inChannel.close();
             }
-            outChannel.close();
+            if (outChannel != null) {
+                outChannel.close();
+            }
         }
     }
 
 
-    /** Returns whether an SD card is present and writable **/
-    private static boolean SdIsPresent() {
-        return Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED);
+    /**
+     * Returns a file containing the path to the application's internal database.
+     * If no database existed yet, a new one is created automatically.
+     *
+     * @param context  the calling activity
+     * @return  the file of the application database
+     */
+    private static File getDatabaseFile(Context context) {
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
+        File database = new File(dbHelper.getReadableDatabase().getPath());
+        dbHelper.close();
+        return database;
     }
 
 
-    private static void checkColumns(Cursor cursor, String[] columns) {
-        // Every column should have an index in the table
-        for (String s : columns) {
-            cursor.getColumnIndexOrThrow(s);
-        }
-    }
-
-
-    private static void copyMeasurements(SQLiteDatabase sqlDb, DataManager dataManager) {
-        Cursor cursor = sqlDb.query(true, MeasurementData.TABLE_MEASUREMENT,
+    /**
+     * Imports the content of the external measurement table into the application's table.
+     * <p>
+     * The database to be read from must be opened before passing it and has to be checked
+     * for compatibility in respect to the application database, represented by an open
+     * {@link DataManager}.
+     *
+     * @param importDb     a valid and readable {@link SQLiteDatabase}
+     * @param dataManager  an opened instance of DataManager
+     */
+    private static void importMeasurements(SQLiteDatabase importDb, DataManager dataManager) {
+        Cursor cursor = importDb.query(true, MeasurementData.TABLE_MEASUREMENT,
                 null, null, null, null, null, null, null
         );
 
@@ -234,8 +327,18 @@ public class DbExportImport {
     }
 
 
-    private static void copyRecords(SQLiteDatabase sqlDb, DataManager dataManager) {
-        Cursor cursor = sqlDb.query(true, RecordData.TABLE_RECORD,
+    /**
+     * Imports the content of the external record table into the application's table.
+     * <p>
+     * The database to be read from must be opened before passing it and has to be checked
+     * for compatibility in respect to the application database, represented by an open
+     * {@link DataManager}.
+     *
+     * @param importDb     a valid and readable {@link SQLiteDatabase}
+     * @param dataManager  an opened instance of DataManager
+     */
+    private static void importRecords(SQLiteDatabase importDb, DataManager dataManager) {
+        Cursor cursor = importDb.query(true, RecordData.TABLE_RECORD,
                 null, null, null, null, null, null, null
         );
 
@@ -260,8 +363,18 @@ public class DbExportImport {
     }
 
 
-    private static void copySensors(SQLiteDatabase sqlDb, DataManager dataManager) {
-        Cursor cursor = sqlDb.query(true, SensorData.TABLE_SENSOR,
+    /**
+     * Imports the content of the external sensor table into the application's table.
+     * <p>
+     * The database to be read from must be opened before passing it and has to be checked
+     * for compatibility in respect to the application database, represented by an open
+     * {@link DataManager}.
+     *
+     * @param importDb     a valid and readable {@link SQLiteDatabase}
+     * @param dataManager  an opened instance of DataManager
+     */
+    private static void importSensors(SQLiteDatabase importDb, DataManager dataManager) {
+        Cursor cursor = importDb.query(true, SensorData.TABLE_SENSOR,
                 null, null, null, null, null, null, null
         );
 
@@ -287,8 +400,19 @@ public class DbExportImport {
     }
 
 
-    private static void copyUsers(SQLiteDatabase sqlDb, DataManager dataManager) {
-        Cursor cursor = sqlDb.query(true, UserData.TABLE_USER,
+
+    /**
+     * Imports the content of the external user table into the application's table.
+     * <p>
+     * The database to be read from must be opened before passing it and has to be checked
+     * for compatibility in respect to the application database, represented by an open
+     * {@link DataManager}.
+     *
+     * @param importDb     a valid and readable {@link SQLiteDatabase}
+     * @param dataManager  an opened instance of DataManager
+     */
+    private static void importUsers(SQLiteDatabase importDb, DataManager dataManager) {
+        Cursor cursor = importDb.query(true, UserData.TABLE_USER,
                 null, null, null, null, null, null, null
         );
 
@@ -312,12 +436,15 @@ public class DbExportImport {
     }
 
 
-    /** Contains: /data/data/com.example.groupfourtwo.bluetoothsensorapp/databases/sensor_tag **/
-    private static File getDatabaseDirectory(Context context) {
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
-        File database = new File(dbHelper.getReadableDatabase().getPath());
-        dbHelper.close();
-        return database;
+    /**
+     * Checks whether the external storage is present and writable.
+     * <p>
+     * The actual location of the storage can vary depending on System and user settings.
+     *
+     * @return  whether the storage is present
+     */
+    private static boolean storageIsPresent() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
 }

@@ -302,7 +302,7 @@ public class DrawGraph {
         if (end <= begin) {
             throw new IllegalArgumentException("Begin must lay in the past of end.");
         }
-        if (end - begin > MONTH.length) {
+        if (end - begin > MAX.length) {
             throw new IllegalArgumentException("Time span too long.");
         }
         this.end = end;

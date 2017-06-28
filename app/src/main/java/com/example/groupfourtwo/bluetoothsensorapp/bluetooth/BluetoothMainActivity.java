@@ -120,7 +120,7 @@ public class BluetoothMainActivity extends AppCompatActivity {
             if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.request_gps_title));
-                builder.setMessage(getString(R.string.request_gps_title));
+                builder.setMessage(getString(R.string.request_gps_message));
                 builder.setPositiveButton(getString(R.string.ok), null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override

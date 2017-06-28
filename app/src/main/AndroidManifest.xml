@@ -4,12 +4,19 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.bluetooth_le"  android:required="true" />
-    <uses-feature android:name="android.hardware.location.gps" android:required="true"/>
-    <uses-feature android:name="android.hardware.location.network" android:required="true"/>
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.network"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -31,15 +38,15 @@
         </activity>
         <activity
             android:name=".BrightnessActivity"
-            android:parentActivityName=".MainActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ClearDataActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".HumidityActivity"
-            android:parentActivityName=".MainActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".bluetooth.BluetoothMainActivity"
             android:parentActivityName=".MainActivity" />
@@ -48,29 +55,38 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PressureActivity"
-            android:parentActivityName=".MainActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".TemperatureActivity"
-            android:parentActivityName=".MainActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".RecordsActivity"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBarOwn"/>
+            android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".TimespanActivity"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBarOwn"/>
+            android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".SensorSettingsActivity"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBarOwn"/>
+            android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".bluetooth.ControlActivity"
-            android:parentActivityName=".bluetooth.BluetoothMainActivity"/>
-        <service android:name=".bluetooth.BluetoothLeService" android:enabled="true"/>
-        <service android:name=".bluetooth.DatabaseUpdateService" android:enabled="true"/>
+            android:parentActivityName=".bluetooth.BluetoothMainActivity" />
+        <activity
+            android:name=".StorageActivity"
+            android:parentActivityName=".MainActivity" />
+
+        <service
+            android:name=".bluetooth.BluetoothLeService"
+            android:enabled="true" />
+        <service
+            android:name=".bluetooth.DatabaseUpdateService"
+            android:enabled="true" />
+
     </application>
 
 </manifest>

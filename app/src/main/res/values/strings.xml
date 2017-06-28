@@ -18,9 +18,24 @@
     <string name="request_gps_title">Please enable location information services</string>
     <string name="request_gps_message">The application needs location information to be able to find new BLE devices.</string>
 
+    <string name="button_export">Export</string>
+    <string name="button_restore">Restore</string>
+    <string name="button_import">Import</string>
+    <string name="desc_export">Export the data gathered by the application to the external storage of the device.</string>
+    <string name="desc_restore">Replace the internal database with data from the external storage.\nThis will delete all data that has been saved by the application.</string>
+    <string name="desc_import">Import the data of another database into the application while keeping the gathered data.</string>
+    <string name="request_storage_title">Please enable storage writing permissions.</string>
+    <string name="request_storage_message">To export and import data the application needs to have the right to access the external storage.</string>
+    <string name="storage_request_denied">Sharing data with the external storage is not possible without system permission.</string>
+    <string name="error_export_title">Could not export database</string>
+    <string name="error_export_desc">Please make sure that the external storage is mounted and accessible.</string>
+    <string name="error_import_title">Could not restore or import database</string>
+    <string name="error_import_desc">Please make sure that the external storage is accessible, the import file is saved under the correct path and the database is of a valid format.</string>
+
     <string name="menu_manage_sensors">Manage Sensors</string>
     <string name="menu_clear_data">Clear Data</string>
     <string name="menu_manage_connection">Manage Connection</string>
+    <string name="menu_export_import">Export / Import</string>
     <string name="menu_other">Other</string>
     <string name="menu_help">Help</string>
     <string name="menu_about">About</string>

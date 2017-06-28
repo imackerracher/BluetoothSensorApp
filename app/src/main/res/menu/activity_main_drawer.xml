@@ -18,6 +18,11 @@
             android:icon="@android:drawable/btn_radio"
             android:title="@string/menu_manage_connection" />
 
+        <item
+            android:id="@+id/nav_export_import"
+            android:icon="@android:drawable/ic_menu_save"
+            android:title="@string/menu_export_import" />
+
 
     </group>
 

@@ -88,29 +88,41 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        Intent intent;
 
-        if (id == R.id.nav_manage_sensors) {
-            //changeToManageSensors();
-            Intent intent = new Intent(this, ManageSensorsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_clear_data) {
-            Intent intent = new Intent(this, ClearDataActivity.class);
-            startActivity(intent);
-        }else if (id == R.id.nav_manage_connection) {
-            Intent intent = new Intent(this, BluetoothMainActivity.class);
-            startActivity(intent);
+        switch (item.getItemId()) {
+            case R.id.nav_manage_sensors:
+                intent = new Intent(this, ManageSensorsActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.nav_clear_data:
+                intent = new Intent(this, ClearDataActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.nav_manage_connection:
+                intent = new Intent(this, BluetoothMainActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.nav_export_import:
+                intent = new Intent(this, StorageActivity.class);
+                startActivity(intent);
+                break;
+
+            default:
+                Log.d(LOG_TAG, "Unknown navigation item id");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -151,12 +163,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void changeToHumidity(View view) {
-        /*
         Intent intent = new Intent(this, HumidityActivity.class);
-        startActivity(intent);*/
-        Log.d(LOG_TAG, "Datenbank wurde exportiert.");
-
-        DbExportImport.exportDb(this);
+        startActivity(intent);
     }
 
 
