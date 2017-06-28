@@ -26,28 +26,13 @@ public class StorageActivity extends AppCompatActivity {
     /* debugging only */
     private static final String LOG_TAG = StorageActivity.class.getSimpleName();
 
-    /**
-     * Request id to handle returning security settings.
-     */
     private static final int PERMISSION_REQUEST_STORAGE = 1;
-
     private static final int EXPORT_FAILED = 2;
     private static final int RESTORING_FAILED = 3;
     private static final int IMPORT_FAILED = 4;
 
-    /**
-     *
-     */
     Button exportButton;
-
-    /**
-     *
-     */
     Button restoreButton;
-
-    /**
-     *
-     */
     Button importButton;
 
 
@@ -168,11 +153,9 @@ public class StorageActivity extends AppCompatActivity {
         }
         builder.setPositiveButton(android.R.string.ok, null);
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
             @Override
             public void onDismiss(DialogInterface dialog) {
             }
-
         });
         builder.show();
     }

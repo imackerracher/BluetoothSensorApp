@@ -31,11 +31,6 @@ public class DataManager {
     private static final String LOG_TAG = DataManager.class.getSimpleName();
 
     /**
-     * The single data manager object, to access and operate on the database.
-     */
-    private static DataManager instance;
-
-    /**
      * An SQLite database the application is connected to that contains all persistent data.
      */
     private SQLiteDatabase database;
@@ -73,7 +68,8 @@ public class DataManager {
 
     /**
      * Get an own instance of the Data Manager object.
-     * <p>Note: Use getInstance because of using application context.
+     * <p>
+     * Note: Use getInstance because of using application context.
      *
      * @param context  the context of the calling activity
      * @return  the instance of the data manager
@@ -87,7 +83,8 @@ public class DataManager {
 
     /**
      * Open the connection to an SQLite database.
-     * <p>If there is no existing database yet, a new one is created.
+     * <p>
+     * If there is no existing database yet, a new one is created.
      */
     public synchronized void open() throws IOException {
         try {
@@ -165,7 +162,8 @@ public class DataManager {
 
     /**
      * Find and return the {@link Record} with the given id.
-     * <p>If not already present in the cache, the record is fetched from the database and
+     * <p>
+     * If not already present in the cache, the record is fetched from the database and
      * inserted into the former.
      * If the database contains no matching row, a {@link Record#RECORD_DUMMY} is returned.
      *
@@ -189,7 +187,8 @@ public class DataManager {
 
     /**
      * Find and return the {@link Sensor} with the given id.
-     * <p>If not already present in the cache, the sensor is fetched from the database and
+     * <p>
+     * If not already present in the cache, the sensor is fetched from the database and
      * inserted into the former.
      * If the database contains no matching row, a {@link Sensor#SENSOR_DUMMY} is returned.
      *
@@ -214,7 +213,8 @@ public class DataManager {
 
     /**
      * Find and return the {@link User} with the given id.
-     * <p>If not already present in the cache, the user is fetched from the database and
+     * <p>
+     * If not already present in the cache, the user is fetched from the database and
      * inserted into the former.
      * If the database contains no matching row, a {@link User#USER_DUMMY} is returned.
      *
@@ -408,7 +408,8 @@ public class DataManager {
 
     /**
      * Insert a new measurement and its information into the database.
-     * <p>Note: id will be ignored by database and replaced with insertion id.
+     * <p>
+     * Note: id will be ignored by database and replaced with insertion id.
      *
      * @param measurement  the measurement to save
      */
@@ -440,7 +441,7 @@ public class DataManager {
      *
      * @param record  the record to save
      */
-    public void saveRecord(Record record) {
+    void saveRecord(Record record) {
         ContentValues values = new ContentValues();
 
         values.put(RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());

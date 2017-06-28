@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class User {
 
-    public static final User USER_DUMMY = new User(0, "Dummy User");
+    static final User USER_DUMMY = new User(0, "Dummy User");
 
     /**
      * The unique id of the user.
@@ -67,7 +67,8 @@ public class User {
 
     /**
      * Modify the name of the user.
-     * <p>The name must neither be null nor empty nor longer than 50 characters.
+     * <p>
+     * The name must neither be null nor empty nor longer than 50 characters.
      *
      * @param name  the new name
      */

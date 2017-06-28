@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -13,21 +14,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.data.DbExportImport;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
-import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
-import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
-import com.example.groupfourtwo.bluetoothsensorapp.data.User;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
@@ -48,26 +43,17 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        //Tie the values in content_main.xml to the textviews in this file
+        //Tie the values in content_main.xml to the text views in this file
         currentTemperature = (TextView) findViewById(R.id.textViewCurrentTemperature);
         currentBrightness = (TextView) findViewById(R.id.textViewCurrentBrightness);
         currentPressure = (TextView) findViewById(R.id.textViewCurrentPressure);
@@ -89,7 +75,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         Intent intent;
 
@@ -116,6 +102,7 @@ public class MainActivity extends AppCompatActivity
 
             default:
                 Log.d(LOG_TAG, "Unknown navigation item id");
+                return false;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

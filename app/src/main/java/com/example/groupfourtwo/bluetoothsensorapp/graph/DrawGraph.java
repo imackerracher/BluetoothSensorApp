@@ -41,6 +41,11 @@ public class DrawGraph {
 
     private static final String LOG_TAG = DrawGraph.class.getSimpleName();
 
+    /**
+     * Offset in milliseconds from epoch to 1. Jan 2016 UTC
+     */
+    private final static long EPOCH_TO_2016 = 1451606400000L;
+
     private Context context;
     private Measure measure1, measure2;
     private long begin;
@@ -50,14 +55,19 @@ public class DrawGraph {
     private int textColour = Color.WHITE;
     private LineChart lineChart;
 
-    public DrawGraph(Context context , Measure measure1, Measure measure2,
-                     long begin, long end) {
+    public DrawGraph(Context context, Measure measure1, Measure measure2,
+                     Record record, long begin, long end) {
         this.context = context;
         this.measure1 = measure1;
         this.measure2 = measure2;
-        this.begin = begin;
-        this.end = end;
-        record = null;
+        if (record != null) {
+            this.record = record;
+            this.begin = record.getBegin();
+            this.end = record.getEnd();
+        } else {
+            this.begin = begin;
+            this.end = end;
+        }
     }
 
 
@@ -70,7 +80,7 @@ public class DrawGraph {
 
 
 
-        long offset =  1451606400000L ; // time in milliseconds to 1.Jan 2016 UTC = 1451606400000L
+
 
 
 
@@ -98,7 +108,7 @@ public class DrawGraph {
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
 
         x.setPointsPerHour(3600/(interval.step/1000)); // Maximal number of data points per Hour
-        x.setStartInSec((begin - offset) ); // The start in milliseconds since 1st Jan 2016 in UTC
+        x.setStartInSec(begin - EPOCH_TO_2016); // The start in milliseconds since 1st Jan 2016 in UTC
         xAxis.setValueFormatter(x);
 
         /**

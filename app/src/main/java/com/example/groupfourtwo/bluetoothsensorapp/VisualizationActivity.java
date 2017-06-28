@@ -2,12 +2,14 @@ package com.example.groupfourtwo.bluetoothsensorapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
@@ -15,7 +17,6 @@ import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 import java.io.IOException;
 import java.util.Locale;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 
 /**
  * Created by Stefan on 21.06.2017.
@@ -52,14 +53,33 @@ public class VisualizationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visualization);
 
         end = System.currentTimeMillis();
-        begin = end - DAY.length;
+        begin = end - Interval.DAY.length;
 
-        drawGraph = new DrawGraph(this, mainMeasure, addMeasure, begin, end);
+        if (savedInstanceState != null) {
+            Log.d(TAG, "restore old state");
+            String sndMeasure = savedInstanceState.getString(ADD_MEASURE);
+            if (sndMeasure != null) {
+                addMeasure = Measure.valueOf(sndMeasure);
+            }
 
+            long recordId = savedInstanceState.getLong(RESULT_RECORD);
+            if (recordId > 0) {
+                DataManager dataManager = DataManager.getInstance(this);
+                record = dataManager.findRecord(recordId);
+                end = record.getEnd();
+                begin = record.getBegin();
+            } else {
+                end = savedInstanceState.getLong(RESULT_END, end);
+                begin = savedInstanceState.getLong(RESULT_BEGIN, begin);
+            }
+        }
+
+        drawGraph = new DrawGraph(this, mainMeasure, addMeasure, record, begin, end);
         drawGraph.draw(this);
     }
 
@@ -75,33 +95,33 @@ public class VisualizationActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        /* Handle action bar item clicks here. The action bar will
+         * automatically handle clicks on the Home/Up button, so long
+         * as you specify a parent activity in AndroidManifest.xml */
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.measurements_settings:
+                intent = new Intent(this, RecordsActivity.class);
+                startActivityForResult(intent, RECORD_SELECTION_REQUEST);
+                return true;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.measurements_settings) {
-            Intent intent = new Intent(this, RecordsActivity.class);
-            startActivityForResult(intent, RECORD_SELECTION_REQUEST);
-            return true;
-        }
-        if (id == R.id.timespan_settings) {
-            Intent intent = new Intent(this, TimespanActivity.class);
-            startActivityForResult(intent, TIME_SPAN_SELECTION_REQUEST);
-            return true;
-        }
-        if (id == R.id.sensor_settings) {
-            Intent intent = new Intent(this, SensorSettingsActivity.class);
-            intent.putExtra(MAIN_MEASURE, mainMeasure.name());
-            if (addMeasure != null) {
-                intent.putExtra(ADD_MEASURE, addMeasure.name());
-            }
-            startActivityForResult(intent, SENSOR_SELECTION_REQUEST);
-            return true;
-        }
+            case R.id.timespan_settings:
+                intent = new Intent(this, TimespanActivity.class);
+                startActivityForResult(intent, TIME_SPAN_SELECTION_REQUEST);
+                return true;
 
-        return super.onOptionsItemSelected(item);
+            case R.id.sensor_settings:
+                intent = new Intent(this, SensorSettingsActivity.class);
+                intent.putExtra(MAIN_MEASURE, mainMeasure.name());
+                if (addMeasure != null) {
+                    intent.putExtra(ADD_MEASURE, addMeasure.name());
+                }
+                startActivityForResult(intent, SENSOR_SELECTION_REQUEST);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 
@@ -155,4 +175,19 @@ public class VisualizationActivity extends AppCompatActivity {
         }
         drawGraph.draw(this);
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
+        if (addMeasure != null) {
+            outState.putString(ADD_MEASURE, addMeasure.name());
+        }
+        if (record != null) {
+            outState.putLong(RESULT_RECORD, record.getId());
+        } else {
+            outState.putLong(RESULT_BEGIN, begin);
+            outState.putLong(RESULT_END, end);
+        }
+    }
+
 }

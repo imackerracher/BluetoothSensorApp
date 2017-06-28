@@ -2,7 +2,6 @@ package com.example.groupfourtwo.bluetoothsensorapp.data;
 
 import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
@@ -15,7 +14,7 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
 public class Sensor {
 
-    public static final Sensor SENSOR_DUMMY = new Sensor(0, "Dummy Sensor", 0);
+    static final Sensor SENSOR_DUMMY = new Sensor(0, "Dummy Sensor", 0);
 
     /**
      * The unique identifier according to the sensor's bluetooth MAC address.
@@ -100,7 +99,8 @@ public class Sensor {
 
     /**
      * Modify the name of the sensor.
-     * <p>The name must neither be null nor empty nor longer than 50 characters.
+     * <p>
+     * The name must neither be null nor empty nor longer than 50 characters.
      *
      * @param name  the new name
      */

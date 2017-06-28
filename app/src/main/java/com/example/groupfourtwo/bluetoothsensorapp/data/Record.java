@@ -1,10 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.data;
 
-import android.util.Log;
-
 import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
 
 /**
  * Wrapper for information about a continuous set of measurements forming a record.
@@ -14,8 +11,6 @@ import java.util.TimeZone;
  */
 
 public class Record {
-
-    private static final String LOG_TAG = Record.class.getSimpleName();
 
     public static final Record RECORD_DUMMY = new Record(
             0, Sensor.SENSOR_DUMMY, User.USER_DUMMY, Long.MIN_VALUE, Long.MAX_VALUE);
@@ -55,7 +50,7 @@ public class Record {
      * @param begin    when the record started
      * @param end      when the record ended, MIN_VALUE if running
      */
-    public Record(long id, Sensor sensor, User user, long begin, long end) {
+    Record(long id, Sensor sensor, User user, long begin, long end) {
 
         Objects.requireNonNull(sensor, "Sensor must not be null.");
         Objects.requireNonNull(user, "User must not be null.");
