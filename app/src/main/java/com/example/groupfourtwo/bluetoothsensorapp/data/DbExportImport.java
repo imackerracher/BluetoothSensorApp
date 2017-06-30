@@ -322,6 +322,7 @@ public class DbExportImport {
                             cursor.getFloat(indexPressure),
                             cursor.getFloat(indexTemperature) )
             );
+            cursor.moveToNext();
         }
         cursor.close();
     }
@@ -358,6 +359,7 @@ public class DbExportImport {
                             cursor.getLong(indexBegin),
                             cursor.getLong(indexEnd) )
             );
+            cursor.moveToNext();
         }
         cursor.close();
     }
@@ -387,7 +389,7 @@ public class DbExportImport {
         while(!cursor.isAfterLast()){
             final long id = cursor.getLong(indexSensorID);
 
-            if (dataManager.findSensor(id) == null) {
+            if (dataManager.findSensor(id).getId() < 1) {
                 dataManager.saveSensor(
                         new Sensor(
                                 cursor.getLong(indexSensorID),
@@ -395,6 +397,7 @@ public class DbExportImport {
                                 cursor.getLong(indexKnownSince) )
                 );
             }
+            cursor.moveToNext();
         }
         cursor.close();
     }
@@ -424,13 +427,14 @@ public class DbExportImport {
         while(!cursor.isAfterLast()){
             final long id = cursor.getLong(indexUserID);
 
-            if (dataManager.findUser(id) == null) {
+            if (dataManager.findUser(id).getId() < 1) {
                 dataManager.saveUser(
                         new User(
                                 cursor.getLong(indexUserID),
                                 cursor.getString(indexUserName) )
                 );
             }
+            cursor.moveToNext();
         }
         cursor.close();
     }
