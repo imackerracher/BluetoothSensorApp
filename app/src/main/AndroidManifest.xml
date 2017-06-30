@@ -37,14 +37,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BrightnessActivity"
+            android:name=".visualization.BrightnessActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ClearDataActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".HumidityActivity"
+            android:name=".visualization.HumidityActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity" />
         <activity
@@ -54,23 +54,23 @@
             android:name=".ManageSensorsActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".PressureActivity"
+            android:name=".visualization.PressureActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".TemperatureActivity"
+            android:name=".visualization.TemperatureActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".RecordsActivity"
+            android:name=".visualization.RecordsActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
-            android:name=".TimespanActivity"
+            android:name=".visualization.TimespanActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
-            android:name=".SensorSettingsActivity"
+            android:name=".visualization.SensorSettingsActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
@@ -78,6 +78,10 @@
             android:parentActivityName=".bluetooth.BluetoothMainActivity" />
         <activity
             android:name=".StorageActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".AboutActivity"
+            android:label="About"
             android:parentActivityName=".MainActivity" />
 
         <service

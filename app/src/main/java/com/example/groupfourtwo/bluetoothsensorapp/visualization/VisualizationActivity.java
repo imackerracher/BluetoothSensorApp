@@ -1,13 +1,13 @@
-package com.example.groupfourtwo.bluetoothsensorapp;
+package com.example.groupfourtwo.bluetoothsensorapp.visualization;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
@@ -19,7 +19,9 @@ import java.util.Locale;
 
 
 /**
- * Created by Stefan on 21.06.2017.
+ * Displays graphics of the data collected by the sensors.
+ *
+ * @author all
  */
 
 public class VisualizationActivity extends AppCompatActivity {

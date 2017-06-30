@@ -1,4 +1,4 @@
-package com.example.groupfourtwo.bluetoothsensorapp;
+package com.example.groupfourtwo.bluetoothsensorapp.visualization;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.*;

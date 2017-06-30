@@ -16,11 +16,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
+import com.example.groupfourtwo.bluetoothsensorapp.visualization.BrightnessActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.visualization.HumidityActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.visualization.PressureActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.visualization.TemperatureActivity;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -100,6 +105,11 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 break;
 
+            case R.id.nav_about:
+                intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
+                break;
+
             default:
                 Log.d(LOG_TAG, "Unknown navigation item id");
                 return false;
@@ -154,6 +164,14 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    public void startStopRecord(View view) {
+        ToggleButton button = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
+        if (button.isChecked()) {
+            Log.d(LOG_TAG, "start record");
+        } else {
+            Log.d(LOG_TAG, "stop record");
+        }
+    }
 
     //Sets the values in the home screen next to the sensor icon to the last measured value
     public void setLatestSensorValues() {
@@ -195,18 +213,25 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            //Log.d(LOG_TAG, "Broadcast received.");
-            if (BluetoothLeService.ACTION_TEMP_DATA.equals(action)) {
-                setTemperature(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
+            switch (action) {
+                case BluetoothLeService.ACTION_TEMP_DATA:
+                    setTemperature(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f));
+                    break;
 
-            } else if (BluetoothLeService.ACTION_HUM_DATA.equals(action)) {
-                setHumidity(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
+                case BluetoothLeService.ACTION_LUX_DATA:
+                    setBrightness(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f));
+                    break;
 
-            } else if (BluetoothLeService.ACTION_BARO_DATA.equals(action)) {
-                setPressure(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
+                case BluetoothLeService.ACTION_BARO_DATA:
+                    setPressure(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f));
+                    break;
 
-            } else if (BluetoothLeService.ACTION_LUX_DATA.equals(action)) {
-                setBrightness(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA,0.0f));
+                case BluetoothLeService.ACTION_HUM_DATA:
+                    setHumidity(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f));
+                    break;
+
+                default:
+                    Log.d(LOG_TAG, "Unknown broadcast action received.");
             }
         }
     };

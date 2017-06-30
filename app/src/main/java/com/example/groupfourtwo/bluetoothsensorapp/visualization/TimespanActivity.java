@@ -1,10 +1,9 @@
-package com.example.groupfourtwo.bluetoothsensorapp;
+package com.example.groupfourtwo.bluetoothsensorapp.visualization;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -15,10 +14,10 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 
 
+import com.example.groupfourtwo.bluetoothsensorapp.R;
+
 import java.util.Calendar;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.VisualizationActivity.RESULT_BEGIN;
-import static com.example.groupfourtwo.bluetoothsensorapp.VisualizationActivity.RESULT_END;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.MONTH;
 
 /**
@@ -192,8 +191,8 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                 }
 
                 Intent intent = new Intent();
-                intent.putExtra(RESULT_BEGIN, begin.getTimeInMillis());
-                intent.putExtra(RESULT_END, end.getTimeInMillis());
+                intent.putExtra(VisualizationActivity.RESULT_BEGIN, begin.getTimeInMillis());
+                intent.putExtra(VisualizationActivity.RESULT_END, end.getTimeInMillis());
                 setResult(RESULT_OK, intent);
                 finish();
             }
