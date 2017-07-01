@@ -10,11 +10,12 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.
  */
 
 public enum Measure {
-    BRIGHTNESS (MAGENTA, MeasurementData.COLUMN_BRIGHTNESS, "lm"),
+    BRIGHTNESS (YELLOW, MeasurementData.COLUMN_BRIGHTNESS, "lm"),
     DISTANCE (BLACK, MeasurementData.COLUMN_DISTANCE, "m"),
-    HUMIDITY (BLUE, MeasurementData.COLUMN_HUMIDITY, "%"),
+    HUMIDITY (CYAN, MeasurementData.COLUMN_HUMIDITY, "%"),
     PRESSURE (GRAY, MeasurementData.COLUMN_PRESSURE, "hPa"),
     TEMPERATURE (RED, MeasurementData.COLUMN_TEMPERATURE, "°C");
+
 
     /**
      * The color that is used to draw the graph.

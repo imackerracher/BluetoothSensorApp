@@ -52,6 +52,8 @@ public class StorageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (checkStoragePermission() && !DbExportImport.exportDb(context)) {
                     showErrorDialog(EXPORT_FAILED);
+                } else {
+                    showSuccessDialog();
                 }
             }
         });
@@ -61,6 +63,8 @@ public class StorageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (checkStoragePermission() && !DbExportImport.restoreDb(context)) {
                     showErrorDialog(RESTORING_FAILED);
+                } else {
+                    showSuccessDialog();
                 }
             }
         });
@@ -70,6 +74,8 @@ public class StorageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (checkStoragePermission() && !DbExportImport.importIntoDb(context)) {
                     showErrorDialog(IMPORT_FAILED);
+                } else {
+                    showSuccessDialog();
                 }
             }
         });
@@ -151,6 +157,21 @@ public class StorageActivity extends AppCompatActivity {
             default:
                 Log.d(LOG_TAG, "Unknown error code from button click.");
         }
+        builder.setPositiveButton(android.R.string.ok, null);
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+            }
+        });
+        builder.show();
+    }
+
+    private void showSuccessDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Finished");
+        builder.setMessage("Transfer completed successfully");
+
         builder.setPositiveButton(android.R.string.ok, null);
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
