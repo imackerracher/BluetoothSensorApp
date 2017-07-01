@@ -318,7 +318,7 @@ public class DrawGraph {
             throw new IllegalArgumentException("Time span too long.");
         }
         this.end = end;
-        this.begin = end;
+        this.begin = begin;
         record = null;
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
