@@ -177,35 +177,7 @@ public class DrawGraph {
         }
 
 
-        /*
-         * Some Data generated for testing NOT USED
-         *
-
-        int numDataPoints = dataPointCount;
-        int gapSize = dataPointCount/10;
-        int gapPosition = dataPointCount/3;
-
-                //Generating empty y-Value Array
-        ArrayList<Float> yAxesTest = new ArrayList<>();
-
-        // genarate data for Testing ************
-        Random randomGenerator = new Random();
-        yAxesTest.add(null);
-
-        for (int i = 1; i < gapPosition; i++)
-            yAxesTest.add( (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
-
-        for (int i = gapPosition; i < gapPosition + gapSize; i++)
-            yAxesTest.add(null);
-
-
-        for (int i = gapPosition + gapSize; i < numDataPoints; i++)
-            yAxesTest.add(  (float) Math.sin(((double) i + randomGenerator.nextInt(25))/200) *3 +4);
-
-        */
-
-
-
+        
 
 
 
@@ -217,14 +189,14 @@ public class DrawGraph {
 
         LineDataSet lineDataSet1 = new LineDataSet(yAxes1, "1");
         lineDataSet1.setColors(createColorArray(yAxes1, measure1));
-        lineDataSet1.setHighLightColor(measure1.color);
+        lineDataSet1.setHighLightColor(brighter(measure1.color, 0.3f));
         lineDataSets.add(lineDataSet1);
 
         LineDataSet lineDataSet2 = new LineDataSet(yAxes2,"2");
         if (measure2 != null) {
             lineDataSet2.setColors(createColorArray(yAxes2, measure2));
             lineDataSet2.setAxisDependency(RIGHT);
-            lineDataSet2.setHighLightColor(measure2.color);
+            lineDataSet2.setHighLightColor(brighter(measure2.color, 0.3f));
             lineDataSets.add(lineDataSet2);
 
         }
@@ -322,6 +294,17 @@ public class DrawGraph {
         record = null;
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
+    }
+
+    public int brighter(int color, float factor) {
+        float hsv[] = new float[3];
+        Color.RGBToHSV( Color.red(color),Color.green(color), Color.blue(color)  , hsv);
+        hsv[1] *= factor;
+        hsv[1] = Math.min(1.0f, hsv[1]);
+        int rgb = Color.HSVToColor(hsv);
+        //rgb = (255 & 0xff) << 24 | (Color.red(rgb) & 0xff) << 16 | ((Color.green(rgb) & 0xff) << 16 | ((Color.blue(rgb))) & 0xff);
+        System.out.println("kimsDebugging:" + Color.alpha(rgb) +"red: " + Color.red(rgb) +" green: " + Color.green(rgb) +" blue: " + Color.blue(rgb));
+        return rgb;
     }
 
 

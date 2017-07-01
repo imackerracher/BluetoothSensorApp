@@ -39,7 +39,6 @@ public class CustomMarkerView extends MarkerView {
     // content (user-interface)
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
-        System.out.println("kimsDebugging: HIGHLICHTCOLOR"+ tvContent.getHighlightColor());
         DecimalFormat mFormat = new DecimalFormat("###,###,##0.00");
         tvContent.setText( "" + mFormat.format(e.getY()));
 
