@@ -1,10 +1,13 @@
 package com.example.groupfourtwo.bluetoothsensorapp;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +23,8 @@ import android.widget.ToggleButton;
 
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.ControlActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.BrightnessActivity;
@@ -35,11 +40,15 @@ public class MainActivity extends AppCompatActivity
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private DatabaseUpdateService mDatabaseUpdateService;
+
     //Values to be displayed in the home screen next to the sensor icons
     TextView currentTemperature;
     TextView currentBrightness;
     TextView currentPressure;
     TextView currentHumidity;
+
+    ToggleButton button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +72,15 @@ public class MainActivity extends AppCompatActivity
         currentBrightness = (TextView) findViewById(R.id.textViewCurrentBrightness);
         currentPressure = (TextView) findViewById(R.id.textViewCurrentPressure);
         currentHumidity = (TextView) findViewById(R.id.textViewCurrentHumidity);
-
+        button = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
+        button.setVisibility(View.GONE);
         setLatestSensorValues();
 
+
+        Intent databaseServiceIntent = new Intent(this, DatabaseUpdateService.class);
+        bindService(databaseServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
+        Log.d(LOG_TAG, "onCreate");
     }
 
     @Override
@@ -77,6 +91,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+        finish();
     }
 
     @Override
@@ -123,8 +138,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        stopService(gattServiceIntent);
+        mDatabaseUpdateService.stopUpdating();
+        unbindService(mServiceConnection);
         Log.d(LOG_TAG, "onDestroy");
     }
 
@@ -132,8 +147,16 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
+        Log.d(LOG_TAG, "onResume");
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(LOG_TAG, "onNewIntent");
+        boolean b = intent.getBooleanExtra("BUTTON", true);
+        if (!b)
+            button.setVisibility(View.VISIBLE);
+    }
 
     @Override
     protected void onStop() {
@@ -165,11 +188,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startStopRecord(View view) {
-        ToggleButton button = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
         if (button.isChecked()) {
             Log.d(LOG_TAG, "start record");
+            mDatabaseUpdateService.startUpdating();
         } else {
             Log.d(LOG_TAG, "stop record");
+            mDatabaseUpdateService.stopUpdating();
         }
     }
 
@@ -243,6 +267,21 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(BluetoothLeService.ACTION_BARO_DATA);
         intentFilter.addAction(BluetoothLeService.ACTION_LUX_DATA);
         return intentFilter;
-
     }
+
+
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            Log.d(LOG_TAG, "onServiceConnected()");
+            mDatabaseUpdateService = ((DatabaseUpdateService.LocalBinder) service).getService();
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mDatabaseUpdateService = null;
+        }
+    };
 }
