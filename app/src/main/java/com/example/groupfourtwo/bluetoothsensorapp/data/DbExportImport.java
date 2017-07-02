@@ -160,9 +160,8 @@ public class DbExportImport {
 
             importUsers(importDb, dataManager);
 
+            // imports both records and measurements in parallel
             importRecords(importDb, dataManager);
-
-            importMeasurements(importDb, dataManager);
 
             importDb.close();
             dataManager.close();
@@ -287,7 +286,7 @@ public class DbExportImport {
 
 
     /**
-     * Imports the content of the external measurement table into the application's table.
+     * Imports all of the external measurement table into the application's table.
      * <p>
      * The database to be read from must be opened before passing it and has to be checked
      * for compatibility in respect to the application database, represented by an open
@@ -295,13 +294,19 @@ public class DbExportImport {
      *
      * @param importDb     a valid and readable {@link SQLiteDatabase}
      * @param dataManager  an opened instance of DataManager
+     * @param oldId        the former id of the respective record from the imported database
+     * @param newId        the new id of the record as it was set after the import
      */
-    private static void importMeasurements(SQLiteDatabase importDb, DataManager dataManager) {
-        Cursor cursor = importDb.query(true, MeasurementData.TABLE_MEASUREMENT,
-                null, null, null, null, null, null, null
-        );
+    private static void importMeasurements(SQLiteDatabase importDb, DataManager dataManager,
+                                           long oldId, long newId) {
 
-        final int indexRecord = cursor.getColumnIndex(MeasurementData.COLUMN_RECORD_ID);
+        String[] select = MeasurementData.ALL_COLUMNS;
+        String where = MeasurementData.COLUMN_RECORD_ID + " = " + oldId;
+
+        // SELECT * FROM MEASUREMENT WHERE RECORD_ID = oldID;
+        Cursor cursor = importDb.query(MeasurementData.TABLE_MEASUREMENT,
+                select, where, null, null, null, null);
+
         final int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
         final int indexBrightness = cursor.getColumnIndex(MeasurementData.COLUMN_BRIGHTNESS);
         final int indexDistance = cursor.getColumnIndex(MeasurementData.COLUMN_DISTANCE);
@@ -311,17 +316,15 @@ public class DbExportImport {
 
         // Adds all measurements in cursor to current database
         cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             dataManager.saveMeasurement(
-                    new Measurement(
-                            -1, // some invalid value, not used
-                            dataManager.findRecord(cursor.getLong(indexRecord)),
-                            cursor.getLong(indexTime),
-                            cursor.getFloat(indexBrightness),
-                            cursor.getFloat(indexDistance),
-                            cursor.getFloat(indexHumidity),
-                            cursor.getFloat(indexPressure),
-                            cursor.getFloat(indexTemperature) )
+                    newId,
+                    cursor.getLong(indexTime),
+                    cursor.getFloat(indexBrightness),
+                    cursor.getFloat(indexDistance),
+                    cursor.getFloat(indexHumidity),
+                    cursor.getFloat(indexPressure),
+                    cursor.getFloat(indexTemperature)
             );
             cursor.moveToNext();
         }
@@ -340,10 +343,10 @@ public class DbExportImport {
      * @param dataManager  an opened instance of DataManager
      */
     private static void importRecords(SQLiteDatabase importDb, DataManager dataManager) {
-        Cursor cursor = importDb.query(true, RecordData.TABLE_RECORD,
-                null, null, null, null, null, null, null
-        );
+        Cursor cursor = importDb.query(RecordData.TABLE_RECORD,
+                RecordData.ALL_COLUMNS, null, null, null, null, null);
 
+        final int indexID = cursor.getColumnIndex(RecordData._ID);
         final int indexSensor = cursor.getColumnIndex(RecordData.COLUMN_SENSOR_ID);
         final int indexUser = cursor.getColumnIndex(RecordData.COLUMN_USER_ID);
         final int indexBegin = cursor.getColumnIndex(RecordData.COLUMN_BEGIN);
@@ -351,15 +354,15 @@ public class DbExportImport {
 
         // Adds all Records in cursor to current database
         cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
-            dataManager.saveRecord(
-                    new Record(
-                            -1, // some invalid value, not used
-                            dataManager.findSensor(cursor.getLong(indexSensor)),
-                            dataManager.findUser(cursor.getLong(indexUser)),
-                            cursor.getLong(indexBegin),
-                            cursor.getLong(indexEnd) )
+        while (!cursor.isAfterLast()) {
+            long oldId = cursor.getLong(indexID);
+            long newId = dataManager.saveRecord(
+                    cursor.getLong(indexSensor),
+                    cursor.getLong(indexUser),
+                    cursor.getLong(indexBegin),
+                    cursor.getLong(indexEnd)
             );
+            importMeasurements(importDb, dataManager, oldId, newId);
             cursor.moveToNext();
         }
         cursor.close();
@@ -387,10 +390,10 @@ public class DbExportImport {
 
         // Adds all Sensors in cursor to current database iff not known yet.
         cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             final long id = cursor.getLong(indexSensorID);
 
-            if (dataManager.findSensor(id).getId() < 1) {
+            if (dataManager.existsSensor(id)) {
                 dataManager.saveSensor(
                         new Sensor(
                                 cursor.getLong(indexSensorID),
@@ -425,10 +428,10 @@ public class DbExportImport {
 
         // Adds all Users in cursor to current database iff not known yet.
         cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             final long id = cursor.getLong(indexUserID);
 
-            if (dataManager.findUser(id).getId() < 1) {
+            if (!dataManager.existsUser(id)) {
                 dataManager.saveUser(
                         new User(
                                 cursor.getLong(indexUserID),

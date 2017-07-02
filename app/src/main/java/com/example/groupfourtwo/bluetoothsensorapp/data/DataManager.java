@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.LongSparseArray;
 
@@ -186,6 +187,28 @@ public class DataManager {
 
 
     /**
+     * Checks whether an entry of the given id exists in the sensor table already.
+     *
+     * @param id  the id of the sensor
+     * @return  whether the sensor has an entry in the database
+     */
+    public boolean existsSensor(long id) {
+        return  searchSensor(id) != null;
+    }
+
+
+    /**
+     * Checks whether a user entry of the given id exists in the user table already.
+     *
+     * @param id  the id of the sensor
+     * @return  whether the sensor has an entry in the database
+     */
+    public boolean existsUser(long id) {
+        return  searchUser(id) != null;
+    }
+
+
+    /**
      * Find and return the {@link Sensor} with the given id.
      * <p>
      * If not already present in the cache, the sensor is fetched from the database and
@@ -195,8 +218,8 @@ public class DataManager {
      * @param id  id of the sensor to search
      * @return  the sensor with the given id or dummy if none was found
      */
-    public Sensor findSensor(long id
-    ) {
+    public Sensor findSensor(long id) {
+        Log.d(LOG_TAG, sensors.size() + "sensors saved in cache.");
         Sensor sensor = sensors.get(id);
         if (sensor == null) { // wanted sensor not in map -> search in database
             sensor = searchSensor(id);
@@ -413,7 +436,7 @@ public class DataManager {
      *
      * @param measurement  the measurement to save
      */
-    public void saveMeasurement(Measurement measurement) {
+    public long saveMeasurement(Measurement measurement) {
         if (measurement.getId() != -1) {
             throw new IllegalArgumentException("Measurement was already inserted some other time.");
         }
@@ -433,6 +456,37 @@ public class DataManager {
         Log.d(LOG_TAG, "Inserted new measurement: " + id);
 
         measurement.setId(id);
+        return id;
+    }
+
+
+    /**
+     * Insert a new measurement by its information into the database.
+     *
+     * @param recordId     the id of the respective record
+     * @param time         the time when the measurement was taken
+     * @param brightness   the brightness value
+     * @param distance     the distance value
+     * @param humidity     the humidity value
+     * @param pressure     the pressure value
+     * @param temperature  the temperature value
+     */
+    public long saveMeasurement(long recordId, long time, float brightness, float distance,
+                                float humidity, float pressure, float temperature) {
+        ContentValues values = new ContentValues();
+
+        values.put(MeasurementData.COLUMN_RECORD_ID, recordId);
+        values.put(MeasurementData.COLUMN_TIME, time);
+        values.put(MeasurementData.COLUMN_BRIGHTNESS, brightness);
+        values.put(MeasurementData.COLUMN_DISTANCE, distance);
+        values.put(MeasurementData.COLUMN_HUMIDITY, humidity);
+        values.put(MeasurementData.COLUMN_PRESSURE, pressure);
+        values.put(MeasurementData.COLUMN_TEMPERATURE, temperature);
+
+        // INSERT INTO MEASUREMENT VALUES (record, time, ..., pressure, temperature)
+        long id = database.insert(MeasurementData.TABLE_MEASUREMENT, null, values);
+        Log.d(LOG_TAG, "Inserted new measurement: " + id);
+        return id;
     }
 
 
@@ -441,7 +495,7 @@ public class DataManager {
      *
      * @param record  the record to save
      */
-    void saveRecord(Record record) {
+    long saveRecord(Record record) {
         ContentValues values = new ContentValues();
 
         values.put(RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());
@@ -451,10 +505,34 @@ public class DataManager {
 
         // INSERT INTO RECORD VALUES (sensor, user, begin, end)
         long id = database.insert(RecordData.TABLE_RECORD, null, values);
-        Log.d(LOG_TAG, "Inserted new record: " + id + " " + record.getId());
+        Log.d(LOG_TAG, "Inserted new record: " + id);
 
         record.setId(id);
         records.put(id, record);
+        return id;
+    }
+
+
+    /**
+     * Insert a new record by its parameters into the database.
+     *
+     * @param sensorId  the id of the respective sensor
+     * @param userId    the id of the respective user
+     * @param begin     the start point of the record
+     * @param end       the end point of the record
+     */
+    long saveRecord(long sensorId, long userId, long begin, long end) {
+        ContentValues values = new ContentValues();
+
+        values.put(RecordData.COLUMN_SENSOR_ID, sensorId);
+        values.put(RecordData.COLUMN_USER_ID, userId);
+        values.put(RecordData.COLUMN_BEGIN, begin);
+        values.put(RecordData.COLUMN_END, end);
+
+        // INSERT INTO RECORD VALUES (sensor, user, begin, end)
+        long id = database.insert(RecordData.TABLE_RECORD, null, values);
+        Log.d(LOG_TAG, "Inserted new record: " + id);
+        return id;
     }
 
 

@@ -96,9 +96,13 @@ public class DatabaseUpdateService extends Service {
             isUpdating = true;
             handler.postDelayed(runnable, 0);
             startTime = System.currentTimeMillis();
-            sensor = dataManager.findSensor(Sensor.parseAddress(sensorAddress));
-            if (sensor == null) {//sensor not in database -> add new Sensor
-                sensor = new Sensor(Sensor.parseAddress(sensorAddress), "defaultName", startTime);
+
+            long sensorId = Sensor.parseAddress(sensorAddress);
+
+            if (dataManager.existsSensor(sensorId)) {
+                sensor = dataManager.findSensor(Sensor.parseAddress(sensorAddress));
+            } else {//sensor not in database -> add new Sensor
+                sensor = new Sensor(sensorId, "new Sensor: " + sensorAddress, startTime);
                 dataManager.saveSensor(sensor);
                 Log.d(TAG, "saved Sensor :" + sensorAddress);
             }
