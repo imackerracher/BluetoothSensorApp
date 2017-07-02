@@ -13,7 +13,7 @@ public enum Measure {
     BRIGHTNESS (YELLOW, MeasurementData.COLUMN_BRIGHTNESS, "lm"),
     DISTANCE (BLACK, MeasurementData.COLUMN_DISTANCE, "m"),
     HUMIDITY (CYAN, MeasurementData.COLUMN_HUMIDITY, "%"),
-    PRESSURE (GRAY, MeasurementData.COLUMN_PRESSURE, "hPa"),
+    PRESSURE (LTGRAY, MeasurementData.COLUMN_PRESSURE, "hPa"),
     TEMPERATURE (RED, MeasurementData.COLUMN_TEMPERATURE, "°C");
 
 
