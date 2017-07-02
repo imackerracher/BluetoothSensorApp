@@ -583,9 +583,6 @@ public class DataManager {
             while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + interval.step) {
                 float value = cursor.getFloat(indexValue);
                 cursor.moveToNext();
-                if (measure == HUMIDITY  &&  value > 100f) {
-                    continue;
-                }
                 sum += value;
                 ++noOfValues;
             }

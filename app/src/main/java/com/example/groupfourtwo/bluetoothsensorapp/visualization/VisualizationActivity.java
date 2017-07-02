@@ -72,7 +72,13 @@ public class VisualizationActivity extends AppCompatActivity {
             long recordId = savedInstanceState.getLong(RESULT_RECORD);
             if (recordId > 0) {
                 DataManager dataManager = DataManager.getInstance(this);
+                try {
+                    dataManager.open();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 record = dataManager.findRecord(recordId);
+                dataManager.close();
                 end = record.getEnd();
                 begin = record.getBegin();
             } else {

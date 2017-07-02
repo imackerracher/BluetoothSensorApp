@@ -34,8 +34,9 @@ public class DbExportImport {
      * Directory that files are to be read from and written to.
      */
     private static final File EXTERNAL_DATABASE_DIRECTORY =
-            new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-                    PACKAGE_NAME);
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            //new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+              //      PACKAGE_NAME);
 
     /**
      * The file that is used for a backup, as well as a source to restore the internal database.

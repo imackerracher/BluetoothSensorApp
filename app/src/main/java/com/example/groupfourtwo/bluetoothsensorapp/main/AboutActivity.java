@@ -1,9 +1,10 @@
-package com.example.groupfourtwo.bluetoothsensorapp;
+package com.example.groupfourtwo.bluetoothsensorapp.main;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
 /**
  * Delivers information about the application to the user.
@@ -71,9 +73,11 @@ public class AboutActivity extends AppCompatActivity {
      */
     private String formatDuration(long duration) {
         if (duration < DAY.length) {
-            return String.format(Locale.ENGLISH, "%tHh, %<tMmin", duration);
+            return String.format(Locale.ENGLISH, "%dh, %dmin",
+                    duration / HOUR.length, (duration / 60000) % 60 );
         } else {
-            return String.format(Locale.ENGLISH, "%dd, %tHh, %<tMmin", duration / DAY.length, duration);
+            return String.format(Locale.ENGLISH, "%dd, %dh, %dmin",
+                    duration / DAY.length, (duration / HOUR.length) % 24, (duration / 60000) % 60);
         }
     }
 }

@@ -26,7 +26,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar"
@@ -40,50 +40,51 @@
         <activity
             android:name=".visualization.BrightnessActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
-            android:name=".ClearDataActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name=".main.ClearDataActivity"
+            android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".visualization.HumidityActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".bluetooth.BluetoothMainActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
-            android:name=".ManageSensorsActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name=".main.ManageSensorsActivity"
+            android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".visualization.PressureActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".visualization.TemperatureActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".visualization.RecordsActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".visualization.TimespanActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".visualization.SensorSettingsActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".bluetooth.ControlActivity"
             android:parentActivityName=".bluetooth.BluetoothMainActivity" />
         <activity
-            android:name=".StorageActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name=".main.StorageActivity"
+            android:parentActivityName=".main.MainActivity" />
         <activity
-            android:name=".AboutActivity"
+            android:name=".main.AboutActivity"
             android:label="About"
-            android:parentActivityName=".MainActivity" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".main.MainActivity" />
 
         <service
             android:name=".bluetooth.BluetoothLeService"

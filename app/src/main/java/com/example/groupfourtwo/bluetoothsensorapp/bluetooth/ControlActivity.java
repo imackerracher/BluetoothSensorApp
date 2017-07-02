@@ -19,13 +19,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.example.groupfourtwo.bluetoothsensorapp.MainActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.main.MainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
 
