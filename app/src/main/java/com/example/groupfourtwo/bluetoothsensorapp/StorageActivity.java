@@ -50,10 +50,12 @@ public class StorageActivity extends AppCompatActivity {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkStoragePermission() && DbExportImport.exportDb(context)) {
-                    showSuccessDialog();
-                } else {
-                    showErrorDialog(EXPORT_FAILED);
+                if (checkStoragePermission()) {
+                    if (DbExportImport.exportDb(context)) {
+                        showSuccessDialog();
+                    } else {
+                        showErrorDialog(EXPORT_FAILED);
+                    }
                 }
             }
         });
@@ -61,10 +63,12 @@ public class StorageActivity extends AppCompatActivity {
         restoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkStoragePermission() && DbExportImport.restoreDb(context)) {
-                    showSuccessDialog();
-                } else {
-                    showErrorDialog(RESTORING_FAILED);
+                if (checkStoragePermission()) {
+                    if (DbExportImport.restoreDb(context)) {
+                        showErrorDialog(RESTORING_FAILED);
+                    } else {
+                        showErrorDialog(RESTORING_FAILED);
+                    }
                 }
             }
         });
@@ -72,10 +76,12 @@ public class StorageActivity extends AppCompatActivity {
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkStoragePermission() && DbExportImport.importIntoDb(context)) {
-                    showSuccessDialog();
-                } else {
-                    showErrorDialog(RESTORING_FAILED);
+                if (checkStoragePermission()) {
+                    if (DbExportImport.importIntoDb(context)) {
+                        showSuccessDialog();
+                    } else {
+                        showErrorDialog(IMPORT_FAILED);
+                    }
                 }
             }
         });
