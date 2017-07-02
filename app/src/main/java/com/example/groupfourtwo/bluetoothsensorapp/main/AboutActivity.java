@@ -1,9 +1,10 @@
-package com.example.groupfourtwo.bluetoothsensorapp;
+package com.example.groupfourtwo.bluetoothsensorapp.main;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 
