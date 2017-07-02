@@ -22,8 +22,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.MONTH;
+import static java.lang.String.format;
 
 /**
  * @author Tobias Nusser, Ian Mackerracher
@@ -102,7 +104,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                         public void onDateSet(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
 
-                            txtDateStart.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                            txtDateStart.setText(format(Locale.ENGLISH, "%02d-%02d-%d", dayOfMonth, monthOfYear + 1, year));
 
                         }
                     }, mYearStart, mMonthStart, mDayStart);
@@ -126,7 +128,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                         public void onTimeSet(TimePicker view, int hourOfDay,
                                               int minute) {
 
-                            txtTimeStart.setText(hourOfDay + ":" + minute);
+                            txtTimeStart.setText(format(Locale.ENGLISH, "%02d:%02d", hourOfDay, minute));
 
                         }
                     }, mHourStart, mMinuteStart, true);
@@ -150,7 +152,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                         public void onDateSet(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
 
-                            txtDateEnd.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                            txtDateEnd.setText(format(Locale.ENGLISH, "%02d-%02d-%d", dayOfMonth, monthOfYear + 1, year));
 
                         }
                     }, mYearEnd, mMonthEnd, mDayEnd);
@@ -172,7 +174,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                         public void onTimeSet(TimePicker view, int hourOfDay,
                                               int minute) {
 
-                            txtTimeEnd.setText(hourOfDay + ":" + minute);
+                            txtTimeEnd.setText(format(Locale.ENGLISH, "%02d:%02d", hourOfDay, minute));
 
                         }
                     }, mHourEnd, mMinuteEnd, true);
@@ -200,10 +202,22 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                     begin = df.parse(txtDateStart.getText().toString() + " " + txtTimeStart.getText().toString());
                     end = df.parse(txtDateEnd.getText().toString() + " " + txtTimeEnd.getText().toString());
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Invalid time span, please select again.");
+                    builder.setCancelable(true);
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    return;
                 }
 
-                if (end.getTime() - begin.getTime() > MONTH.length) {
+                if (end.getTime() <= begin.getTime()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Invalid time span, please select again.");
+                    builder.setCancelable(true);
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    return;
+                } else if (end.getTime() - begin.getTime() > MONTH.length) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Time Span is too long, please select again.");
                     builder.setCancelable(true);
