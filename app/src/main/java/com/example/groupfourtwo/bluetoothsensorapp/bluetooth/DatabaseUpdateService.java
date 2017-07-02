@@ -1,7 +1,10 @@
 package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -36,11 +39,13 @@ public class DatabaseUpdateService extends Service {
     private Float brightness;
     private long UPDATE_INTERVAL = 1000;
 
+    private boolean isUpdating = false;
+
 
     private DataManager dataManager;
     // Service Binder
     public class LocalBinder extends Binder {
-        DatabaseUpdateService getService() {
+        public DatabaseUpdateService getService() {
             return DatabaseUpdateService.this;
         }
     }
@@ -73,6 +78,7 @@ public class DatabaseUpdateService extends Service {
         }
         Log.d(TAG, "Open Database");
         Log.d(TAG, "onCreate() , service started...");
+        registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
 
     }
 
@@ -81,25 +87,33 @@ public class DatabaseUpdateService extends Service {
         super.onDestroy();
         dataManager.close();
         //stopUpdating();
+        unregisterReceiver(bleDataReceiver);
         Log.d(TAG, "onDestroy() , service stopped...");
     }
 
     public void startUpdating() {
-        handler.postDelayed(runnable, 0);
-        startTime = System.currentTimeMillis();
-        sensor = dataManager.findSensor(Sensor.parseAddress(sensorAddress));
-        if (sensor == null) {//sensor not in database -> add new Sensor
-            sensor = new Sensor(Sensor.parseAddress(sensorAddress), "defaultName", startTime);
-            dataManager.saveSensor(sensor);
+        if (!isUpdating) {
+            isUpdating = true;
+            handler.postDelayed(runnable, 0);
+            startTime = System.currentTimeMillis();
+            sensor = dataManager.findSensor(Sensor.parseAddress(sensorAddress));
+            if (sensor == null) {//sensor not in database -> add new Sensor
+                sensor = new Sensor(Sensor.parseAddress(sensorAddress), "defaultName", startTime);
+                dataManager.saveSensor(sensor);
+                Log.d(TAG, "saved Sensor :" + sensorAddress);
+            }
+            record = dataManager.startRecord(sensor, user);
+            Log.d(TAG, "startUpdating()");
         }
-        record = dataManager.startRecord(sensor, user);
-        Log.d(TAG, "startUpdating()");
     }
 
     public void stopUpdating() {
-        Log.d(TAG, "stopUpdating()");
-        dataManager.stopRecord(record);
-        handler.removeCallbacks(runnable);
+        if (isUpdating) {
+            isUpdating = false;
+            Log.d(TAG, "stopUpdating()");
+            dataManager.stopRecord(record);
+            handler.removeCallbacks(runnable);
+        }
     }
     private Handler handler = new Handler();
 
@@ -137,8 +151,45 @@ public class DatabaseUpdateService extends Service {
     }
 
     public void setSensorAddress(String s) {
-        Log.d(TAG, "setSensorAddress" + s);
+        Log.d(TAG, "setSensorAddress " + s);
         sensorAddress = s;
+    }
+
+    private final BroadcastReceiver bleDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            switch (action) {
+                case BluetoothLeService.ACTION_TEMP_DATA:
+                    temp = intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f);
+                    break;
+
+                case BluetoothLeService.ACTION_LUX_DATA:
+                    brightness = intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f);
+                    break;
+
+                case BluetoothLeService.ACTION_BARO_DATA:
+                    pressure = intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f);
+                    break;
+
+                case BluetoothLeService.ACTION_HUM_DATA:
+                    humidity = intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f);
+                    break;
+
+                default:
+                    Log.d(TAG, "Unknown broadcast action received.");
+            }
+        }
+    };
+
+    private static IntentFilter makeBleDataIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_TEMP_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_HUM_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_BARO_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_LUX_DATA);
+        return intentFilter;
+
     }
 
 

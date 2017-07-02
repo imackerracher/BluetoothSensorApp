@@ -27,7 +27,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
+
+import com.example.groupfourtwo.bluetoothsensorapp.R;
 
 import java.util.Queue;
 import java.util.UUID;
@@ -79,7 +82,7 @@ public class BluetoothLeService extends Service {
             Log.d(TAG, "onServiceConnected()");
             mDatabaseUpdateService = ((DatabaseUpdateService.LocalBinder) service).getService();
             mDatabaseUpdateService.setSensorAddress((mBluetoothGatt.getDevice().getAddress()));
-            mDatabaseUpdateService.startUpdating();
+            //mDatabaseUpdateService.startUpdating();
         }
 
         @Override
@@ -112,6 +115,7 @@ public class BluetoothLeService extends Service {
                 broadcastUpdate(intentAction);
                 Log.d(TAG,"DISCONNECTED");
                 stopUpdating();
+                //TODO: disable button
             }
         }
 
@@ -166,22 +170,22 @@ public class BluetoothLeService extends Service {
                 data = conversionHum(raw);
                 action = ACTION_HUM_DATA;
                 val = data[0];
-                mDatabaseUpdateService.setHumidity(val);
+                //mDatabaseUpdateService.setHumidity(val);
             } else if (id.equals(UUID_IR_TEMP_DATA)) {
                 data = conversionIRTemp(raw);
                 action = ACTION_TEMP_DATA;
                 val = data[0];
-                mDatabaseUpdateService.setTemp(val);
+                //mDatabaseUpdateService.setTemp(val);
             } else if (id.equals(UUID_BAROMETER_DATA)) {
                 data = conversionBaro(raw);
                 action = ACTION_BARO_DATA;
                 val = data[0];
-                mDatabaseUpdateService.setPressure(val);
+                //mDatabaseUpdateService.setPressure(val);
             } else if (id.equals(UUID_LUXMETER_DATA)) {
                 data = conversionLux(raw);
                 action = ACTION_LUX_DATA;
                 val = data[0];
-                mDatabaseUpdateService.setBrightness(val);
+                //mDatabaseUpdateService.setBrightness(val);
             }
 
             broadcastUpdate(action, characteristic, val);
@@ -417,7 +421,7 @@ public class BluetoothLeService extends Service {
         super.onDestroy();
         Log.d(TAG, "onDestroy() , BLEservice stopped");
         close();
-        stopUpdating();
+        //stopUpdating();
     }
 
 }

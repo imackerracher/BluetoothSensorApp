@@ -19,12 +19,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
-import com.example.groupfourtwo.bluetoothsensorapp.MainActivity;
+import com.example.groupfourtwo.bluetoothsensorapp.main.MainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
 
@@ -36,6 +35,8 @@ public class ControlActivity extends AppCompatActivity {
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
+
+    public static final String EXTRA_BUTTON = "EXTRA_BUTTON";
 
     private String mDeviceAddress;
 
@@ -89,18 +90,20 @@ public class ControlActivity extends AppCompatActivity {
                 //updateConnectionState("GATT_DISCONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-               for (UUID id : gattServices) {
-                   subscribe(id);
-               }
-               Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
-               Intent i = new Intent(context, MainActivity.class);
-               startActivity(i);
+                for (UUID id : gattServices) {
+                    subscribe(id);
+                }
+                Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(context, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.putExtra("BUTTON", false);
+                startActivity(i);
+                finish();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
-
 
 
     private void updateConnectionState(final String st) {
