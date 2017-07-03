@@ -69,6 +69,7 @@
         <activity
             android:name=".visualization.TimespanActivity"
             android:parentActivityName=".main.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".visualization.SensorSettingsActivity"

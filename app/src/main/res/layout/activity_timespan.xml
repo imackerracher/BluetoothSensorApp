@@ -3,31 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.groupfourtwo.bluetoothsensorapp.visualization.TimespanActivity">
+    android:layout_height="match_parent">
 
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/mtoolbar"
-        android:layout_width="364dp"
-        android:layout_height="60dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <TextView
         android:id="@+id/select_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Select start point"
-        android:textSize="20dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="71dp"
+        android:textSize="20sp"
+        android:layout_marginTop="16dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtoolbar"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
 
@@ -35,16 +40,15 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/in_date_start"
+        android:inputType="date"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/btn_date_start"
         android:layout_marginRight="8dp"
-        app:layout_constraintHorizontal_bias="0.516"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="119dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/select_start"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp" />
 
@@ -53,31 +57,28 @@
         android:layout_height="wrap_content"
         android:text="SELECT DATE"
         android:id="@+id/btn_date_start"
-        android:layout_alignBottom="@+id/in_date_start"
         android:layout_toRightOf="@+id/in_date_start"
-        android:layout_toEndOf="@+id/in_date_start"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="119dp"
         android:layout_marginRight="16dp"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/in_date_start"
+        app:layout_constraintBottom_toBottomOf="@+id/in_date_start"
         android:layout_marginEnd="16dp" />
 
     <EditText
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/in_time_start"
+        android:inputType="time"
         android:layout_below="@+id/in_date_start"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/btn_time_start"
         android:layout_marginRight="8dp"
-        app:layout_constraintHorizontal_bias="0.457"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/in_date_start"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="23dp"
-        app:layout_constraintTop_toBottomOf="@+id/in_date_start" />
+        android:layout_marginEnd="8dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -86,12 +87,11 @@
         android:id="@+id/btn_time_start"
         android:layout_below="@+id/btn_date_start"
         android:layout_alignLeft="@+id/btn_date_start"
-        android:layout_alignStart="@+id/btn_date_start"
         android:layout_marginRight="16dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="15dp"
-        android:layout_marginTop="18dp"
-        app:layout_constraintTop_toBottomOf="@+id/btn_date_start" />
+        app:layout_constraintTop_toTopOf="@+id/in_time_start"
+        app:layout_constraintBottom_toBottomOf="@+id/in_time_start"
+        android:layout_marginEnd="16dp" />
 
 
 
@@ -101,14 +101,14 @@
         android:layout_height="wrap_content"
         android:text="Select end point"
         android:textSize="20dp"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp"
-        app:layout_constraintVertical_bias="0.507"
+        app:layout_constraintBottom_toTopOf="@+id/btn_save_display"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/select_start"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
 
@@ -116,15 +116,15 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/in_date_end"
+        android:inputType="date"
         android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/btn_date_end"
         android:layout_marginRight="8dp"
-        app:layout_constraintHorizontal_bias="0.516"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/select_end"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="76dp"
-        app:layout_constraintTop_toBottomOf="@+id/in_time_start" />
+        android:layout_marginEnd="8dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -133,23 +133,23 @@
         android:id="@+id/btn_date_end"
         android:layout_alignBottom="@+id/in_date_end"
         android:layout_toRightOf="@+id/in_date_end"
-        android:layout_toEndOf="@+id/in_date_end"
         android:layout_marginRight="16dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="70dp"
-        app:layout_constraintTop_toBottomOf="@+id/btn_time_start" />
+        app:layout_constraintTop_toTopOf="@+id/in_date_end"
+        app:layout_constraintBottom_toBottomOf="@+id/in_date_end"
+        app:layout_constraintVertical_bias="0.6"
+        android:layout_marginEnd="16dp" />
 
     <EditText
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/in_time_end"
+        android:inputType="time"
         android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/btn_time_end"
         android:layout_marginRight="8dp"
-        app:layout_constraintHorizontal_bias="0.516"
-        android:layout_marginTop="31dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintTop_toBottomOf="@+id/in_date_end"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp" />
@@ -161,12 +161,11 @@
         android:id="@+id/btn_time_end"
         android:layout_alignBottom="@+id/in_date_end"
         android:layout_toRightOf="@+id/in_date_end"
-        android:layout_toEndOf="@+id/in_date_end"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="16dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="26dp"
-        app:layout_constraintTop_toBottomOf="@+id/btn_date_end"
-        android:layout_marginEnd="15dp" />
+        app:layout_constraintTop_toTopOf="@+id/in_time_end"
+        app:layout_constraintBottom_toBottomOf="@+id/in_time_end"
+        android:layout_marginEnd="16dp" />
 
     <Button
         android:id="@+id/btn_save_display"
@@ -175,7 +174,6 @@
         android:text="save and display time frame"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
