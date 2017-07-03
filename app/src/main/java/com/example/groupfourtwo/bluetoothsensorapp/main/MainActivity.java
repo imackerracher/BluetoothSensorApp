@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity
         currentHumidity = (TextView) findViewById(R.id.textViewCurrentHumidity);
         button = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
         button.setVisibility(View.GONE);
-        setLatestSensorValues();
 
 
         Intent databaseServiceIntent = new Intent(this, DatabaseUpdateService.class);
@@ -147,6 +146,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        setLatestSensorValues();
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
         Log.d(LOG_TAG, "onResume");
     }
