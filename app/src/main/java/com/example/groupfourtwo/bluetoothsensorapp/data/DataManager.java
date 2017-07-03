@@ -414,6 +414,17 @@ public class DataManager {
 
 
     /**
+     * Delete all recorded data. This includes all entries in the Record and Measurement table.
+     * User and Sensor data is not deleted.
+     */
+    public void deleteAll() {
+        int measurements = database.delete(MeasurementData.TABLE_MEASUREMENT, null, null);
+        int records = database.delete(RecordData.TABLE_RECORD, null, null);
+        Log.d(LOG_TAG, "Deleted " + measurements + "Measurements and " + records + " Records.");
+    }
+
+
+    /**
      * Delete the data of a certain record from the database
      *
      * @param record  the record to delete
@@ -421,11 +432,13 @@ public class DataManager {
     public void deleteRecord(Record record) {
         // First delete all data rows that have been collected in that record.
         database.delete(MeasurementData.TABLE_MEASUREMENT,
-                MeasurementData._ID + " = " + record.getId(), null);
+                MeasurementData.COLUMN_RECORD_ID + " = " + record.getId(), null);
+        Log.d(LOG_TAG, "Deleted record No " + record.getId());
 
         // Then delete the actual record in the record table
-        database.delete(RecordData.TABLE_RECORD,
+        int count = database.delete(RecordData.TABLE_RECORD,
                 RecordData._ID + " = " + record.getId(), null);
+        Log.d(LOG_TAG, "Deleted " + count + " corresponding measurements.");
     }
 
 
