@@ -100,12 +100,35 @@ public class DataManager {
 
 
     /**
-     * Close the connection to an open SQLite database.
+     * Close the connection    to an open SQLite database.
      */
     public synchronized void close() {
         dbHelper.close();
         Log.d(LOG_TAG, "Database was closed.");
     }
+
+
+    /**
+     * Checks whether an entry of the given id exists in the sensor table already.
+     *
+     * @param id  the id of the sensor
+     * @return  whether the sensor has an entry in the database
+     */
+    public boolean existsSensor(long id) {
+        return  searchSensor(id) != null;
+    }
+
+
+    /**
+     * Checks whether a user entry of the given id exists in the user table already.
+     *
+     * @param id  the id of the sensor
+     * @return  whether the sensor has an entry in the database
+     */
+    public boolean existsUser(long id) {
+        return  searchUser(id) != null;
+    }
+
 
     /**
      * Fetch a collection of all records that have been saved in the database.
@@ -175,36 +198,14 @@ public class DataManager {
         Record record = records.get(id);
         if (record == null) { // wanted sensor not in map -> search in database
             record = searchRecord(id);
-        }
-        if (record != null) { // wanted sensor was found -> cache and return
-            records.put(record.getId(), record);
-            Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
-        } else {
-            record = Record.RECORD_DUMMY;
+            if (record != null) { // wanted sensor was found -> cache and return
+                records.put(record.getId(), record);
+                Log.d(LOG_TAG, "Added record " + record.getId() + " to cache.");
+            } else {
+                record = Record.RECORD_DUMMY;
+            }
         }
         return record;
-    }
-
-
-    /**
-     * Checks whether an entry of the given id exists in the sensor table already.
-     *
-     * @param id  the id of the sensor
-     * @return  whether the sensor has an entry in the database
-     */
-    public boolean existsSensor(long id) {
-        return  searchSensor(id) != null;
-    }
-
-
-    /**
-     * Checks whether a user entry of the given id exists in the user table already.
-     *
-     * @param id  the id of the sensor
-     * @return  whether the sensor has an entry in the database
-     */
-    public boolean existsUser(long id) {
-        return  searchUser(id) != null;
     }
 
 
@@ -223,12 +224,12 @@ public class DataManager {
         Sensor sensor = sensors.get(id);
         if (sensor == null) { // wanted sensor not in map -> search in database
             sensor = searchSensor(id);
-        }
-        if (sensor != null) { // wanted sensor was found -> cache and return
-            sensors.put(sensor.getId(), sensor);
-            Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
-        } else {
-            sensor = Sensor.SENSOR_DUMMY;
+            if (sensor != null) { // wanted sensor was found -> cache and return
+                sensors.put(sensor.getId(), sensor);
+                Log.d(LOG_TAG, "Added sensor " + sensor.getId() + " to cache.");
+            } else {
+                sensor = Sensor.SENSOR_DUMMY;
+            }
         }
         return sensor;
     }
@@ -248,12 +249,12 @@ public class DataManager {
         User user = users.get(id);
         if (user == null) { // wanted user not in map -> search in database
             user = searchUser(id);
-        }
-        if (user != null) { // wanted user was found -> cache and return it
-            users.put(user.getId(), user);
-            Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
-        } else {
-            user = User.USER_DUMMY;
+            if (user != null) { // wanted user was found -> cache and return it
+                users.put(user.getId(), user);
+                Log.d(LOG_TAG, "Added user " + user.getId() + " to cache.");
+            } else {
+                user = User.USER_DUMMY;
+            }
         }
         return user;
     }
