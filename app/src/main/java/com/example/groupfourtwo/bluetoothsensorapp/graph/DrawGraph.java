@@ -142,9 +142,10 @@ public class DrawGraph {
 
 
         /**
-         * Access to Database USED
+         * Access to Database and Buffer
          */
         DataManager dataManager = DataManager.getInstance(context);
+        BufferStorage buf = BufferStorage.getInstance();
 
         try {
             dataManager.open();
@@ -155,20 +156,55 @@ public class DrawGraph {
         ArrayList<Entry> yAxes1;
         ArrayList<Entry> yAxes2;
 
+
+
         if (record == null) {
-            yAxes1 = dataManager.getValuesFromInterval(measure1, begin, end);
+            if (begin == buf.getBegin1Buffer() && end == buf.getEnd1Buffer()) {
+                yAxes1 = buf.getyAxes1Buffer();
+            } else {
+                yAxes1 = dataManager.getValuesFromInterval(measure1, begin, end);
+                buf.setBegin1Buffer(begin);
+                buf.setEnd1Buffer(end);
+                buf.setyAxes1Buffer(yAxes1);
+            }
         } else {
-            yAxes1 = dataManager.getValuesFromRecord(measure1, record);
+            if (record.getBegin() == buf.getBegin1Buffer() && record.getEnd() == buf.getEnd1Buffer()) {
+                yAxes1 = buf.getyAxes1Buffer();
+            } else {
+                yAxes1 = dataManager.getValuesFromInterval(measure1, begin, end);
+                buf.setBegin1Buffer(record.getBegin());
+                buf.setEnd1Buffer(record.getEnd());
+                buf.setyAxes1Buffer(yAxes1);
+            }
         }
+
 
         if (measure2 != null) {
             if (record == null) {
-                yAxes2 = dataManager.getValuesFromInterval(measure2, begin, end);
+                if (begin == buf.getBegin2Buffer() && end == buf.getEnd2Buffer()) {
+                    yAxes2 = buf.getyAxes2Buffer();
+                } else {
+                    yAxes2 = dataManager.getValuesFromInterval(measure2, begin, end);
+                    buf.setBegin2Buffer(begin);
+                    buf.setEnd2Buffer(end);
+                    buf.setyAxes2Buffer(yAxes2);
+                }
             } else {
-                yAxes2 = dataManager.getValuesFromRecord(measure2, record);
+                if (record.getBegin() == buf.getBegin2Buffer() && record.getEnd() == buf.getEnd2Buffer()) {
+                    yAxes2 = buf.getyAxes2Buffer();
+                } else {
+                    yAxes2 = dataManager.getValuesFromInterval(measure2, begin, end);
+                    buf.setBegin2Buffer(record.getBegin());
+                    buf.setEnd2Buffer(record.getEnd());
+                    buf.setyAxes2Buffer(yAxes2);
+                }
             }
-        } else
+        } else {
             yAxes2 = null;
+        }
+
+
+
 
         dataManager.close();
 
