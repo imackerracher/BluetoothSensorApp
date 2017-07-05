@@ -52,6 +52,8 @@
     <string name="no_of_records">No of records:  %d</string>
     <string name="recording_time">total recording time:  %s</string>
     <string name="no_of_measurements">No of data points:  %d</string>
+    <string name="loading">loading…</string>
+    <string name="error_while_loading">inaccessible</string>
     <string name="desc_team"><b>Bluetooth Sensor App</b>\n\nStefan Erk\nIan Mackerracher\nTobias Nusser\nKim Rehberg\nPatrick Reichle</string>
 
     <string name="not_available">Not available</string>

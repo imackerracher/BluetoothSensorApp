@@ -23,46 +23,49 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
 public class AboutActivity extends AppCompatActivity {
 
+    DataManager dataManager;
+    TextView noOfSensors;
+    TextView noOfRecords;
+    TextView noOfMeasurements;
+    TextView recordingTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        DataManager dataManager = DataManager.getInstance(this);
+        dataManager = DataManager.getInstance(this);
+
+        noOfSensors = (TextView) findViewById(R.id.no_of_sensors);
+        noOfRecords = (TextView) findViewById(R.id.no_of_records);
+        noOfMeasurements = (TextView) findViewById(R.id.no_of_measurements);
+        recordingTime = (TextView) findViewById(R.id.total_recording_time);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         try {
             dataManager.open();
+
+            int sensors = dataManager.getNoOfSensors();
+            noOfSensors.setText(getString(R.string.no_of_sensors, sensors));
+
+            int records = dataManager.getNoOfRecords();
+            noOfRecords.setText(getString(R.string.no_of_records, records));
+
+            int measurements = dataManager.getNoOfMeasurements();
+            noOfMeasurements.setText(getString(R.string.no_of_measurements, measurements));
+
+            long time = dataManager.getTotalRecordingTime();
+            recordingTime.setText(getString(R.string.recording_time, formatDuration(time)));
+
+            dataManager.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        int sensors = dataManager.getNoOfSensors();
-        TextView noOfSensors = (TextView) findViewById(R.id.no_of_sensors);
-        noOfSensors.setText(getString(R.string.no_of_sensors, sensors));
-
-        int records = dataManager.getNoOfRecords();
-        TextView noOfRecords = (TextView) findViewById(R.id.no_of_records);
-        noOfRecords.setText(getString(R.string.no_of_records, records));
-
-        int measurements = dataManager.getNoOfMeasurements();
-        TextView noOfMeasurements = (TextView) findViewById(R.id.no_of_measurements);
-        noOfMeasurements.setText(getString(R.string.no_of_measurements, measurements));
-
-        List<Record> allRecords = dataManager.getAllRecords();
-        dataManager.close();
-
-        long time = 0;
-        for (Record r : allRecords) {
-            if (r.isRunning()) {
-                time += System.currentTimeMillis() - r.getBegin();
-            } else {
-                time += r.getEnd() - r.getBegin();
-            }
-        }
-
-        TextView recordingTime = (TextView) findViewById(R.id.total_recording_time);
-        recordingTime.setText(getString(R.string.recording_time, formatDuration(time)));
     }
-
 
     /**
      * Formats a duration of time into a string that shows that duration in minutes, hours

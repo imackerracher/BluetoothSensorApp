@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.LongSparseArray;
 
@@ -13,10 +12,10 @@ import com.github.mikephil.charting.data.Entry;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.HUMIDITY;
 
 /**
  * Central interface between persistent data of the database and the running application.
@@ -220,7 +219,6 @@ public class DataManager {
      * @return  the sensor with the given id or dummy if none was found
      */
     public Sensor findSensor(long id) {
-        Log.d(LOG_TAG, sensors.size() + "sensors saved in cache.");
         Sensor sensor = sensors.get(id);
         if (sensor == null) { // wanted sensor not in map -> search in database
             sensor = searchSensor(id);
@@ -297,16 +295,31 @@ public class DataManager {
             throw new IllegalArgumentException("End point must lay in future of begin.");
         }
 
-        String[] select = {MeasurementData.COLUMN_TIME, measure.column};
+        // Insert the variables into the template SQL statement.
+        String query = String.format(Locale.ENGLISH, SQL_SELECT_VALUES_FROM_INTERVAL,
+                MeasurementData.COLUMN_TIME,
+                fromLength(end - begin).step,
+                COLUMN_STEPS,
+                measure.column,
+                COLUMN_VALUE,
+                MeasurementData.TABLE_MEASUREMENT,
+                MeasurementData.COLUMN_TIME,
+                COLUMN_STEPS,
+                COLUMN_STEPS
+        );
 
-        String where = MeasurementData.COLUMN_TIME + " BETWEEN " +
-                begin + " AND " + end;
+        String[] args = {Long.toString(begin), Long.toString(end)};
 
-        // SELECT TIME, measure.column FROM MEASUREMENT WHERE TIME BETWEEN begin AND end ORDER BY TIME
-        Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
-                where, null, null, null, MeasurementData.COLUMN_TIME);
+        /* SELECT TIME / interval.step AS "STEPS", AVG(measure.column) AS "VALUE"
+         * FROM MEASUREMENTS
+         * WHERE TIME BETWEEN begin AND end
+         * GROUP BY STEPS
+         * SORT BY STEPS */
+        Cursor cursor = database.rawQuery(query, args);
 
-        ArrayList<Entry> data = cursorToList(cursor, measure, begin, end);
+        long start = begin / fromLength(end - begin).step;
+        ArrayList<Entry> data = cursorToList(cursor, start);
+
         cursor.close();
         return data;
     }
@@ -320,23 +333,35 @@ public class DataManager {
      * @return  all values of the record, null if no entry was found
      */
     public ArrayList<Entry> getValuesFromRecord(Measure measure, Record record) {
-        String[] select = {MeasurementData.COLUMN_TIME, measure.column};
-
-        String where = MeasurementData.COLUMN_RECORD_ID + " = " + record.getId();
-
-        // SELECT TIME, measure.column FROM MEASUREMENT WHERE RECORD_ID = record.id ORDER BY TIME
-        Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT, select,
-                where, null, null, null, MeasurementData.COLUMN_TIME);
 
         long begin = record.getBegin();
-        long end = record.getEnd();
+        // If record is still running, take all values received so far.
+        long end = record.isRunning() ? System.currentTimeMillis() : record.getEnd();
 
-        // Record is still running, take all values received so far.
-        if (record.isRunning()) {
-            end = System.currentTimeMillis();
-        }
+        // Insert the variables into the template SQL statement.
+        String query = String.format(Locale.ENGLISH, SQL_SELECT_VALUES_FROM_RECORD,
+                MeasurementData.COLUMN_TIME,
+                fromLength(end - begin).step,
+                COLUMN_STEPS,
+                measure.column,
+                COLUMN_VALUE,
+                MeasurementData.TABLE_MEASUREMENT,
+                MeasurementData.COLUMN_RECORD_ID,
+                COLUMN_STEPS,
+                COLUMN_STEPS
+        );
+        String[] args = {Long.toString(record.getId())};
 
-        ArrayList<Entry> data = cursorToList(cursor, measure, begin, end);
+        /* SELECT TIME / interval.step AS "STEPS", AVG(measure.column) AS "VALUE"
+         * FROM MEASUREMENTS
+         * WHERE RECORD_ID = record.getId()
+         * GROUP BY STEPS
+         * SORT BY STEPS */
+        Cursor cursor = database.rawQuery(query, args);
+
+        long start = begin / fromLength(end - begin).step;
+        ArrayList<Entry> data = cursorToList(cursor, start);
+
         cursor.close();
         return data;
     }
@@ -348,13 +373,19 @@ public class DataManager {
      * @return  number of saved measurements
      */
     public int getNoOfMeasurements() {
-        String[] select = {MeasurementData._ID};
+        String query = String.format(SQL_SELECT_NUMBER_OF,
+                MeasurementData._ID,
+                COLUMN_SUM,
+                MeasurementData.TABLE_MEASUREMENT
+        );
 
-        // SELECT COUNT(ID) FROM MEASUREMENT
-        Cursor cursor = database.query(MeasurementData.TABLE_MEASUREMENT,
-                select, null, null, null, null, null);
+        // SELECT COUNT(_ID) AS "INDEX" FROM MEASUREMENT
+        Cursor cursor = database.rawQuery(query, null);
 
-        int result = cursor.getCount();
+        int index = cursor.getColumnIndexOrThrow(COLUMN_SUM);
+        cursor.moveToFirst();
+
+        int result = cursor.getInt(index);
         cursor.close();
         return result;
     }
@@ -366,13 +397,19 @@ public class DataManager {
      * @return  number of saved records
      */
     public int getNoOfRecords() {
-        String[] select = {RecordData._ID};
+        String query = String.format(SQL_SELECT_NUMBER_OF,
+                RecordData._ID,
+                COLUMN_SUM,
+                RecordData.TABLE_RECORD
+        );
 
-        // SELECT COUNT(ID) FROM RECORD
-        Cursor cursor = database.query(RecordData.TABLE_RECORD,
-                select, null, null, null, null, null);
+        // SELECT COUNT(_ID) AS "INDEX" FROM RECORD
+        Cursor cursor = database.rawQuery(query, null);
 
-        int result = cursor.getCount();
+        int index = cursor.getColumnIndexOrThrow(COLUMN_SUM);
+        cursor.moveToFirst();
+
+        int result = cursor.getInt(index);
         cursor.close();
         return result;
     }
@@ -384,13 +421,19 @@ public class DataManager {
      * @return  number of saved sensors
      */
     public int getNoOfSensors() {
-        String[] select = {SensorData._ID};
+        String query = String.format(SQL_SELECT_NUMBER_OF,
+                SensorData._ID,
+                COLUMN_SUM,
+                SensorData.TABLE_SENSOR
+        );
 
-        // SELECT COUNT(ID) FROM SENSOR
-        Cursor cursor = database.query(SensorData.TABLE_SENSOR,
-                select, null, null, null, null, null);
+        // SELECT COUNT(_ID) AS "INDEX" FROM SENSOR
+        Cursor cursor = database.rawQuery(query, null);
 
-        int result = cursor.getCount();
+        int index = cursor.getColumnIndexOrThrow(COLUMN_SUM);
+        cursor.moveToFirst();
+
+        int result = cursor.getInt(index);
         cursor.close();
         return result;
     }
@@ -402,13 +445,48 @@ public class DataManager {
      * @return  number of saved users
      */
     public int getNoOfUsers() {
-        String[] select = {UserData._ID};
+        String query = String.format(SQL_SELECT_NUMBER_OF,
+                UserData._ID,
+                COLUMN_SUM,
+                UserData.TABLE_USER
+        );
 
-        // SELECT COUNT(ID) FROM USER
-        Cursor cursor = database.query(UserData.TABLE_USER,
-                select, null, null, null, null, null);
+        // SELECT COUNT(_ID) AS "INDEX" FROM USER
+        Cursor cursor = database.rawQuery(query, null);
 
-        int result = cursor.getCount();
+        int index = cursor.getColumnIndexOrThrow(COLUMN_SUM);
+        cursor.moveToFirst();
+
+        int result = cursor.getInt(index);
+        cursor.close();
+        return result;
+    }
+
+
+    /**
+     * Calculate the summarized duration of all recordings in the database.
+     * Only records that have been stopped are considered in the calculation.
+     *
+     * @return  total time of records
+     */
+    public long getTotalRecordingTime() {
+        final String query = String.format(SQL_TOTAL_RECORDING_TIME,
+                RecordData.COLUMN_END,
+                RecordData.COLUMN_BEGIN,
+                COLUMN_SUM,
+                RecordData.TABLE_RECORD,
+                RecordData.COLUMN_END
+        );
+
+        String[] args = {Long.toString(Long.MIN_VALUE)};
+
+        // SELECT SUM(END - BEGIN) AS "SUM" FROM USER WHERE END != Long.MIN_VALUE;
+        Cursor cursor = database.rawQuery(query, args);
+
+        int index = cursor.getColumnIndexOrThrow(COLUMN_SUM);
+        cursor.moveToFirst();
+
+        long result = cursor.getLong(index);
         cursor.close();
         return result;
     }
@@ -485,7 +563,7 @@ public class DataManager {
      * @param pressure     the pressure value
      * @param temperature  the temperature value
      */
-    public long saveMeasurement(long recordId, long time, float brightness, float distance,
+    long saveMeasurement(long recordId, long time, float brightness, float distance,
                                 float humidity, float pressure, float temperature) {
         ContentValues values = new ContentValues();
 
@@ -641,56 +719,37 @@ public class DataManager {
 
 
     /**
-     * Fill a List with all values that a cursor contains. Group if multiple values at a time.
+     * Fill a list with all values that a cursor contains.
      *
-     * @param cursor   the cursor pointing to the database
-     * @param measure  the measure of values to retrieve
-     * @param begin    the start point of data
-     * @param end      the end point of data
+     * @param cursor  the cursor pointing to the database
+     * @param start   the first possible entry of the time column
      * @return  a list of values from the cursor
      */
-    private ArrayList<Entry> cursorToList(Cursor cursor, Measure measure,
-                                          long begin, long end) {
-        int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
-        int indexValue = cursor.getColumnIndex(measure.column);
+    private ArrayList<Entry> cursorToList(Cursor cursor, long start) {
+        int indexTime = cursor.getColumnIndex(COLUMN_STEPS);
+        int indexValue = cursor.getColumnIndex(COLUMN_VALUE);
 
         Log.d(LOG_TAG, cursor.getCount() + " rows received from database.");
 
         // Cursor might be empty. Return nothing if no entries were found.
         if (!cursor.moveToFirst()) {
-            Log.d(LOG_TAG, "No data available.");
-            return null;
+            Log.d(LOG_TAG, "No data available in this selection.");
+            return new ArrayList<>();
         }
 
-        // The length of the requested interval determines maximum possible number of data points.
-        // Memory is allocated generously to avoid reallocation.
-        Interval interval = fromLength(end - begin);
-        ArrayList<Entry> data = new ArrayList<>(interval.points);
+        // For every row in the result table an Entry point is added to the output.
+        ArrayList<Entry> data = new ArrayList<>(cursor.getCount());
 
         // Fill list with values from cursor according to resolution of data points.
-        for (long i = begin, j = 0; i < end; i += interval.step, ++j) {
-            int noOfValues = 0;
-            float sum = 0f;
-            // Take arithmetic mean of all values that are in one step size.
-            while (!cursor.isAfterLast() && cursor.getLong(indexTime) < i + interval.step) {
-                float value = cursor.getFloat(indexValue);
+        for (int i = 0; !cursor.isAfterLast(); ++i) {
+            if (start + i == cursor.getLong(indexTime)) {
+                data.add(new Entry(i, cursor.getFloat(indexValue)));
                 cursor.moveToNext();
-                sum += value;
-                ++noOfValues;
-            }
-            // Save value or else mark as missing.
-            if (noOfValues > 0) {
-                data.add(new Entry(j, sum / noOfValues));
             }
         }
 
-        Log.d(LOG_TAG, "Soviele Datenpunkte gefunden: " + data.size());
-        for (Entry e : data) {
-            Log.d(LOG_TAG, "Entry: " + e.toString());
-        }
         return data;
     }
-
 
     /**
      * Retrieve the measured values and meta data of a whole measurement from a database request.

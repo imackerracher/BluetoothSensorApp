@@ -179,4 +179,49 @@ final class DatabaseContract {
     static final String SQL_DROP_USER =
             "DROP TABLE IF EXISTS " + UserData.TABLE_USER;
 
+
+    /**
+     * Defines the template of an SQL statement to retrieve preprocessed data of a time span.
+     */
+    static final String SQL_SELECT_VALUES_FROM_INTERVAL =
+            "SELECT %s / %d AS %s, AVG(%s) AS %s FROM %s " +
+                    "WHERE %s BETWEEN ? AND ? GROUP BY %s ORDER BY %s";
+
+
+    /**
+     * Defines the template of an SQL statement to retrieve preprocessed data of a record.
+     */
+    static final String SQL_SELECT_VALUES_FROM_RECORD =
+            "SELECT %s / %d AS %s, AVG(%s) AS %s FROM %s " +
+                    "WHERE %s = ? GROUP BY %s ORDER BY %s";
+
+
+    /**
+     * Defines the template of an SQL statement to retrieve preprocessed data of a record.
+     */
+    static final String SQL_SELECT_NUMBER_OF =
+            "SELECT COUNT(%s) AS %s FROM %s";
+
+    /**
+     * Defines the template of an SQL statement to calculate the total recording time.
+     */
+    static final String SQL_TOTAL_RECORDING_TIME = "SELECT SUM(%s - %s) AS %s FROM %s WHERE %s > ?";
+
+    /**
+     *
+     */
+    static final String COLUMN_STEPS = "steps";
+
+
+    /**
+     *
+     */
+    static final String COLUMN_VALUE = "value";
+
+
+    /**
+     *
+     */
+    static final String COLUMN_SUM = "sum";
+
 }
