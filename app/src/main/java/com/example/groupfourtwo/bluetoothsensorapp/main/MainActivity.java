@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private DatabaseUpdateService mDatabaseUpdateService;
+    private DataManager dataManager;
 
     //Values to be displayed in the home screen next to the sensor icons
     TextView currentTemperature;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        dataManager = DataManager.getInstance(this);
 
         //Tie the values in content_main.xml to the text views in this file
         currentTemperature = (TextView) findViewById(R.id.textViewCurrentTemperature);
@@ -198,22 +200,24 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //Sets the values in the home screen next to the sensor icon to the last measured value
+    /**
+     * Sets the values in the home screen next to the sensor icon to the value lastly measured.
+     */
     public void setLatestSensorValues() {
-        DataManager dataManager = DataManager.getInstance(this);
+        dataManager = DataManager.getInstance(this);
         try {
             dataManager.open();
+            Measurement measurement = dataManager.getLatestMeasurement();
+            dataManager.close();
+
+            if (measurement != null) {
+                setTemperature(measurement.getTemperature());
+                setBrightness(measurement.getBrightness());
+                setPressure(measurement.getPressure());
+                setHumidity(measurement.getHumidity());
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        Measurement measurement = dataManager.getLatestMeasurement();
-        dataManager.close();
-
-        if (measurement != null) {
-            setTemperature(measurement.getTemperature());
-            setBrightness(measurement.getBrightness());
-            setPressure(measurement.getPressure());
-            setHumidity(measurement.getHumidity());
         }
     }
 

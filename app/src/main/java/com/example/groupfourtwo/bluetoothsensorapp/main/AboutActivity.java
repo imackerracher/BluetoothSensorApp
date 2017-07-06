@@ -1,7 +1,9 @@
 package com.example.groupfourtwo.bluetoothsensorapp.main;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
@@ -28,6 +30,10 @@ public class AboutActivity extends AppCompatActivity {
     TextView noOfRecords;
     TextView noOfMeasurements;
     TextView recordingTime;
+    int sensors;
+    int records;
+    int measurements;
+    long time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,29 +52,16 @@ public class AboutActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        try {
-            dataManager.open();
+        new Statistics().doInBackground(null);
 
-            int sensors = dataManager.getNoOfSensors();
-            noOfSensors.setText(getString(R.string.no_of_sensors, sensors));
-
-            int records = dataManager.getNoOfRecords();
-            noOfRecords.setText(getString(R.string.no_of_records, records));
-
-            int measurements = dataManager.getNoOfMeasurements();
-            noOfMeasurements.setText(getString(R.string.no_of_measurements, measurements));
-
-            long time = dataManager.getTotalRecordingTime();
-            recordingTime.setText(getString(R.string.recording_time, formatDuration(time)));
-
-            dataManager.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        noOfSensors.setText(getString(R.string.no_of_sensors, sensors));
+        noOfRecords.setText(getString(R.string.no_of_records, records));
+        noOfMeasurements.setText(getString(R.string.no_of_measurements, measurements));
+        recordingTime.setText(getString(R.string.recording_time, formatDuration(time)));
     }
 
     /**
-     * Formats a duration of time into a string that shows that duration in minutes, hours
+     * Formats a duration of time into a string that shows this duration in minutes, hours
      * and days if necessary.
      *
      * @param duration  the duration in milliseconds
@@ -81,6 +74,26 @@ public class AboutActivity extends AppCompatActivity {
         } else {
             return String.format(Locale.ENGLISH, "%dd, %dh, %dmin",
                     duration / DAY.length, (duration / HOUR.length) % 24, (duration / 60000) % 60);
+        }
+    }
+
+
+    private class Statistics extends AsyncTask {
+        @Override
+        protected Object doInBackground(Object[] params) {
+            try {
+                dataManager.open();
+
+                sensors = dataManager.getNoOfSensors();
+                records = dataManager.getNoOfRecords();
+                measurements = dataManager.getNoOfMeasurements();
+                time = dataManager.getTotalRecordingTime();
+
+                dataManager.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 }
