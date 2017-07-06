@@ -370,7 +370,7 @@ public class DbExportImport {
         while (!cursor.isAfterLast()) {
             final long id = cursor.getLong(indexSensorID);
 
-            if (dataManager.existsSensor(id)) {
+            if (!dataManager.existsSensor(id)) {
                 dataManager.saveSensor(
                         new Sensor(
                                 cursor.getLong(indexSensorID),
