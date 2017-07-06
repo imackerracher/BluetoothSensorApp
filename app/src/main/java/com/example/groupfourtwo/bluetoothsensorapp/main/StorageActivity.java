@@ -66,7 +66,7 @@ public class StorageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (checkStoragePermission()) {
                     if (DbExportImport.restoreDb(context)) {
-                        showErrorDialog(RESTORING_FAILED);
+                        showSuccessDialog();
                     } else {
                         showErrorDialog(RESTORING_FAILED);
                     }
