@@ -3,12 +3,14 @@ package com.example.groupfourtwo.bluetoothsensorapp.main;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -91,9 +93,40 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    this);
+
+            // set title
+            alertDialogBuilder.setTitle("Exit app?");
+
+            // set dialog message
+            alertDialogBuilder
+                    .setMessage("Running records will be closed.")
+                    .setCancelable(false)
+                    .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            // if this button is clicked, close
+                            // current activity
+                            MainActivity.this.finish();
+                        }
+                    })
+                    .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // if this button is clicked, just close
+                            // the dialog box and do nothing
+                            dialog.cancel();
+                        }
+                    });
+
+            // create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+
+            // show it
+            alertDialog.show();
+
         }
-        finish();
+        //finish();
     }
 
     @Override
@@ -143,6 +176,8 @@ public class MainActivity extends AppCompatActivity
         mDatabaseUpdateService.stopUpdating();
         unbindService(mServiceConnection);
         Log.d(LOG_TAG, "onDestroy");
+        Intent intent = new Intent(this,BluetoothLeService.class);
+        stopService(intent);
     }
 
     @Override
