@@ -366,8 +366,7 @@ public class DbExportImport {
         final int indexKnownSince = cursor.getColumnIndex(SensorData.COLUMN_KNOWN_SINCE);
 
         // Adds all Sensors in cursor to current database iff not known yet.
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             final long id = cursor.getLong(indexSensorID);
 
             if (!dataManager.existsSensor(id)) {
@@ -378,7 +377,6 @@ public class DbExportImport {
                                 cursor.getLong(indexKnownSince) )
                 );
             }
-            cursor.moveToNext();
         }
         cursor.close();
     }
@@ -402,8 +400,7 @@ public class DbExportImport {
         final int indexUserName = cursor.getColumnIndex(UserData.COLUMN_NAME);
 
         // Adds all Users in cursor to current database iff not known yet.
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             final long id = cursor.getLong(indexUserID);
 
             if (!dataManager.existsUser(id)) {
@@ -413,7 +410,6 @@ public class DbExportImport {
                                 cursor.getString(indexUserName) )
                 );
             }
-            cursor.moveToNext();
         }
         cursor.close();
     }

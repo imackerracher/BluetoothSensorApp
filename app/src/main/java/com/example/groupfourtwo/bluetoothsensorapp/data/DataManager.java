@@ -145,11 +145,9 @@ public class DataManager {
         ArrayList<Record> result = new ArrayList<>(cursor.getCount());
 
         // For every entry in the record table, insert that record into the list.
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             Record record = cursorToRecord(cursor);
             result.add(record);
-            cursor.moveToNext();
         }
         cursor.close();
 
@@ -172,11 +170,9 @@ public class DataManager {
         ArrayList<Sensor> result = new ArrayList<>(cursor.getCount());
 
         // For every entry in the sensor table, insert that sensor into the list.
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             Sensor sensor = cursorToSensor(cursor);
             result.add(sensor);
-            cursor.moveToNext();
         }
         cursor.close();
 
