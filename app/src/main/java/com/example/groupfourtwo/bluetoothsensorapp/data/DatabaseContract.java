@@ -181,47 +181,93 @@ final class DatabaseContract {
 
 
     /**
+     * Defines the name of the modified time column when fetching data points.
+     */
+    static final String COLUMN_STEPS = "steps";
+
+
+    /**
+     * Defines the name of the aggregated measure when fetching data points.
+     */
+    static final String COLUMN_VALUE = "value";
+
+
+    /**
+     * Defines the name of the aggregated column when gathering database statistics.
+     */
+    static final String COLUMN_SUM = "sum";
+
+
+    /**
+     * Defines the SQL statement to insert a measurement with dynamically settable values.
+     */
+    static final String SQL_INSERT_MEASUREMENTS =
+            String.format(
+                    "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    MeasurementData.TABLE_MEASUREMENT,
+                    MeasurementData.COLUMN_RECORD_ID,
+                    MeasurementData.COLUMN_TIME,
+                    MeasurementData.COLUMN_BRIGHTNESS,
+                    MeasurementData.COLUMN_DISTANCE,
+                    MeasurementData.COLUMN_HUMIDITY,
+                    MeasurementData.COLUMN_PRESSURE,
+                    MeasurementData.COLUMN_TEMPERATURE
+            );
+
+
+    /**
      * Defines the template of an SQL statement to retrieve preprocessed data of a time span.
      */
     static final String SQL_SELECT_VALUES_FROM_INTERVAL =
-            "SELECT %s / %d AS %s, AVG(%s) AS %s FROM %s " +
-                    "WHERE %s BETWEEN ? AND ? GROUP BY %s ORDER BY %s";
+            String.format("SELECT %s / %s AS %s, AVG(%s) AS %s FROM %s " +
+                    "WHERE %s BETWEEN ? AND ? GROUP BY %s ORDER BY %s",
+                    MeasurementData.COLUMN_TIME,
+                    "%d",
+                    COLUMN_STEPS,
+                    "%s",
+                    COLUMN_VALUE,
+                    MeasurementData.TABLE_MEASUREMENT,
+                    MeasurementData.COLUMN_TIME,
+                    COLUMN_STEPS,
+                    COLUMN_STEPS
+            );
 
 
     /**
      * Defines the template of an SQL statement to retrieve preprocessed data of a record.
      */
     static final String SQL_SELECT_VALUES_FROM_RECORD =
-            "SELECT %s / %d AS %s, AVG(%s) AS %s FROM %s " +
-                    "WHERE %s = ? GROUP BY %s ORDER BY %s";
+            String.format("SELECT %s / %s AS %s, AVG(%s) AS %s FROM %s " +
+                    "WHERE %s = ? GROUP BY %s ORDER BY %s",
+                    MeasurementData.COLUMN_TIME,
+                    "%d",
+                    COLUMN_STEPS,
+                    "%s",
+                    COLUMN_VALUE,
+                    MeasurementData.TABLE_MEASUREMENT,
+                    MeasurementData.COLUMN_RECORD_ID,
+                    COLUMN_STEPS,
+                    COLUMN_STEPS
+            );
 
 
     /**
-     * Defines the template of an SQL statement to retrieve preprocessed data of a record.
+     * Defines the template of an SQL statement to calculate the size of a table.
      */
     static final String SQL_SELECT_NUMBER_OF =
             "SELECT COUNT(%s) AS %s FROM %s";
 
+
     /**
      * Defines the template of an SQL statement to calculate the total recording time.
      */
-    static final String SQL_TOTAL_RECORDING_TIME = "SELECT SUM(%s - %s) AS %s FROM %s WHERE %s > ?";
-
-    /**
-     *
-     */
-    static final String COLUMN_STEPS = "steps";
-
-
-    /**
-     *
-     */
-    static final String COLUMN_VALUE = "value";
-
-
-    /**
-     *
-     */
-    static final String COLUMN_SUM = "sum";
+    static final String SQL_TOTAL_RECORDING_TIME =
+            String.format("SELECT SUM(%s - %s) AS %s FROM %s WHERE %s <> ?",
+                    RecordData.COLUMN_END,
+                    RecordData.COLUMN_BEGIN,
+                    COLUMN_SUM,
+                    RecordData.TABLE_RECORD,
+                    RecordData.COLUMN_END
+            );
 
 }

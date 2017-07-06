@@ -300,34 +300,14 @@ public class DbExportImport {
     private static void importMeasurements(SQLiteDatabase importDb, DataManager dataManager,
                                            long oldId, long newId) {
 
-        String[] select = MeasurementData.ALL_COLUMNS;
         String where = MeasurementData.COLUMN_RECORD_ID + " = " + oldId;
 
         // SELECT * FROM MEASUREMENT WHERE RECORD_ID = oldID;
         Cursor cursor = importDb.query(MeasurementData.TABLE_MEASUREMENT,
-                select, where, null, null, null, null);
-
-        final int indexTime = cursor.getColumnIndex(MeasurementData.COLUMN_TIME);
-        final int indexBrightness = cursor.getColumnIndex(MeasurementData.COLUMN_BRIGHTNESS);
-        final int indexDistance = cursor.getColumnIndex(MeasurementData.COLUMN_DISTANCE);
-        final int indexHumidity = cursor.getColumnIndex(MeasurementData.COLUMN_HUMIDITY);
-        final int indexPressure = cursor.getColumnIndex(MeasurementData.COLUMN_PRESSURE);
-        final int indexTemperature = cursor.getColumnIndex(MeasurementData.COLUMN_TEMPERATURE);
+                null, where, null, null, null, null);
 
         // Adds all measurements in cursor to current database
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            dataManager.saveMeasurement(
-                    newId,
-                    cursor.getLong(indexTime),
-                    cursor.getFloat(indexBrightness),
-                    cursor.getFloat(indexDistance),
-                    cursor.getFloat(indexHumidity),
-                    cursor.getFloat(indexPressure),
-                    cursor.getFloat(indexTemperature)
-            );
-            cursor.moveToNext();
-        }
+        dataManager.insertMeasurements(cursor, newId);
         cursor.close();
     }
 
@@ -343,8 +323,7 @@ public class DbExportImport {
      * @param dataManager  an opened instance of DataManager
      */
     private static void importRecords(SQLiteDatabase importDb, DataManager dataManager) {
-        Cursor cursor = importDb.query(RecordData.TABLE_RECORD,
-                RecordData.ALL_COLUMNS, null, null, null, null, null);
+        Cursor cursor = importDb.query(RecordData.TABLE_RECORD, null, null, null, null, null, null);
 
         final int indexID = cursor.getColumnIndex(RecordData._ID);
         final int indexSensor = cursor.getColumnIndex(RecordData.COLUMN_SENSOR_ID);
@@ -353,8 +332,7 @@ public class DbExportImport {
         final int indexEnd = cursor.getColumnIndex(RecordData.COLUMN_END);
 
         // Adds all Records in cursor to current database
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             long oldId = cursor.getLong(indexID);
             long newId = dataManager.saveRecord(
                     cursor.getLong(indexSensor),
@@ -363,7 +341,6 @@ public class DbExportImport {
                     cursor.getLong(indexEnd)
             );
             importMeasurements(importDb, dataManager, oldId, newId);
-            cursor.moveToNext();
         }
         cursor.close();
     }
@@ -419,9 +396,7 @@ public class DbExportImport {
      * @param dataManager  an opened instance of DataManager
      */
     private static void importUsers(SQLiteDatabase importDb, DataManager dataManager) {
-        Cursor cursor = importDb.query(true, UserData.TABLE_USER,
-                null, null, null, null, null, null, null
-        );
+        Cursor cursor = importDb.query(UserData.TABLE_USER, null, null, null, null, null, null);
 
         final int indexUserID = cursor.getColumnIndex(UserData._ID);
         final int indexUserName = cursor.getColumnIndex(UserData.COLUMN_NAME);

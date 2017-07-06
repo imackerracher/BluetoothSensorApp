@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import android.util.LongSparseArray;
 
@@ -99,7 +100,7 @@ public class DataManager {
 
 
     /**
-     * Close the connection    to an open SQLite database.
+     * Close the connection to an open SQLite database.
      */
     public synchronized void close() {
         dbHelper.close();
@@ -297,15 +298,8 @@ public class DataManager {
 
         // Insert the variables into the template SQL statement.
         String query = String.format(Locale.ENGLISH, SQL_SELECT_VALUES_FROM_INTERVAL,
-                MeasurementData.COLUMN_TIME,
                 fromLength(end - begin).step,
-                COLUMN_STEPS,
-                measure.column,
-                COLUMN_VALUE,
-                MeasurementData.TABLE_MEASUREMENT,
-                MeasurementData.COLUMN_TIME,
-                COLUMN_STEPS,
-                COLUMN_STEPS
+                measure.column
         );
 
         String[] args = {Long.toString(begin), Long.toString(end)};
@@ -340,16 +334,9 @@ public class DataManager {
 
         // Insert the variables into the template SQL statement.
         String query = String.format(Locale.ENGLISH, SQL_SELECT_VALUES_FROM_RECORD,
-                MeasurementData.COLUMN_TIME,
                 fromLength(end - begin).step,
-                COLUMN_STEPS,
-                measure.column,
-                COLUMN_VALUE,
-                MeasurementData.TABLE_MEASUREMENT,
-                MeasurementData.COLUMN_RECORD_ID,
-                COLUMN_STEPS,
-                COLUMN_STEPS
-        );
+                measure.column
+                );
         String[] args = {Long.toString(record.getId())};
 
         /* SELECT TIME / interval.step AS "STEPS", AVG(measure.column) AS "VALUE"
@@ -470,18 +457,11 @@ public class DataManager {
      * @return  total time of records
      */
     public long getTotalRecordingTime() {
-        final String query = String.format(SQL_TOTAL_RECORDING_TIME,
-                RecordData.COLUMN_END,
-                RecordData.COLUMN_BEGIN,
-                COLUMN_SUM,
-                RecordData.TABLE_RECORD,
-                RecordData.COLUMN_END
-        );
 
         String[] args = {Long.toString(Long.MIN_VALUE)};
 
-        // SELECT SUM(END - BEGIN) AS "SUM" FROM USER WHERE END != Long.MIN_VALUE;
-        Cursor cursor = database.rawQuery(query, args);
+        // SELECT SUM(END - BEGIN) AS "SUM" FROM USER WHERE END <> Long.MIN_VALUE;
+        Cursor cursor = database.rawQuery(SQL_TOTAL_RECORDING_TIME, args);
 
         int index = cursor.getColumnIndexOrThrow(COLUMN_SUM);
         cursor.moveToFirst();
@@ -1002,5 +982,47 @@ public class DataManager {
         Log.d(LOG_TAG, "Updated user: " + id);
 
         users.put(id, user);
+    }
+
+
+    /**
+     * Import all Measurements that belong to a record into the database.
+     *
+     * @param cursor    a cursor containing all measurement rows that belong to the record
+     * @param recordId  the new id of the record
+     */
+    boolean insertMeasurements(Cursor cursor, long recordId) {
+        final int indexTime = cursor.getColumnIndexOrThrow(MeasurementData.COLUMN_TIME);
+        final int indexBrightness = cursor.getColumnIndexOrThrow(MeasurementData.COLUMN_BRIGHTNESS);
+        final int indexDistance = cursor.getColumnIndexOrThrow(MeasurementData.COLUMN_DISTANCE);
+        final int indexHumidity = cursor.getColumnIndexOrThrow(MeasurementData.COLUMN_HUMIDITY);
+        final int indexPressure = cursor.getColumnIndexOrThrow(MeasurementData.COLUMN_PRESSURE);
+        final int indexTemperature = cursor.getColumnIndexOrThrow(MeasurementData.COLUMN_TEMPERATURE);
+
+        try {
+            database.beginTransaction();
+            SQLiteStatement query = database.compileStatement(SQL_INSERT_MEASUREMENTS);
+
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                query.clearBindings();
+                query.bindLong(1, recordId);
+                query.bindLong(2, cursor.getLong(indexTime));
+                query.bindDouble(3, cursor.getFloat(indexBrightness));
+                query.bindDouble(4, cursor.getFloat(indexDistance));
+                query.bindDouble(5, cursor.getFloat(indexHumidity));
+                query.bindDouble(6, cursor.getFloat(indexPressure));
+                query.bindDouble(7, cursor.getFloat(indexTemperature));
+                query.executeInsert();
+            }
+
+            database.setTransactionSuccessful();
+            return true;
+
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            database.endTransaction();
+        }
     }
 }
