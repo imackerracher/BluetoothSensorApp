@@ -60,7 +60,7 @@ public class VisualizationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_visualization);
 
         end = System.currentTimeMillis();
-        begin = end - Interval.DAY.length;
+        begin = end - Interval.HOUR.length;
 
         if (savedInstanceState != null) {
             Log.d(TAG, "restore old state");
@@ -79,11 +79,11 @@ public class VisualizationActivity extends AppCompatActivity {
                 }
                 record = dataManager.findRecord(recordId);
                 dataManager.close();
-                end = record.getEnd();
                 begin = record.getBegin();
+                end = record.getEnd();
             } else {
-                end = savedInstanceState.getLong(RESULT_END, end);
                 begin = savedInstanceState.getLong(RESULT_BEGIN, begin);
+                end = savedInstanceState.getLong(RESULT_END, end);
             }
         }
 
@@ -125,6 +125,11 @@ public class VisualizationActivity extends AppCompatActivity {
                     intent.putExtra(ADD_MEASURE, addMeasure.name());
                 }
                 startActivityForResult(intent, SENSOR_SELECTION_REQUEST);
+                return true;
+
+            case R.id.refresh:
+                //drawGraph.refresh();
+                drawGraph.draw(this);
                 return true;
 
             default:
