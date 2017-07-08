@@ -138,9 +138,9 @@ public class DataManager {
     public ArrayList<Record> getAllRecords() {
         String[] select = RecordData.ALL_COLUMNS;
 
-        // SELECT * FROM RECORD ORDER BY ID DESC
+        // SELECT * FROM RECORD ORDER BY BEGIN DESC
         Cursor cursor = database.query(RecordData.TABLE_RECORD, select,
-                null, null, null, null, RecordData._ID + " DESC");
+                null, null, null, null, RecordData.COLUMN_BEGIN + " DESC");
 
         ArrayList<Record> result = new ArrayList<>(cursor.getCount());
 
@@ -298,14 +298,14 @@ public class DataManager {
                 measure.column
         );
 
-        String[] args = {Long.toString(begin), Long.toString(end)};
+        String[] timeSpan = {Long.toString(begin), Long.toString(end)};
 
         /* SELECT TIME / interval.step AS "STEPS", AVG(measure.column) AS "VALUE"
          * FROM MEASUREMENTS
          * WHERE TIME BETWEEN begin AND end
          * GROUP BY STEPS
          * SORT BY STEPS */
-        Cursor cursor = database.rawQuery(query, args);
+        Cursor cursor = database.rawQuery(query, timeSpan);
 
         long start = begin / fromLength(end - begin).step;
         ArrayList<Entry> data = cursorToList(cursor, start);
@@ -324,26 +324,24 @@ public class DataManager {
      */
     public ArrayList<Entry> getValuesFromRecord(Measure measure, Record record) {
 
-        long begin = record.getBegin();
-        // If record is still running, take all values received so far.
-        long end = record.isRunning() ? System.currentTimeMillis() : record.getEnd();
+        Interval interval = fromLength(record.getEnd() - record.getBegin());
 
         // Insert the variables into the template SQL statement.
         String query = String.format(Locale.ENGLISH, SQL_SELECT_VALUES_FROM_RECORD,
-                fromLength(end - begin).step,
+                interval.step,
                 measure.column
                 );
-        String[] args = {Long.toString(record.getId())};
+        String[] recordId = {Long.toString(record.getId())};
 
         /* SELECT TIME / interval.step AS "STEPS", AVG(measure.column) AS "VALUE"
          * FROM MEASUREMENTS
          * WHERE RECORD_ID = record.getId()
          * GROUP BY STEPS
          * SORT BY STEPS */
-        Cursor cursor = database.rawQuery(query, args);
+        Cursor cursor = database.rawQuery(query, recordId);
 
-        long start = begin / fromLength(end - begin).step;
-        ArrayList<Entry> data = cursorToList(cursor, start);
+        long first = record.getBegin() / interval.step;
+        ArrayList<Entry> data = cursorToList(cursor, first);
 
         cursor.close();
         return data;

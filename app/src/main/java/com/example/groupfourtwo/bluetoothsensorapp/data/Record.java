@@ -113,7 +113,7 @@ public class Record {
      * @return  the end point
      */
     public long getEnd() {
-        return end;
+        return isRunning() ? System.currentTimeMillis() : end;
     }
 
 
