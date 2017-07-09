@@ -43,6 +43,7 @@
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".main.ClearDataActivity"
+            android:label="@string/menu_clear_data"
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".visualization.HumidityActivity"
@@ -50,9 +51,11 @@
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".bluetooth.BluetoothMainActivity"
+            android:label="@string/menu_manage_connection"
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".main.ManageSensorsActivity"
+            android:label="@string/menu_manage_sensors"
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".visualization.PressureActivity"
@@ -64,15 +67,18 @@
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".visualization.RecordsActivity"
+            android:label="@string/records_settings"
             android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".visualization.TimespanActivity"
+            android:label="@string/select_time_span_settings"
             android:parentActivityName=".main.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
             android:name=".visualization.SensorSettingsActivity"
+            android:label="@string/select_sensors_settings"
             android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBarOwn" />
         <activity
@@ -80,10 +86,11 @@
             android:parentActivityName=".bluetooth.BluetoothMainActivity" />
         <activity
             android:name=".main.StorageActivity"
+            android:label="@string/menu_export_import"
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".main.AboutActivity"
-            android:label="About"
+            android:label="@string/menu_about"
             android:screenOrientation="portrait"
             android:parentActivityName=".main.MainActivity" />
 
