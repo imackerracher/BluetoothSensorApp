@@ -192,7 +192,6 @@ public class StorageActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
             waitDialog = new AlertDialog.Builder(context)
                     .setTitle("Loading")
                     .setMessage("Please wait while the data is being imported.")
@@ -207,7 +206,6 @@ public class StorageActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
             waitDialog.dismiss();
             if (result) {
                 showSuccessDialog();
