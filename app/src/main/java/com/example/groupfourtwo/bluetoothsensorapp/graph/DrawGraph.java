@@ -159,35 +159,41 @@ public class DrawGraph {
 
 
         if (record == null) {
-            if (begin == buf.getBegin1Buffer() && end == buf.getEnd1Buffer()) {
+            if (begin == buf.getBegin1Buffer() && end == buf.getEnd1Buffer() &&
+                    measure1 == buf.getMeasure1()) {
                 yAxes1 = buf.getyAxes1Buffer();
             } else {
                 yAxes1 = dataManager.getValuesFromInterval(measure1, begin, end);
                 buf.setBegin1Buffer(begin);
                 buf.setEnd1Buffer(end);
                 buf.setyAxes1Buffer(yAxes1);
+                buf.setMeasure1(measure1);
             }
         } else {
-            if (record.getBegin() == buf.getBegin1Buffer() && record.getEnd() == buf.getEnd1Buffer()) {
+            if (record.getBegin() == buf.getBegin1Buffer() && record.getEnd() == buf.getEnd1Buffer()
+                    && measure1 == buf.getMeasure1()) {
                 yAxes1 = buf.getyAxes1Buffer();
             } else {
                 yAxes1 = dataManager.getValuesFromInterval(measure1, begin, end);
                 buf.setBegin1Buffer(record.getBegin());
                 buf.setEnd1Buffer(record.getEnd());
                 buf.setyAxes1Buffer(yAxes1);
+                buf.setMeasure1(measure1);
             }
         }
 
 
         if (measure2 != null) {
             if (record == null) {
-                if (begin == buf.getBegin2Buffer() && end == buf.getEnd2Buffer()) {
+                if (begin == buf.getBegin2Buffer() && end == buf.getEnd2Buffer() &&
+                        measure2 == buf.getMeasure2()) {
                     yAxes2 = buf.getyAxes2Buffer();
                 } else {
                     yAxes2 = dataManager.getValuesFromInterval(measure2, begin, end);
                     buf.setBegin2Buffer(begin);
                     buf.setEnd2Buffer(end);
                     buf.setyAxes2Buffer(yAxes2);
+                    buf.setMeasure2(measure2);
                 }
             } else {
                 if (record.getBegin() == buf.getBegin2Buffer() && record.getEnd() == buf.getEnd2Buffer()) {
@@ -197,6 +203,7 @@ public class DrawGraph {
                     buf.setBegin2Buffer(record.getBegin());
                     buf.setEnd2Buffer(record.getEnd());
                     buf.setyAxes2Buffer(yAxes2);
+                    buf.setMeasure2(measure2);
                 }
             }
         } else {
@@ -330,6 +337,20 @@ public class DrawGraph {
         record = null;
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
+
+        DataManager dataManager2 = DataManager.getInstance(context);
+        try {
+            dataManager2.open();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (dataManager2.getValuesFromInterval(measure1, begin, end) == null ||
+                dataManager2.getValuesFromInterval(measure1, begin, end).isEmpty()) {
+            lineChart.setData(null);
+            lineChart.invalidate();
+            return;
+        }
     }
 
     public int brighter(int color, float factor) {

@@ -1,5 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.graph;
 
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ public class BufferStorage {
     private float end1Buffer;
     private float begin2Buffer;
     private float end2Buffer;
+    private Measure measure1;
+    private Measure measure2;
 
 
     // Verhindere die Erzeugung des Objektes über andere Methoden
@@ -80,4 +83,22 @@ public class BufferStorage {
     public void setEnd2Buffer(float end2Buffer) {
         this.end2Buffer = end2Buffer;
     }
+
+
+    public Measure getMeasure1() {
+        return measure1;
+    }
+
+    public Measure getMeasure2() {
+        return measure2;
+    }
+
+    public void setMeasure1(Measure measure1) {
+        this.measure1 = measure1;
+    }
+
+    public void setMeasure2(Measure measure2) {
+        this.measure2 = measure2;
+    }
+
 }
