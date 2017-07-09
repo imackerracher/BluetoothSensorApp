@@ -10,7 +10,7 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.
  */
 
 public enum Measure {
-    BRIGHTNESS (YELLOW, MeasurementData.COLUMN_BRIGHTNESS, "lm"),
+    BRIGHTNESS (YELLOW, MeasurementData.COLUMN_BRIGHTNESS, "lx"),
     DISTANCE (BLACK, MeasurementData.COLUMN_DISTANCE, "m"),
     HUMIDITY (CYAN, MeasurementData.COLUMN_HUMIDITY, "%"),
     PRESSURE (LTGRAY, MeasurementData.COLUMN_PRESSURE, "hPa"),
@@ -38,6 +38,8 @@ public enum Measure {
         this.unit = unit;
     }
 
-
-
+    @Override
+    public String toString() {
+        return name().substring(0, 1) + name().substring(1).toLowerCase();
+    }
 }
