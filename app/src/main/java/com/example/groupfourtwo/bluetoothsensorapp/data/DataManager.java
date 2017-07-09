@@ -922,11 +922,6 @@ public class DataManager {
      */
     private void updateRecord(Record record) {
         ContentValues values = new ContentValues();
-
-        values.put(RecordData._ID, record.getId());
-        values.put(RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());
-        values.put(RecordData.COLUMN_USER_ID, record.getUser().getId());
-        values.put(RecordData.COLUMN_BEGIN, record.getBegin());
         values.put(RecordData.COLUMN_END, record.getEnd());
 
         // UPDATE SENSOR SET END = end WHERE ID = id
@@ -945,8 +940,6 @@ public class DataManager {
      */
     private void updateSensor(Sensor sensor) {
         ContentValues values = new ContentValues();
-
-        values.put(SensorData._ID, sensor.getId());
         values.put(SensorData.COLUMN_NAME, sensor.getName());
         values.put(SensorData.COLUMN_KNOWN_SINCE, sensor.getKnownSince());
 
@@ -966,8 +959,6 @@ public class DataManager {
      */
     private void updateUser(User user) {
         ContentValues values = new ContentValues();
-
-        values.put(UserData._ID, user.getId());
         values.put(UserData.COLUMN_NAME, user.getName());
 
         // UPDATE USER SET NAME = name WHERE ID = id

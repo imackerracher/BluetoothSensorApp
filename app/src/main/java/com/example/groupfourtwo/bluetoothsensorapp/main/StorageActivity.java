@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -11,9 +12,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DbExportImport;
+
+import java.util.concurrent.ExecutionException;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -30,12 +34,13 @@ public class StorageActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1;
     private static final int EXPORT_FAILED = 2;
     private static final int RESTORING_FAILED = 3;
-    private static final int IMPORT_FAILED = 4;
+    public static final int IMPORT_FAILED = 4;
 
     Button exportButton;
     Button restoreButton;
     Button importButton;
 
+    final StorageActivity context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +50,6 @@ public class StorageActivity extends AppCompatActivity {
         exportButton = (Button) findViewById(R.id.button_export);
         restoreButton = (Button) findViewById(R.id.button_restore);
         importButton = (Button) findViewById(R.id.button_import);
-
-        final Context context = this;
 
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,11 +81,7 @@ public class StorageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (checkStoragePermission()) {
-                    if (DbExportImport.importIntoDb(context)) {
-                        showSuccessDialog();
-                    } else {
-                        showErrorDialog(IMPORT_FAILED);
-                    }
+                    new ImportTask().execute();
                 }
             }
         });
@@ -176,15 +175,46 @@ public class StorageActivity extends AppCompatActivity {
     private void showSuccessDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Finished");
-        builder.setMessage("Transfer completed successfully");
-
-        builder.setPositiveButton(android.R.string.ok, null);
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        builder.setTitle("Finished")
+                .setMessage("Transfer completed successfully")
+                .setPositiveButton(android.R.string.ok, null)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
             }
-        });
-        builder.show();
+                })
+                .show();
     }
+
+
+    private class ImportTask extends AsyncTask<Object, Integer, Boolean> {
+        private AlertDialog waitDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            waitDialog = new AlertDialog.Builder(context)
+                    .setTitle("Loading")
+                    .setMessage("Please wait while the data is being imported.")
+                    .setCancelable(false)
+                    .show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Object... params) {
+            return DbExportImport.importDb(context);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            waitDialog.dismiss();
+            if (result) {
+                showSuccessDialog();
+            } else {
+                showErrorDialog(IMPORT_FAILED);
+            }
+        }
+    }
+
 }
