@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.app.AlertDialog;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,13 +21,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
-import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.ControlActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
@@ -37,6 +39,8 @@ import com.example.groupfourtwo.bluetoothsensorapp.visualization.TemperatureActi
 
 import java.io.IOException;
 import java.util.Locale;
+
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.*;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -53,6 +57,11 @@ public class MainActivity extends AppCompatActivity
     TextView currentHumidity;
 
     ToggleButton button;
+
+    /**
+     * Whether the display shall be dimmed according to device settings.
+     */
+    private boolean displayTimeout = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +180,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.screen_on:
+                if (displayTimeout) {
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    displayTimeout = false;
+                    Toast.makeText(this, "Display will stay turned on.", Toast.LENGTH_SHORT).show();
+                } else {
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    displayTimeout = true;
+                    Toast.makeText(this, "Display will be turned off.", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         mDatabaseUpdateService.stopUpdating();
@@ -257,19 +293,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setTemperature(Float t) {
-        currentTemperature.setText(String.format(Locale.ENGLISH, "%.2f °C", t));
+        currentTemperature.setText(String.format(Locale.ENGLISH, "%.2f %s", t, TEMPERATURE.unit));
     }
 
     public void setBrightness(Float t) {
-        currentBrightness.setText(String.format(Locale.ENGLISH, "%.2f lm", t));
+        currentBrightness.setText(String.format(Locale.ENGLISH, "%.2f %s", t, BRIGHTNESS.unit));
     }
 
     public void setHumidity(Float t) {
-        currentHumidity.setText(String.format(Locale.ENGLISH, "%.2f %%", t));
+        currentHumidity.setText(String.format(Locale.ENGLISH, "%.2f %s", t, HUMIDITY.unit));
     }
 
     public void setPressure(Float t) {
-        currentPressure.setText(String.format(Locale.ENGLISH, "%.2f hPa", t));
+        currentPressure.setText(String.format(Locale.ENGLISH, "%.2f %s", t, PRESSURE.unit));
     }
 
 
