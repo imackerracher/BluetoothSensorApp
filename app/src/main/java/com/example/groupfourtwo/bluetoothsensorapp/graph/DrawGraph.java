@@ -337,6 +337,20 @@ public class DrawGraph {
         record = null;
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
+
+        DataManager dataManager2 = DataManager.getInstance(context);
+        try {
+            dataManager2.open();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (dataManager2.getValuesFromInterval(measure1, begin, end) == null ||
+                dataManager2.getValuesFromInterval(measure1, begin, end).isEmpty()) {
+            lineChart.setData(null);
+            lineChart.invalidate();
+            return;
+        }
     }
 
     public int brighter(int color, float factor) {
