@@ -452,9 +452,9 @@ public class DataManager {
      */
     public long getTotalRecordingTime() {
 
-        String[] args = {Long.toString(Long.MIN_VALUE)};
+        String[] args = {Long.toString(Long.MAX_VALUE)};
 
-        // SELECT SUM(END - BEGIN) AS "SUM" FROM USER WHERE END <> Long.MIN_VALUE;
+        // SELECT SUM(END - BEGIN) AS "SUM" FROM USER WHERE END <> Long.MAX_VALUE;
         Cursor cursor = database.rawQuery(SQL_TOTAL_RECORDING_TIME, args);
 
         int index = cursor.getColumnIndexOrThrow(COLUMN_SUM);
@@ -561,13 +561,13 @@ public class DataManager {
      *
      * @param record  the record to save
      */
-    long saveRecord(Record record) {
+    private long saveRecord(Record record) {
         ContentValues values = new ContentValues();
 
         values.put(RecordData.COLUMN_SENSOR_ID, record.getSensor().getId());
         values.put(RecordData.COLUMN_USER_ID, record.getUser().getId());
         values.put(RecordData.COLUMN_BEGIN, record.getBegin());
-        values.put(RecordData.COLUMN_END, record.getEnd());
+        values.put(RecordData.COLUMN_END, record.isRunning() ? Long.MAX_VALUE : record.getEnd());
 
         // INSERT INTO RECORD VALUES (sensor, user, begin, end)
         long id = database.insert(RecordData.TABLE_RECORD, null, values);
@@ -650,7 +650,7 @@ public class DataManager {
      * @return  a new running record
      */
     public Record startRecord(Sensor sensor, User user) {
-        Record record = new Record(-1, sensor, user, System.currentTimeMillis(), Long.MIN_VALUE);
+        Record record = new Record(-1, sensor, user, System.currentTimeMillis(), Long.MAX_VALUE);
         saveRecord(record);
         return record;
     }

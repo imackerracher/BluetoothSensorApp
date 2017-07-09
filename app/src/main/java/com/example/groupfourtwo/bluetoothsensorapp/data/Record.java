@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class Record {
 
-    public static final Record RECORD_DUMMY = new Record(
+    static final Record RECORD_DUMMY = new Record(
             0, Sensor.SENSOR_DUMMY, User.USER_DUMMY, Long.MIN_VALUE, Long.MAX_VALUE);
 
     /**
@@ -36,7 +36,7 @@ public class Record {
     private final long begin;
 
     /**
-     * The moment in time when the record ended. MIN_VALUE if record is still running.
+     * The moment in time when the record ended. MAX_VALUE if record is still running.
      */
     private long end;
 
@@ -48,14 +48,14 @@ public class Record {
      * @param sensor   the associated sensor
      * @param user     the associated user
      * @param begin    when the record started
-     * @param end      when the record ended, MIN_VALUE if running
+     * @param end      when the record ended, MAX_VALUE if running
      */
     Record(long id, Sensor sensor, User user, long begin, long end) {
 
         Objects.requireNonNull(sensor, "Sensor must not be null.");
         Objects.requireNonNull(user, "User must not be null.");
 
-        if (end > Long.MIN_VALUE && end < begin) {
+        if (end < begin) {
             throw new IllegalArgumentException("End cannot lay in past of begin.");
         }
 
@@ -123,7 +123,7 @@ public class Record {
      * @return  whether the record is running
      */
     public boolean isRunning() {
-        return end == Long.MIN_VALUE;
+        return end == Long.MAX_VALUE;
     }
 
 
@@ -143,7 +143,7 @@ public class Record {
      * Finish the record. May only be called when the record is just running.
      */
     void stop() {
-        if (end > Long.MIN_VALUE) {
+        if (end != Long.MAX_VALUE) {
             throw new IllegalStateException("Cannot stop a record that was already finished.");
         }
         end = System.currentTimeMillis();
@@ -152,9 +152,6 @@ public class Record {
 
     @Override
     public String toString() {
-        //long localBegin = begin + TimeZone.getDefault().getOffset(begin);
-        //long localEnd = end + TimeZone.getDefault().getOffset(end);
-
         boolean endsOnBegin = String.format("%tF", begin).equals(String.format("%tF", end));
 
         String endFormatted;
