@@ -220,13 +220,11 @@ public class VisualizationActivity extends AppCompatActivity {
 
     private void showInfo() {
         String details = String.format(Locale.ENGLISH,
-                "Record: %s\nSensor: %s\nBegin:   %tF %<tR\nEnd:      %tF %<tR\n",/* +
-                        "Points:  %d/h",*/
+                "Record: %s\nSensor: %s\nBegin:   %tF %<tR\nEnd:      %tF %<tR\n",
                 record == null ? "all" : "#" + record.getId(),
                 record == null ? "all" : record.getSensor().getName(),
                 begin,
-                end /*,
-                HOUR.length / fromLength(end - begin).step*/
+                end
         );
 
         new AlertDialog.Builder(this)
