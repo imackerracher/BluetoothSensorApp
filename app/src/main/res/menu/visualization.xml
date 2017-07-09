@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/measurements_settings"
+        android:orderInCategory="100"
+        android:title="@string/records_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/timespan_settings"
+        android:orderInCategory="100"
+        android:title="@string/select_time_span_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/sensor_settings"
+        android:orderInCategory="100"
+        android:title="@string/select_sensors_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/info"
+        android:orderInCategory="100"
+        android:title="@string/info"
+        android:icon="@android:drawable/ic_menu_info_details"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/refresh"
+        android:orderInCategory="100"
+        android:title="@string/refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        app:showAsAction="ifRoom" />
+</menu>

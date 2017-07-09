@@ -2,6 +2,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.visualization;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +17,9 @@ import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
 
 import java.io.IOException;
 import java.util.Locale;
+
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.fromLength;
 
 
 /**
@@ -49,6 +53,11 @@ public class VisualizationActivity extends AppCompatActivity {
 
     private DrawGraph drawGraph;
 
+    /**
+     * Sets the main measure according to which activity was called from main.
+     *
+     * @param measure  the measure that shall always be displayed
+     */
     protected VisualizationActivity(Measure measure) {
         mainMeasure = measure;
     }
@@ -58,9 +67,11 @@ public class VisualizationActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visualization);
+        // Set activity title in usual style e.g.: Temperature instead of TEMPERATURE
+        setTitle(mainMeasure.toString());
 
         end = System.currentTimeMillis();
-        begin = end - Interval.HOUR.length;
+        begin = end - HOUR.length;
 
         if (savedInstanceState != null) {
             Log.d(TAG, "restore old state");
@@ -95,10 +106,9 @@ public class VisualizationActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.visualization, menu);
         return true;
     }
-
 
 
     @Override
@@ -130,6 +140,10 @@ public class VisualizationActivity extends AppCompatActivity {
             case R.id.refresh:
                 //drawGraph.refresh();
                 drawGraph.draw(this);
+                return true;
+
+            case R.id.info:
+                showInfo();
                 return true;
 
             default:
@@ -203,4 +217,22 @@ public class VisualizationActivity extends AppCompatActivity {
         }
     }
 
+
+    private void showInfo() {
+        String details = String.format(Locale.ENGLISH,
+                "Record: %s\nSensor: %s\nBegin:   %tF %<tR\nEnd:      %tF %<tR\n",/* +
+                        "Points:  %d/h",*/
+                record == null ? "all" : "#" + record.getId(),
+                record == null ? "all" : record.getSensor().getName(),
+                begin,
+                end /*,
+                HOUR.length / fromLength(end - begin).step*/
+        );
+
+        new AlertDialog.Builder(this)
+                .setTitle("Current selection:")
+                .setMessage(details)
+                .setCancelable(true)
+                .show();
+    }
 }

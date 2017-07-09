@@ -7,7 +7,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.data;
  */
 
 public enum Interval {
-    //          length     step points
+    //             length     step points
     HOUR  (      3600000L,    1000, 3600), // 1/s
     DAY   (     86400000L,   60000, 1440), // 1/min
     WEEK  (    604800000L,  600000, 1008), // 6/h
