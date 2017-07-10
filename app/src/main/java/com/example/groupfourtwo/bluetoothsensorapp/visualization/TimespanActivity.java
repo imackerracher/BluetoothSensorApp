@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.MONTH;
 import static java.lang.String.format;
 
@@ -39,11 +40,6 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
     Button btnDatePickerStart, btnTimePickerStart, btnDatePickerEnd, btnTimePickerEnd, btnDisplayTimeframe;
     EditText txtDateStart, txtTimeStart, txtDateEnd, txtTimeEnd;
-    private int mYearStart, mMonthStart, mDayStart, mHourStart, mMinuteStart, mYearEnd, mMonthEnd, mDayEnd, mHourEnd, mMinuteEnd;
-    private boolean dateStart = false;
-    private boolean timeStart = false;
-    private boolean dateEnd = false;
-    private boolean timeEnd = false;
 
     //final Calendar begin = Calendar.getInstance();
     //final Calendar end = Calendar.getInstance();
@@ -83,6 +79,12 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
         btnDisplayTimeframe=(Button)findViewById(R.id.btn_save_display);
         btnDisplayTimeframe.setOnClickListener(this);
+
+        long s = System.currentTimeMillis();
+        txtDateStart.setText(String.format("%tF", s - HOUR.length));
+        txtTimeStart.setText(String.format("%tR", s - HOUR.length));
+        txtDateEnd.setText(String.format("%tF", s));
+        txtTimeEnd.setText(String.format("%tR", s));
     }
 
     @Override
@@ -92,9 +94,9 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
             // Get Current Date
             final Calendar c = Calendar.getInstance();
-            mYearStart = c.get(Calendar.YEAR);
-            mMonthStart = c.get(Calendar.MONTH);
-            mDayStart = c.get(Calendar.DAY_OF_MONTH);
+            int yearStart = c.get(Calendar.YEAR);
+            int monthStart = c.get(Calendar.MONTH);
+            int dayStart = c.get(Calendar.DAY_OF_MONTH);
 
 
             DatePickerDialog datePickerDialog = new DatePickerDialog(this,
@@ -107,9 +109,8 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                             txtDateStart.setText(format(Locale.ENGLISH, "%02d-%02d-%d", dayOfMonth, monthOfYear + 1, year));
 
                         }
-                    }, mYearStart, mMonthStart, mDayStart);
+                    }, yearStart, monthStart, dayStart);
             datePickerDialog.show();
-            dateStart = true;
             Log.i(TAG2, c.toString());
         }
 
@@ -117,8 +118,8 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
             // Get Current Time
             final Calendar c = Calendar.getInstance();
-            mHourStart = c.get(Calendar.HOUR_OF_DAY);
-            mMinuteStart = c.get(Calendar.MINUTE);
+            int hourStart = c.get(Calendar.HOUR_OF_DAY);
+            int minuteStart = c.get(Calendar.MINUTE);
 
             // Launch Time Picker Dialog
             TimePickerDialog timePickerDialog = new TimePickerDialog(this,
@@ -131,18 +132,17 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                             txtTimeStart.setText(format(Locale.ENGLISH, "%02d:%02d", hourOfDay, minute));
 
                         }
-                    }, mHourStart, mMinuteStart, true);
+                    }, hourStart, minuteStart, true);
             timePickerDialog.show();
-            timeStart = true;
         }
 
         if (v == btnDatePickerEnd) {
 
             // Get Current Date
             final Calendar c = Calendar.getInstance();
-            mYearEnd = c.get(Calendar.YEAR);
-            mMonthEnd = c.get(Calendar.MONTH);
-            mDayEnd = c.get(Calendar.DAY_OF_MONTH);
+            int yearEnd = c.get(Calendar.YEAR);
+            int monthEnd = c.get(Calendar.MONTH);
+            int dayEnd = c.get(Calendar.DAY_OF_MONTH);
 
 
             DatePickerDialog datePickerDialog = new DatePickerDialog(this,
@@ -155,16 +155,15 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                             txtDateEnd.setText(format(Locale.ENGLISH, "%02d-%02d-%d", dayOfMonth, monthOfYear + 1, year));
 
                         }
-                    }, mYearEnd, mMonthEnd, mDayEnd);
+                    }, yearEnd, monthEnd, dayEnd);
             datePickerDialog.show();
-            dateEnd = true;
         }
         if (v == btnTimePickerEnd) {
 
             // Get Current Time
             final Calendar c = Calendar.getInstance();
-            mHourEnd = c.get(Calendar.HOUR_OF_DAY);
-            mMinuteEnd = c.get(Calendar.MINUTE);
+            int hourEnd = c.get(Calendar.HOUR_OF_DAY);
+            int minuteEnd = c.get(Calendar.MINUTE);
 
             // Launch Time Picker Dialog
             TimePickerDialog timePickerDialog = new TimePickerDialog(this,
@@ -177,62 +176,52 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                             txtTimeEnd.setText(format(Locale.ENGLISH, "%02d:%02d", hourOfDay, minute));
 
                         }
-                    }, mHourEnd, mMinuteEnd, true);
+                    }, hourEnd, minuteEnd, true);
             timePickerDialog.show();
-            timeEnd = true;
         }
 
         if (v == btnDisplayTimeframe) {
 
-            if (!dateStart || !timeStart || !dateEnd || !timeStart) {
+            //Log.d(TAG2, " -----------------" + txtDateStart.getText().toString());
+            Log.d(TAG2, " -----------------" + txtTimeEnd.getText().toString());
+            DateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+
+            Date begin;
+            Date end;
+            try {
+                begin = df.parse(txtDateStart.getText().toString() + " " + txtTimeStart.getText().toString());
+                end = df.parse(txtDateEnd.getText().toString() + " " + txtTimeEnd.getText().toString());
+            } catch (ParseException e) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Select Valid Time Span");
+                builder.setMessage("Invalid time span, please select again.");
                 builder.setCancelable(true);
                 AlertDialog alert = builder.create();
                 alert.show();
-            } else {
-
-                //Log.d(TAG2, " -----------------" + txtDateStart.getText().toString());
-                Log.d(TAG2, " -----------------" + txtTimeEnd.getText().toString());
-                DateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm");
-
-                Date begin = null;
-                Date end = null;
-                try {
-                    begin = df.parse(txtDateStart.getText().toString() + " " + txtTimeStart.getText().toString());
-                    end = df.parse(txtDateEnd.getText().toString() + " " + txtTimeEnd.getText().toString());
-                } catch (ParseException e) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Invalid time span, please select again.");
-                    builder.setCancelable(true);
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                    return;
-                }
-
-                if (end.getTime() <= begin.getTime()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Invalid time span, please select again.");
-                    builder.setCancelable(true);
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                    return;
-                } else if (end.getTime() - begin.getTime() > MONTH.length) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Time Span is too long, please select again.");
-                    builder.setCancelable(true);
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                    return;
-                }
-
-                Intent intent = new Intent();
-                intent.putExtra(VisualizationActivity.RESULT_BEGIN, begin.getTime());
-                intent.putExtra(VisualizationActivity.RESULT_END, end.getTime());
-                setResult(RESULT_OK, intent);
-                finish();
+                return;
             }
 
+            if (end.getTime() <= begin.getTime()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Invalid time span, please select again.");
+                builder.setCancelable(true);
+                AlertDialog alert = builder.create();
+                alert.show();
+                return;
+            } else if (end.getTime() - begin.getTime() > MONTH.length) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Time Span is too long, please select again.");
+                builder.setCancelable(true);
+                AlertDialog alert = builder.create();
+                alert.show();
+                return;
+            }
+
+            Intent intent = new Intent();
+            intent.putExtra(VisualizationActivity.RESULT_BEGIN, begin.getTime());
+            intent.putExtra(VisualizationActivity.RESULT_END, end.getTime());
+            setResult(RESULT_OK, intent);
+            finish();
         }
+
     }
 }
