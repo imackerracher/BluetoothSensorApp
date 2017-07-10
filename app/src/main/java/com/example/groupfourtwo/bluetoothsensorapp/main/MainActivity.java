@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
     TextView currentPressure;
     TextView currentHumidity;
 
-    ToggleButton button;
+    ToggleButton buttonStartStop;
 
     /**
      * Whether the display shall be dimmed according to device settings.
@@ -86,8 +86,8 @@ public class MainActivity extends AppCompatActivity
         currentBrightness = (TextView) findViewById(R.id.textViewCurrentBrightness);
         currentPressure = (TextView) findViewById(R.id.textViewCurrentPressure);
         currentHumidity = (TextView) findViewById(R.id.textViewCurrentHumidity);
-        button = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
-        button.setVisibility(View.GONE);
+        buttonStartStop = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
+        buttonStartStop.setVisibility(View.GONE);
 
 
         Intent databaseServiceIntent = new Intent(this, DatabaseUpdateService.class);
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(LOG_TAG, "onNewIntent");
         boolean b = intent.getBooleanExtra("BUTTON", true);
         if (!b)
-            button.setVisibility(View.VISIBLE);
+            buttonStartStop.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startStopRecord(View view) {
-        if (button.isChecked()) {
+        if (buttonStartStop.isChecked()) {
             Log.d(LOG_TAG, "start record");
             mDatabaseUpdateService.startUpdating();
         } else {
