@@ -10,7 +10,6 @@ import android.view.MenuItem;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.data.Interval;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 import com.example.groupfourtwo.bluetoothsensorapp.graph.DrawGraph;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.fromLength;
 
 
 /**
@@ -138,7 +136,10 @@ public class VisualizationActivity extends AppCompatActivity {
                 return true;
 
             case R.id.refresh:
-                //drawGraph.refresh();
+                if (record != null) {
+                    end = record.getEnd();
+                }
+                drawGraph.refresh();
                 drawGraph.draw(this);
                 return true;
 
@@ -220,11 +221,12 @@ public class VisualizationActivity extends AppCompatActivity {
 
     private void showInfo() {
         String details = String.format(Locale.ENGLISH,
-                "Record: %s\nSensor: %s\nBegin:   %tF %<tR\nEnd:      %tF %<tR\n",
+                "Record: %s\nSensor: %s\nBegin:   %tF %<tR\nEnd:      %tF %<tR%s\n",
                 record == null ? "all" : "#" + record.getId(),
                 record == null ? "all" : record.getSensor().getName(),
                 begin,
-                end
+                end,
+                record != null && record.isRunning() ? " (running)" : ""
         );
 
         new AlertDialog.Builder(this)
