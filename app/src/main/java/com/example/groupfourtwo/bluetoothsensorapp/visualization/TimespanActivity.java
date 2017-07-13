@@ -80,6 +80,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
         btnDisplayTimeframe=(Button)findViewById(R.id.btn_save_display);
         btnDisplayTimeframe.setOnClickListener(this);
 
+        // Set default with the last hour.
         long s = System.currentTimeMillis();
         txtDateStart.setText(String.format("%tF", s - HOUR.length));
         txtTimeStart.setText(String.format("%tR", s - HOUR.length));
@@ -106,7 +107,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                         public void onDateSet(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
 
-                            txtDateStart.setText(format(Locale.ENGLISH, "%02d-%02d-%d", dayOfMonth, monthOfYear + 1, year));
+                            txtDateStart.setText(format(Locale.ENGLISH, "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth));
 
                         }
                     }, yearStart, monthStart, dayStart);
@@ -152,7 +153,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                         public void onDateSet(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
 
-                            txtDateEnd.setText(format(Locale.ENGLISH, "%02d-%02d-%d", dayOfMonth, monthOfYear + 1, year));
+                            txtDateEnd.setText(format(Locale.ENGLISH, "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth));
 
                         }
                     }, yearEnd, monthEnd, dayEnd);
@@ -184,7 +185,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
             //Log.d(TAG2, " -----------------" + txtDateStart.getText().toString());
             Log.d(TAG2, " -----------------" + txtTimeEnd.getText().toString());
-            DateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
 
             Date begin;
             Date end;
@@ -192,6 +193,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                 begin = df.parse(txtDateStart.getText().toString() + " " + txtTimeStart.getText().toString());
                 end = df.parse(txtDateEnd.getText().toString() + " " + txtTimeEnd.getText().toString());
             } catch (ParseException e) {
+                Log.d(TAG, "Parsing went wrong.");
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Invalid time span, please select again.");
                 builder.setCancelable(true);
@@ -201,6 +203,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
             }
 
             if (end.getTime() <= begin.getTime()) {
+                Log.d(TAG, "Not a positive time span.");
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Invalid time span, please select again.");
                 builder.setCancelable(true);
