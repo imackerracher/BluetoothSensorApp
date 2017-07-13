@@ -39,34 +39,35 @@ public class ManageSensorsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Sensor sensor = (Sensor) adapterView.getItemAtPosition(i);
                 Log.d(LOG_TAG, "On item clicked " + sensor.toString());
-                createEditSensorDialog(sensor, getApplication()).show();
+                createEditSensorDialog(sensor).show();
             }
         });
     }
 
 
-    private AlertDialog createEditSensorDialog(final Sensor sensor, final Context context) {
+    private AlertDialog createEditSensorDialog(final Sensor sensor) {
 
+        final Context context = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
 
-        View dialogsView = inflater.inflate(R.layout.dialog_edit_sensor, null);
+        View dialogsView = inflater.inflate(R.layout.dialog_edit_name, null);
 
         final EditText editTextNewName = (EditText) dialogsView.findViewById(R.id.editText_new_name);
         editTextNewName.setText(sensor.getName());
 
         builder.setView(dialogsView)
-                .setTitle("edit Name")
+                .setTitle("Edit sensor name")
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        String Name = editTextNewName.getText().toString();
+                        String name = editTextNewName.getText().toString();
 
                         // Tell database to alter the name of the sensor.
                         DataManager dataManager = DataManager.getInstance(context);
                         try {
                             dataManager.open();
-                            dataManager.renameSensor(sensor, Name);
+                            dataManager.renameSensor(sensor, name);
                             dataManager.close();
                         } catch (IOException | IllegalArgumentException e) {
                             e.printStackTrace();

@@ -74,4 +74,6 @@
     <string name="save_and_display_sensors">Save and display sensors</string>
     <string name="button">Delete all</string>
 
+    <string name="edit_dialog_name">Name:</string>
+
 </resources>

@@ -1,5 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.main;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,21 +8,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -32,6 +36,8 @@ import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivi
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
+import com.example.groupfourtwo.bluetoothsensorapp.data.User;
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.BrightnessActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.HumidityActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.PressureActivity;
@@ -40,6 +46,7 @@ import com.example.groupfourtwo.bluetoothsensorapp.visualization.TemperatureActi
 import java.io.IOException;
 import java.util.Locale;
 
+import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.*;
 
 public class MainActivity extends AppCompatActivity
@@ -47,16 +54,18 @@ public class MainActivity extends AppCompatActivity
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private long userId;
+
     private DatabaseUpdateService mDatabaseUpdateService;
     private DataManager dataManager;
 
     //Values to be displayed in the home screen next to the sensor icons
-    TextView currentTemperature;
-    TextView currentBrightness;
-    TextView currentPressure;
-    TextView currentHumidity;
+    private TextView currentTemperature;
+    private TextView currentBrightness;
+    private TextView currentPressure;
+    private TextView currentHumidity;
 
-    ToggleButton buttonStartStop;
+    private ToggleButton buttonStartStop;
 
     /**
      * Whether the display shall be dimmed according to device settings.
@@ -89,8 +98,11 @@ public class MainActivity extends AppCompatActivity
         buttonStartStop = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
         buttonStartStop.setVisibility(View.GONE);
 
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        userId = preferences.getLong(KEY_USER_ID, 0);
 
         Intent databaseServiceIntent = new Intent(this, DatabaseUpdateService.class);
+        databaseServiceIntent.putExtra(KEY_USER_ID, userId);
         bindService(databaseServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
         Log.d(LOG_TAG, "onCreate");
@@ -209,7 +221,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDatabaseUpdateService.stopUpdating();
+        if (mDatabaseUpdateService != null) {
+            mDatabaseUpdateService.stopUpdating();
+        }
         unbindService(mServiceConnection);
         Log.d(LOG_TAG, "onDestroy");
         Intent intent = new Intent(this,BluetoothLeService.class);
@@ -221,7 +235,9 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         setLatestSensorValues();
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
-        Log.d(LOG_TAG, "onResume");
+        if (userId == 0) {
+            showWelcomeDialog();
+        }
     }
 
     @Override
@@ -360,4 +376,63 @@ public class MainActivity extends AppCompatActivity
             mDatabaseUpdateService = null;
         }
     };
+
+
+    /**
+     * Shows a welcome dialog on the first app start, to set the device profile name.
+     *
+     * @return  a welcome dialog to enter a user name
+     */
+    private AlertDialog showWelcomeDialog() {
+
+        final Context context = this;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+
+        View dialogsView = inflater.inflate(R.layout.dialog_edit_name, null);
+
+        final EditText editTextNewName = (EditText) dialogsView.findViewById(R.id.editText_new_name);
+
+        builder.setView(dialogsView)
+                .setTitle("Welcome")
+                .setMessage("This seems to be your first visit.\nPlease enter a name.")
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        String name = editTextNewName.getText().toString();
+                        if (name.trim().isEmpty() || name.length() > 50) {
+                            Toast.makeText(context, "Invalid name please select again.",
+                                    Toast.LENGTH_LONG).show();
+                            showWelcomeDialog();
+                        }
+
+                        String deviceAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
+                        userId = Sensor.parseAddress(deviceAddress);
+                        Log.d(LOG_TAG, deviceAddress);
+
+                        // Tell database to save the new user.
+                        DataManager dataManager = DataManager.getInstance(context);
+                        try {
+                            dataManager.open();
+                            if (!dataManager.existsUser(userId)) {
+                                dataManager.saveUser(new User(userId, name));
+                            }
+                            dataManager.close();
+                        } catch (IOException | IllegalArgumentException e) {
+                            e.printStackTrace();
+                            return;
+                        }
+
+                        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putLong(KEY_USER_ID, userId);
+                        editor.apply();
+
+                        dialog.dismiss();
+                        recreate();
+                    }
+                });
+        return builder.show();
+    }
 }

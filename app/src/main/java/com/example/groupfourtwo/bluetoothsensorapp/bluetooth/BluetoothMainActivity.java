@@ -40,7 +40,7 @@ import java.util.List;
 
 public class BluetoothMainActivity extends AppCompatActivity {
 
-    private final static String TAG = BluetoothLeService.class.getSimpleName();
+    private final static String TAG = BluetoothMainActivity.class.getSimpleName();
 
     BluetoothManager bluetoothManager;
     BluetoothAdapter bluetoothAdapter;
@@ -83,7 +83,7 @@ public class BluetoothMainActivity extends AppCompatActivity {
         });
         stopScanningButton.setVisibility(View.INVISIBLE);
 
-        bluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
         if (bluetoothAdapter != null) {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();

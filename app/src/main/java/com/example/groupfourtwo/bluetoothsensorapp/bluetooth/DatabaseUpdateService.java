@@ -24,9 +24,11 @@ import java.io.IOException;
 
 public class DatabaseUpdateService extends Service {
 
-    private String TAG = "databaseUpdateService";
+    private static final String TAG = "databaseUpdateService";
 
-    private User user = new User(1, "dummyUser");
+    public static final String KEY_USER_ID = "user_id";
+
+    private User user;
     private Sensor sensor;
     private Record record;
     private long startTime;
@@ -54,6 +56,12 @@ public class DatabaseUpdateService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        long userId = intent.getLongExtra(KEY_USER_ID, 0);
+        if (dataManager.existsUser(userId)) {
+            user = dataManager.findUser(userId);
+        } else {
+            user = User.USER_DUMMY;
+        }
         Log.d(TAG, "onBind()");
         return mBinder;
     }
@@ -70,7 +78,6 @@ public class DatabaseUpdateService extends Service {
         super.onCreate();
         dataManager = DataManager.getInstance(this);
         Log.d(TAG, "Created new data manager object.");
-        //startUpdating();
         try {
             dataManager.open();
         } catch (IOException e) {
@@ -100,7 +107,7 @@ public class DatabaseUpdateService extends Service {
             long sensorId = Sensor.parseAddress(sensorAddress);
 
             if (dataManager.existsSensor(sensorId)) {
-                sensor = dataManager.findSensor(Sensor.parseAddress(sensorAddress));
+                sensor = dataManager.findSensor(sensorId);
             } else {//sensor not in database -> add new Sensor
                 sensor = new Sensor(sensorId, "new Sensor: " + sensorAddress, startTime);
                 dataManager.saveSensor(sensor);
