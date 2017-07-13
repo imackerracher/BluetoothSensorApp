@@ -33,6 +33,10 @@ public class VisualizationActivity extends AppCompatActivity {
     private static final int RECORD_SELECTION_REQUEST = 2;
     private static final int TIME_SPAN_SELECTION_REQUEST = 3;
     private static final int SENSOR_SELECTION_REQUEST = 4;
+    private static final int REFRESH_BUTTON_INDEX = 4;
+
+    private static final String SELECTION_INFO =
+            "Record:\t%s\nSensor:\t%s\nStart:\t\t\t%tF  %<tR\nEnd:\t\t\t%tF  %<tR%s\nadded:\t\t%s";
 
     static final String MAIN_MEASURE = "main_measure";
     static final String ADD_MEASURE = "add_measure";
@@ -48,6 +52,8 @@ public class VisualizationActivity extends AppCompatActivity {
 
     private long begin;
     private long end;
+
+    private boolean refreshVisible = false;
 
     private DrawGraph drawGraph;
 
@@ -90,6 +96,7 @@ public class VisualizationActivity extends AppCompatActivity {
                 dataManager.close();
                 begin = record.getBegin();
                 end = record.getEnd();
+                refreshVisible = record.isRunning();
             } else {
                 begin = savedInstanceState.getLong(RESULT_BEGIN, begin);
                 end = savedInstanceState.getLong(RESULT_END, end);
@@ -105,6 +112,7 @@ public class VisualizationActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.visualization, menu);
+        menu.getItem(REFRESH_BUTTON_INDEX).setVisible(refreshVisible);
         return true;
     }
 
@@ -174,6 +182,8 @@ public class VisualizationActivity extends AppCompatActivity {
                     }
                     begin = record.getBegin();
                     end = record.getEnd();
+                    refreshVisible = record.isRunning();
+                    invalidateOptionsMenu();
                     drawGraph.setRecord(record);
                 }
                 Log.d(TAG, "result: " + record);
@@ -184,6 +194,8 @@ public class VisualizationActivity extends AppCompatActivity {
                 end = data.getLongExtra(RESULT_END, end);
                 record = null;
                 drawGraph.setTimeSpan(begin, end);
+                refreshVisible = false;
+                invalidateOptionsMenu();
                 Log.d(TAG, String.format(Locale.ENGLISH, "result: %tF %<tT - %tF %<tT", begin, end));
                 break;
 
@@ -221,16 +233,17 @@ public class VisualizationActivity extends AppCompatActivity {
 
     private void showInfo() {
         String details = String.format(Locale.ENGLISH,
-                "Record: %s\nSensor: %s\nBegin:   %tF %<tR\nEnd:      %tF %<tR%s\n",
+                SELECTION_INFO,
                 record == null ? "all" : "#" + record.getId(),
                 record == null ? "all" : record.getSensor().getName(),
                 begin,
                 end,
-                record != null && record.isRunning() ? " (running)" : ""
+                record != null && record.isRunning() ? " (running)" : "",
+                addMeasure != null ? addMeasure : "none"
         );
 
         new AlertDialog.Builder(this)
-                .setTitle("Current selection:")
+                .setTitle("Current selection")
                 .setMessage(details)
                 .setCancelable(true)
                 .show();
