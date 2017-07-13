@@ -5,10 +5,12 @@ import com.github.mikephil.charting.data.Entry;
 import java.util.ArrayList;
 
 /**
- * Created by kim on 03.07.17.
+ * Caches the data that is used to draw the graph, to reduce database operations.
+ *
+ * @author Kim
  */
 
-public class BufferStorage {
+class BufferStorage {
 
     // Eine (versteckte) Klassenvariable vom Typ der eigenen Klasse
     private static BufferStorage instance;
@@ -26,11 +28,6 @@ public class BufferStorage {
             instance = new BufferStorage();
         }
         return instance;
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        throw new CloneNotSupportedException();
     }
 
     ArrayList<Entry> getyAxes1Buffer() {
