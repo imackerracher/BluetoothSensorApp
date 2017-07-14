@@ -60,7 +60,7 @@ public class DatabaseUpdateService extends Service {
         if (dataManager.existsUser(userId)) {
             user = dataManager.findUser(userId);
         } else {
-            user = User.USER_DUMMY;
+            user = new User(userId, "defaultName");
         }
         Log.d(TAG, "onBind()");
         return mBinder;

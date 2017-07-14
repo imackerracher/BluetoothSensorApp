@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class User {
 
-    public static final User USER_DUMMY = new User(0, "Dummy User");
+    static final User USER_DUMMY = new User(0, "Dummy User");
 
     /**
      * The unique id of the user.

@@ -122,23 +122,20 @@ public class StorageActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d(LOG_TAG, "External storage - Access granted.");
+                builder.setTitle(getString(R.string.access_granted))
+                        .setMessage(getString(R.string.storage_request_granted));
             } else {
                 Log.d(LOG_TAG, "External storage - Access denied.");
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getString(R.string.attention));
-                builder.setMessage(getString(R.string.storage_request_denied));
-                builder.setPositiveButton(android.R.string.ok, null);
-                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                    }
-
-                });
-                builder.show();
+                builder.setTitle(getString(R.string.attention))
+                        .setMessage(getString(R.string.storage_request_denied));
             }
+
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.show();
         } else {
             Log.d(LOG_TAG, "An unknown request code arrived.");
         }
