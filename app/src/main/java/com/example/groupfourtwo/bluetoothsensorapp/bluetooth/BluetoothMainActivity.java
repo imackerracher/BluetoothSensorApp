@@ -158,12 +158,12 @@ public class BluetoothMainActivity extends AppCompatActivity {
                     new AlertDialog.Builder(BluetoothMainActivity.this)
                             .setTitle(device.getName())
                             .setMessage(msg)
-                            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                            .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
                             })
-                            .setNeutralButton(getString(R.string.connect), new DialogInterface.OnClickListener() {
+                            .setPositiveButton(getString(R.string.connect), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     final Intent intent = new Intent(BluetoothMainActivity.this, ControlActivity.class);

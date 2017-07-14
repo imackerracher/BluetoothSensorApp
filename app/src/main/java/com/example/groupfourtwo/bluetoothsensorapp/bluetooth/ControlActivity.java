@@ -7,6 +7,7 @@ package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
  * @version 1.0
  */
 
+import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -19,6 +20,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -29,7 +32,7 @@ import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUI
 
 import java.util.UUID;
 
-public class ControlActivity extends AppCompatActivity {
+public class ControlActivity extends Activity {
 
     private final static String TAG = ControlActivity.class.getSimpleName();
 
@@ -38,16 +41,13 @@ public class ControlActivity extends AppCompatActivity {
 
     public static final String EXTRA_BUTTON = "EXTRA_BUTTON";
 
-    private String mDeviceAddress;
+    private ProgressBar spinner;
 
-    private BluetoothGattCharacteristic mNotifyCharacteristic;
+    private String mDeviceAddress;
     private BluetoothLeService mBluetoothLeService;
 
     //private ProgressBar spinner;
 
-
-
-    TextView textViewState;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -93,39 +93,24 @@ public class ControlActivity extends AppCompatActivity {
                 for (UUID id : gattServices) {
                     subscribe(id);
                 }
-                Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(context, MainActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                i.putExtra("BUTTON", false);
-                startActivity(i);
+                spinner.setVisibility(View.GONE);
+                //Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
+                Intent intent1 = new Intent(context, MainActivity.class);
+                intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //i.putExtra("BUTTON", false);
+                startActivity(intent1);
+                Intent intent2 = new Intent(BluetoothLeService.ACTION_SET_BUTTON);
+                sendBroadcast(intent2);
                 finish();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
 
-
-    private void updateConnectionState(final String st) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                textViewState.setText(st);
-            }
-        });
-    }
-
-    private void displayData(final String data) {
-        if (data != null) {
-
-            textViewState.setText(data);
-        }
-    }
-
     private void subscribe(UUID id) {
         mBluetoothLeService.subscribe(id);
     }
-
 
 
     @Override
@@ -138,27 +123,24 @@ public class ControlActivity extends AppCompatActivity {
         String mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
 
-        //TextView textViewDeviceName = (TextView)findViewById(R.id.textDeviceName);
-        //TextView textViewDeviceAddr = (TextView)findViewById(R.id.textDeviceAddress);
-        //textViewState = (TextView)findViewById(R.id.textState);
-
-        //textViewDeviceName.setText(mDeviceName);
-        //textViewDeviceAddr.setText(mDeviceAddress);
+        spinner = (ProgressBar) findViewById(R.id.bluetooth_spinner);
+        spinner.setVisibility(View.VISIBLE);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         startService(gattServiceIntent);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG,"onResume");
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Toast.makeText(this, "result:" + result, Toast.LENGTH_SHORT).show();
-        }
+        //if (mBluetoothLeService != null) {
+        //    final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+        //    Toast.makeText(this, "result:" + result, Toast.LENGTH_SHORT).show();
+        //}
     }
 
     @Override
