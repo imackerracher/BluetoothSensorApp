@@ -13,6 +13,7 @@
     <string name="connect">Connect</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="access_granted">Access was granted</string>
     <string name="attention">Attention</string>
     <string name="location_request_denied">Location information request denied. The application is not able to find new BLE devices.</string>
     <string name="request_gps_title">Please enable location information services</string>
@@ -26,6 +27,7 @@
     <string name="desc_import">Import the data of another database into the application while keeping the gathered data.</string>
     <string name="request_storage_title">Please enable storage writing permissions and try again.</string>
     <string name="request_storage_message">To export and import data the application needs to have the right to access the external storage.</string>
+    <string name="storage_request_granted">Reading and writing to the external storage is now possible.\nPlease try again.</string>
     <string name="storage_request_denied">Sharing data with the external storage is not possible without system permission.</string>
     <string name="error_export_title">Could not export database</string>
     <string name="error_export_desc">Please make sure that the external storage is mounted and accessible.</string>
