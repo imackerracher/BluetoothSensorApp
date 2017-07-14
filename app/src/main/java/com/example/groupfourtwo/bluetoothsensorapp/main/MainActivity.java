@@ -126,21 +126,19 @@ public class MainActivity extends AppCompatActivity
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     this);
 
-            // set title
             alertDialogBuilder.setTitle("Exit app?");
 
             // set dialog message
             alertDialogBuilder
                     .setMessage("Running records will be closed.")
-                    .setCancelable(false)
-                    .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                    .setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog,int id) {
                             // if this button is clicked, close
                             // current activity
                             MainActivity.this.finish();
                         }
                     })
-                    .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                    .setNegativeButton(android.R.string.cancel,new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             // if this button is clicked, just close
                             // the dialog box and do nothing
@@ -148,10 +146,8 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
 
-            // create alert dialog
             AlertDialog alertDialog = alertDialogBuilder.create();
 
-            // show it
             alertDialog.show();
 
         }
@@ -229,6 +225,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(bleDataReceiver);
+        mDatabaseUpdateService.stopUpdating();
         if (mDatabaseUpdateService != null) {
             mDatabaseUpdateService.stopUpdating();
         }
@@ -242,22 +240,18 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         setLatestSensorValues();
-        registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
+        //registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
+        Log.d(LOG_TAG, "onResume");
     }
 
-    @Override
+    /*@Override
     protected void onNewIntent(Intent intent) {
         Log.d(LOG_TAG, "onNewIntent");
         boolean b = intent.getBooleanExtra("BUTTON", true);
         if (!b)
-            buttonStartStop.setVisibility(View.VISIBLE);
-    }
+            button.setVisibility(View.VISIBLE);
+    }*/
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(bleDataReceiver);
-    }
 
 
     //Methods that handle the selection of the respective sensor in the home screen
@@ -351,6 +345,21 @@ public class MainActivity extends AppCompatActivity
                     setHumidity(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f));
                     break;
 
+                case BluetoothLeService.ACTION_SET_BUTTON:
+                    buttonStartStop.setVisibility(View.VISIBLE);
+                    break;
+
+                case BluetoothLeService.ACTION_RESET_BUTTON:
+                    buttonStartStop.setChecked(false);
+                    mDatabaseUpdateService.stopUpdating();
+                    break;
+
+                case BluetoothLeService.ACTION_GATT_DISCONNECTED:
+                    buttonStartStop.setVisibility(View.GONE);
+                    mDatabaseUpdateService.stopUpdating();
+                    break;
+
+
                 default:
                     Log.d(LOG_TAG, "Unknown broadcast action received.");
             }
@@ -363,6 +372,9 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(BluetoothLeService.ACTION_HUM_DATA);
         intentFilter.addAction(BluetoothLeService.ACTION_BARO_DATA);
         intentFilter.addAction(BluetoothLeService.ACTION_LUX_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_SET_BUTTON);
+        intentFilter.addAction(BluetoothLeService.ACTION_RESET_BUTTON);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         return intentFilter;
     }
 

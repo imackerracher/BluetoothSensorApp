@@ -50,7 +50,6 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
-    private DatabaseUpdateService mDatabaseUpdateService;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -61,6 +60,8 @@ public class BluetoothLeService extends Service {
     private static final Queue<Object> sWriteQueue = new ConcurrentLinkedQueue<Object>();
     private static boolean sIsWriting = false;
 
+    private boolean connected = false;
+
 
     public final static String ACTION_GATT_CONNECTED = "company.bluettest2.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED = "company.bluettest2.ACTION_GATT_DISCONNECTED";
@@ -70,26 +71,11 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_TEMP_DATA = "company.bluettest2.ACTION_TEMP_DATA";
     public final static String ACTION_BARO_DATA = "company.bluettest2.ACTION_BARO_DATA";
     public final static String ACTION_LUX_DATA = "company.bluettest2.ACTION_LUX_DATA";
+    public final static String ACTION_SENSOR_ADDRESS = "company.bluettest2.ACTION_SENSOR_ADDRESS";
+    public final static String ACTION_SET_BUTTON = "company.bluettest2.ACTION_SET_BUTTON";
+    public final static String ACTION_RESET_BUTTON = "company.bluettest2.ACTION_RESET_BUTTON";
     public final static String EXTRA_DATA = "company.bluettest2.EXTRA_DATA";
-
-    // Test UUIDs
-    public static final UUID OAD_SERVICE_UUID = UUID.fromString("f000ffc0-0451-4000-b000-000000000000");
-    //For database updates
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            Log.d(TAG, "onServiceConnected()");
-            mDatabaseUpdateService = ((DatabaseUpdateService.LocalBinder) service).getService();
-            mDatabaseUpdateService.setSensorAddress((mBluetoothGatt.getDevice().getAddress()));
-            //mDatabaseUpdateService.startUpdating();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mDatabaseUpdateService = null;
-        }
-    };
+    public final static String EXTRA_ADDRESS = "company.bluettest2.EXTRA_ADDRESS";
 
     @Override
     public int onStartCommand (Intent intent, int flags, int startId) {
@@ -102,19 +88,22 @@ public class BluetoothLeService extends Service {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                connected = true;
+                Log.d(TAG, "connected = " + connected);
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
+                broadcastAddress(gatt.getDevice().getAddress());
                 // Discover available GATT Services
                 mBluetoothGatt.discoverServices();
-                bind();
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                connected = false;
+                Log.d(TAG, "connected = " + connected);
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
                 Log.d(TAG,"DISCONNECTED");
-                stopUpdating();
                 //TODO: disable button
             }
         }
@@ -199,6 +188,13 @@ public class BluetoothLeService extends Service {
 
     }
 
+    private void broadcastAddress(final String address) {
+        final Intent intent = new Intent(ACTION_SENSOR_ADDRESS);
+        intent.putExtra(EXTRA_ADDRESS, address);
+        sendBroadcast(intent);
+
+    }
+
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic, final float data) {
         final Intent intent = new Intent(action);
         intent.putExtra(EXTRA_DATA, data);
@@ -253,6 +249,13 @@ public class BluetoothLeService extends Service {
     public boolean connect(final String address) {
         if (bluetoothAdapter == null || address == null) {
             return false;
+        }
+
+        if (connected) {
+            disconnect();
+            close();
+            Intent intent = new Intent(ACTION_RESET_BUTTON);
+            sendBroadcast(intent);
         }
         // Previously connected device.  Try to reconnect.
         if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
@@ -364,59 +367,6 @@ public class BluetoothLeService extends Service {
         }
     }
 
-    // Request a read on a BluetoothGattCharacteristic
-    public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (bluetoothAdapter == null || mBluetoothGatt == null) {
-            return;
-        }
-
-        mBluetoothGatt.readCharacteristic(characteristic);
-    }
-
-    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (bluetoothAdapter == null || mBluetoothGatt == null) {
-            return;
-        }
-        mBluetoothGatt.writeCharacteristic(characteristic);
-    }
-
-
-    // Enables or disables notification on a given characteristic
-   public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enabled) {
-        if (bluetoothAdapter == null || mBluetoothGatt == null) {
-            return;
-        }
-        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-
-        // Specific SensorTag Services.
-        // CHANGE UUIDS         !!!
-        // JUST EXAMPLE UUIDS   !!!
-        if (OAD_SERVICE_UUID.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    OAD_SERVICE_UUID);
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
-        }
-    }
-
-    // Retrieves a list of supported GATT services on the connected device
-    public List<BluetoothGattService> getSupportedGattServices() {
-        if (mBluetoothGatt == null) return null;
-
-        return mBluetoothGatt.getServices();
-    }
-
-    public void bind() {
-        Log.d(TAG,"bind()");
-        Intent databaseServiceIntent = new Intent(this, DatabaseUpdateService.class);
-        bindService(databaseServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-    }
-
-    public void stopUpdating() {
-        Log.d(TAG,"stopUpdating()");
-        mDatabaseUpdateService.stopUpdating();
-        unbindService(mServiceConnection);
-    }
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy() , BLEservice stopped");

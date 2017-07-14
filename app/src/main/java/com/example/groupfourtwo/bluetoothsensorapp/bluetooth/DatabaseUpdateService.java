@@ -144,27 +144,6 @@ public class DatabaseUpdateService extends Service {
 
         }
     };
-    public void setTemp(float t) {
-        //Log.d(TAG, "setTemp");
-        temp = t;
-    }
-
-    public void setPressure(float t) {
-        pressure = t;
-    }
-
-    public void setBrightness(float t) {
-        brightness = t;
-    }
-
-    public void setHumidity(float t) {
-        humidity = t;
-    }
-
-    public void setSensorAddress(String s) {
-        Log.d(TAG, "setSensorAddress " + s);
-        sensorAddress = s;
-    }
 
     private final BroadcastReceiver bleDataReceiver = new BroadcastReceiver() {
         @Override
@@ -186,6 +165,10 @@ public class DatabaseUpdateService extends Service {
                 case BluetoothLeService.ACTION_HUM_DATA:
                     humidity = intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f);
                     break;
+                case BluetoothLeService.ACTION_SENSOR_ADDRESS:
+                    sensorAddress = intent.getStringExtra(BluetoothLeService.EXTRA_ADDRESS);
+                    Log.d(TAG, sensorAddress);
+                    break;
 
                 default:
                     Log.d(TAG, "Unknown broadcast action received.");
@@ -199,6 +182,7 @@ public class DatabaseUpdateService extends Service {
         intentFilter.addAction(BluetoothLeService.ACTION_HUM_DATA);
         intentFilter.addAction(BluetoothLeService.ACTION_BARO_DATA);
         intentFilter.addAction(BluetoothLeService.ACTION_LUX_DATA);
+        intentFilter.addAction(BluetoothLeService.ACTION_SENSOR_ADDRESS);
         return intentFilter;
 
     }
