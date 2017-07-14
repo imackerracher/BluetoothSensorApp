@@ -33,10 +33,11 @@ public class VisualizationActivity extends AppCompatActivity {
     private static final int RECORD_SELECTION_REQUEST = 2;
     private static final int TIME_SPAN_SELECTION_REQUEST = 3;
     private static final int SENSOR_SELECTION_REQUEST = 4;
-    private static final int REFRESH_BUTTON_INDEX = 4;
+
+    private static final int REFRESH_BUTTON_INDEX = 3;
 
     private static final String SELECTION_INFO =
-            "Record:\t%s\nSensor:\t%s\nStart:\t\t\t%tF  %<tR\nEnd:\t\t\t%tF  %<tR%s\nadded:\t\t%s";
+            "Record:\t%s\nSensor:\t%s\nStart:\t\t\t\t%tF  %<tR\nEnd:\t\t\t\t\t%tF  %<tR%s\nadded:\t\t%s";
 
     static final String MAIN_MEASURE = "main_measure";
     static final String ADD_MEASURE = "add_measure";
@@ -155,6 +156,11 @@ public class VisualizationActivity extends AppCompatActivity {
                 showInfo();
                 return true;
 
+            case R.id.zoom_out:
+                drawGraph.resetZoom();
+                drawGraph.draw(this);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -238,7 +244,7 @@ public class VisualizationActivity extends AppCompatActivity {
                 record == null ? "all" : record.getSensor().getName(),
                 begin,
                 end,
-                record != null && record.isRunning() ? " (running)" : "",
+                record != null && record.isRunning() ? "  (running)" : "",
                 addMeasure != null ? addMeasure : "none"
         );
 

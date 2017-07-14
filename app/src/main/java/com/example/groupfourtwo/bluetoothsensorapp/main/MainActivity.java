@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private static final int SCREEN_ON = 0;
+    private static final int SCREEN_OFF = 1;
+
     private long userId;
 
     private DatabaseUpdateService mDatabaseUpdateService;
@@ -96,16 +99,16 @@ public class MainActivity extends AppCompatActivity
         buttonStartStop = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
         buttonStartStop.setVisibility(View.GONE);
 
-        String macAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
-        userId = Sensor.parseAddress(macAddress);
-
         dataManager = DataManager.getInstance(this);
         try {
+            String macAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
+            userId = Sensor.parseAddress(macAddress);
+
             dataManager.open();
             if (!dataManager.existsUser(userId)) {
                 showWelcomeDialog();
             }
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             e.printStackTrace();
         }
 
@@ -199,6 +202,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        // Either show the icon to disable or enable display timeout.
+        menu.getItem(SCREEN_ON).setVisible(displayTimeout);
+        menu.getItem(SCREEN_OFF).setVisible(!displayTimeout);
         return true;
     }
 
@@ -210,11 +216,17 @@ public class MainActivity extends AppCompatActivity
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     displayTimeout = false;
                     Toast.makeText(this, "Display will stay turned on.", Toast.LENGTH_SHORT).show();
-                } else {
+                }
+                invalidateOptionsMenu();
+                return true;
+
+            case R.id.screen_off:
+                if (!displayTimeout){
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     displayTimeout = true;
                     Toast.makeText(this, "Display will be turned off.", Toast.LENGTH_SHORT).show();
                 }
+                invalidateOptionsMenu();
                 return true;
 
             default:

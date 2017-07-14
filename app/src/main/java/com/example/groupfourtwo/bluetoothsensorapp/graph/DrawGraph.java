@@ -43,7 +43,8 @@ public class DrawGraph {
     /**
      * Offset in milliseconds from epoch to 1. Jan 2016 UTC
      */
-    private final static long EPOCH_TO_2016 = 1451606400000L;
+    private static final long EPOCH_TO_2016 = 1451606400000L;
+    private static final int TRANSPARENT = Color.argb(0, 0, 0, 0);
 
     private Context context;
     private Measure measure1, measure2;
@@ -52,7 +53,6 @@ public class DrawGraph {
     private Record record;
     private int backgroundColour;
     private int textColour;
-    private static int transparent = Color.argb(0, 0, 0, 0);
     private LineChart lineChart;
 
     private boolean isBuffered1 = false;
@@ -264,7 +264,7 @@ public class DrawGraph {
             if(YAxis.get(i).getX() - YAxis.get(i+1).getX() == -1)
                 colorArray[i] = measure.color;
             else
-                colorArray[i] = transparent;
+                colorArray[i] = TRANSPARENT;
                 //colorArray[i] = backgroundColour;
 
             i++;
@@ -320,6 +320,11 @@ public class DrawGraph {
         lineChart.invalidate();
 
         refresh();
+    }
+
+    public void resetZoom() {
+        lineChart.fitScreen();
+        lineChart.invalidate();
     }
 
     public int brighter(int color, float factor) {

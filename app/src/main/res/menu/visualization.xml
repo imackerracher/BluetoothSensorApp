@@ -3,35 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/measurements_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="1"
         android:title="@string/records_settings"
         app:showAsAction="never" />
     <item
         android:id="@+id/timespan_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="2"
         android:title="@string/select_time_span_settings"
         app:showAsAction="never" />
     <item
         android:id="@+id/sensor_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="3"
         android:title="@string/select_sensors_settings"
         app:showAsAction="never" />
     <item
-        android:id="@+id/info"
-        android:orderInCategory="100"
-        android:title="@string/info"
-        android:icon="@android:drawable/ic_menu_info_details"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/refresh"
-        android:orderInCategory="100"
+        android:orderInCategory="4"
         android:title="@string/refresh"
         android:icon="@android:drawable/ic_menu_rotate"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/info"
+        android:orderInCategory="5"
+        android:title="@string/info"
+        android:icon="@android:drawable/ic_menu_info_details"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/zoom_out"
-        android:orderInCategory="100"
-        android:title="@string/refresh"
+        android:orderInCategory="6"
+        android:title="@string/zoom_out"
         android:icon="@android:drawable/ic_menu_zoom"
         app:showAsAction="ifRoom" />
 </menu>

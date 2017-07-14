@@ -65,7 +65,9 @@
     <string name="select_sensors_settings">Select sensor</string>
     <string name="refresh">Refresh graph</string>
     <string name="info">Show details</string>
+    <string name="zoom_out">Reset zoom</string>
     <string name="screen_on">Display always on</string>
+    <string name="screen_off">Display timeout</string>
     <string name="stored_records_text">Stored recordings</string>
     <string name="stored_sensors_text">Stored sensors</string>
     <string name="activated_sensors_text">Activated sensors</string>
