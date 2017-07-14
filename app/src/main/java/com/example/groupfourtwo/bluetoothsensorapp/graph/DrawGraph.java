@@ -23,8 +23,6 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static android.R.color.black;
-import static android.R.color.white;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT;
 
@@ -98,7 +96,7 @@ public class DrawGraph {
 
         lineChart.setDescription(null);
 
-        setDay(true);
+        setDay(false);
 
 
         XAxis xAxis = lineChart.getXAxis();
@@ -138,8 +136,6 @@ public class DrawGraph {
             rightAxis.setValueFormatter(y2);
             rightAxis.setDrawGridLines(false); // no grid lines
             rightAxis.setTextColor(measure2.color);
-            //rightAxis.setAxisMinimum(0f);
-            //rightAxis.setAxisMaximum(20f);
         }
 
 
@@ -190,11 +186,8 @@ public class DrawGraph {
         } else {
             yAxes2 = null;
         }
-
-
-
-
         dataManager.close();
+
 
         if(yAxes1 == null  ||  yAxes1.isEmpty()) {
             return;
@@ -228,12 +221,6 @@ public class DrawGraph {
 
 
 
-        //LineDataSet lineDataSet3 = new LineDataSet(yAxes2_2, "2");
-        //setLineColor(lineDataSet3, measure1);
-
-
-
-
         lineChart.setData(new LineData(lineDataSets));
 
 
@@ -245,7 +232,7 @@ public class DrawGraph {
         lineChart.setVisibleXRangeMaximum((float) dataPointCount);
         lineChart.setVisibleXRangeMinimum(10f);
 
-        //lineChart.animateX(1000); // Animation that shows the values from left to right
+        lineChart.animateX(1000); // Animation that shows the values from left to right
 
         lineDataSet1.setDrawValues(true); //Default is true
         lineDataSet1.setValueTextColor(textColour);
