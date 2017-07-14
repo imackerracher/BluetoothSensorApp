@@ -52,8 +52,8 @@ public class DrawGraph {
     private long begin;
     private long end;
     private Record record;
-    private int backgroundColour = Color.WHITE;
-    private int textColour = Color.BLACK;
+    private int backgroundColour;
+    private int textColour;
     private static int transparent = Color.argb(0, 0, 0, 0);
     private LineChart lineChart;
 
@@ -98,7 +98,7 @@ public class DrawGraph {
 
         lineChart.setDescription(null);
 
-        setDay(false);
+        setDay(true);
 
 
         XAxis xAxis = lineChart.getXAxis();
@@ -353,10 +353,12 @@ public class DrawGraph {
 
 
         if(day) {
-            backgroundColour = white;
+            backgroundColour = Color.WHITE;
+            textColour = Color.BLACK;
             lineChart.setMarker(mvd);
         } else {
-            backgroundColour = black;
+            backgroundColour = Color.BLACK;
+            textColour = Color.WHITE;
             lineChart.setMarker(mvn);
         }
     }
