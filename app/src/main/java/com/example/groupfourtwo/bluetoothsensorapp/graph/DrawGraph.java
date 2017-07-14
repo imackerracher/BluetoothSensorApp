@@ -13,7 +13,6 @@ import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.IMarker;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -24,6 +23,8 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static android.R.color.black;
+import static android.R.color.white;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.*;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT;
 
@@ -51,8 +52,8 @@ public class DrawGraph {
     private long begin;
     private long end;
     private Record record;
-    private int backgroundColour = Color.BLACK;
-    private int textColour = Color.WHITE;
+    private int backgroundColour = Color.WHITE;
+    private int textColour = Color.BLACK;
     private static int transparent = Color.argb(0, 0, 0, 0);
     private LineChart lineChart;
 
@@ -97,6 +98,8 @@ public class DrawGraph {
 
         lineChart.setDescription(null);
 
+        setDay(false);
+
 
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setAxisMinimum(0f); //smallest value that is displayed on the XAxis
@@ -140,9 +143,7 @@ public class DrawGraph {
         }
 
 
-        IMarker mv = new CustomMarkerView(context, R.layout.marker_view);
 
-        lineChart.setMarker(mv);
 
 
         /**
@@ -345,6 +346,20 @@ public class DrawGraph {
         return rgb;
     }
 
+    public void setDay(Boolean day)
+    {
+        IMarker mvd = new CustomMarkerView(context, R.layout.marker_view_day);
+        IMarker mvn = new CustomMarkerView(context, R.layout.marker_view_night);
+
+
+        if(day) {
+            backgroundColour = white;
+            lineChart.setMarker(mvd);
+        } else {
+            backgroundColour = black;
+            lineChart.setMarker(mvn);
+        }
+    }
 
 
 

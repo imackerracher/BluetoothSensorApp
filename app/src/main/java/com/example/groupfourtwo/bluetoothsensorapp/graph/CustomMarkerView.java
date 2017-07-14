@@ -59,20 +59,7 @@ public class CustomMarkerView extends MarkerView {
         return mOffset;
     }
 
-    private Measure getMeasure(int color) {
 
-        if (color == HUMIDITY.color)
-            return HUMIDITY;
-        else if (color == PRESSURE.color)
-            return PRESSURE;
-        else if (color == BRIGHTNESS.color)
-            return BRIGHTNESS;
-        else if (color == DISTANCE.color)
-            return DISTANCE;
-        else if (color == TEMPERATURE.color)
-            return TEMPERATURE;
-        return TEMPERATURE;
-    }
 
 
 }
