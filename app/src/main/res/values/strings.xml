@@ -24,7 +24,7 @@
     <string name="desc_export">Export the data gathered by the application to the external storage of the device.</string>
     <string name="desc_restore">Replace the internal database with data from the external storage.\nThis will delete all data that has been saved by the application.</string>
     <string name="desc_import">Import the data of another database into the application while keeping the gathered data.</string>
-    <string name="request_storage_title">Please enable storage writing permissions.</string>
+    <string name="request_storage_title">Please enable storage writing permissions and try again.</string>
     <string name="request_storage_message">To export and import data the application needs to have the right to access the external storage.</string>
     <string name="storage_request_denied">Sharing data with the external storage is not possible without system permission.</string>
     <string name="error_export_title">Could not export database</string>
