@@ -53,6 +53,7 @@ public class DrawGraph {
     private Record record;
     private int backgroundColour = Color.BLACK;
     private int textColour = Color.WHITE;
+    private static int transparent = Color.argb(0, 0, 0, 0);
     private LineChart lineChart;
 
     private boolean isBuffered1 = false;
@@ -275,7 +276,8 @@ public class DrawGraph {
             if(YAxis.get(i).getX() - YAxis.get(i+1).getX() == -1)
                 colorArray[i] = measure.color;
             else
-                colorArray[i] = backgroundColour;
+                colorArray[i] = transparent;
+                //colorArray[i] = backgroundColour;
 
             i++;
         }
