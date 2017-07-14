@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -88,7 +87,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        dataManager = DataManager.getInstance(this);
 
         //Tie the values in content_main.xml to the text views in this file
         currentTemperature = (TextView) findViewById(R.id.textViewCurrentTemperature);
@@ -98,8 +96,18 @@ public class MainActivity extends AppCompatActivity
         buttonStartStop = (ToggleButton) findViewById(R.id.toggleStartStopRecord);
         buttonStartStop.setVisibility(View.GONE);
 
-        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-        userId = preferences.getLong(KEY_USER_ID, 0);
+        String macAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
+        userId = Sensor.parseAddress(macAddress);
+
+        dataManager = DataManager.getInstance(this);
+        try {
+            dataManager.open();
+            if (!dataManager.existsUser(userId)) {
+                showWelcomeDialog();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         Intent databaseServiceIntent = new Intent(this, DatabaseUpdateService.class);
         databaseServiceIntent.putExtra(KEY_USER_ID, userId);
@@ -235,9 +243,6 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         setLatestSensorValues();
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
-        if (userId == 0) {
-            showWelcomeDialog();
-        }
     }
 
     @Override
@@ -407,30 +412,19 @@ public class MainActivity extends AppCompatActivity
                             showWelcomeDialog();
                         }
 
-                        String deviceAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
-                        userId = Sensor.parseAddress(deviceAddress);
-                        Log.d(LOG_TAG, deviceAddress);
-
                         // Tell database to save the new user.
                         DataManager dataManager = DataManager.getInstance(context);
                         try {
                             dataManager.open();
-                            if (!dataManager.existsUser(userId)) {
-                                dataManager.saveUser(new User(userId, name));
-                            }
-                            dataManager.close();
+                            dataManager.saveUser(new User(userId, name));
                         } catch (IOException | IllegalArgumentException e) {
                             e.printStackTrace();
                             return;
+                        } finally {
+                            dataManager.close();
                         }
 
-                        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putLong(KEY_USER_ID, userId);
-                        editor.apply();
-
                         dialog.dismiss();
-                        recreate();
                     }
                 });
         return builder.show();
