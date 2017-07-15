@@ -35,6 +35,7 @@ public enum Interval {
      *
      * @param length  the length of the interval
      * @param step    the length of one data unit
+     * @param points  the maximum of aggregated data points
      */
     Interval(long length, int step, int points) {
         this.length = length;

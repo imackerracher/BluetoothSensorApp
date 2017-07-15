@@ -1,7 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.data;
 
 import static android.graphics.Color.*;
-import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
+import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.MeasurementData.*;
 
 /**
  * Sets predefined parameters for each type of data collected by the application.
@@ -10,11 +10,11 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.
  */
 
 public enum Measure {
-    BRIGHTNESS (YELLOW, MeasurementData.COLUMN_BRIGHTNESS, "lx"),
-    DISTANCE (BLACK, MeasurementData.COLUMN_DISTANCE, "m"),
-    HUMIDITY (CYAN, MeasurementData.COLUMN_HUMIDITY, "%"),
-    PRESSURE (LTGRAY, MeasurementData.COLUMN_PRESSURE, "hPa"),
-    TEMPERATURE (RED, MeasurementData.COLUMN_TEMPERATURE, "°C");
+    BRIGHTNESS  (YELLOW, COLUMN_BRIGHTNESS,  "lx" ),
+    DISTANCE    (BLACK,  COLUMN_DISTANCE,    "m"  ),
+    HUMIDITY    (CYAN,   COLUMN_HUMIDITY,    "%"  ),
+    PRESSURE    (LTGRAY, COLUMN_PRESSURE,    "hPa"),
+    TEMPERATURE (RED,    COLUMN_TEMPERATURE, "°C" );
 
 
     /**
@@ -32,6 +32,13 @@ public enum Measure {
      */
     public final String unit;
 
+    /**
+     * Initializes the Interval constants with their values.
+     *
+     * @param color   the color used in the graph
+     * @param column  the name of the referenced column in the database
+     * @param unit    the physical unit in which the data is taken
+     */
     Measure(int color, String column, String unit) {
         this.color = color;
         this.column = column;
