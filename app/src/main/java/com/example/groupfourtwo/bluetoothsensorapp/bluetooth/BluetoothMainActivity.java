@@ -49,11 +49,14 @@ public class BluetoothMainActivity extends AppCompatActivity {
     ListAdapter adapterLeScanResult;
     Button startScanningButton;
     Button stopScanningButton;
+    Button disconnectButton;
     ListView listViewLE;
 
     private boolean mScanning = false;
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+
+    public static final String EXTRAS_CONNECT_BUTTON = "EXTRAS_CONNECT";
 
     /**
      * Called when "Manage Connection" gets opened
@@ -67,6 +70,15 @@ public class BluetoothMainActivity extends AppCompatActivity {
         listViewLE = (ListView)findViewById(R.id.lelist);
         startScanningButton = (Button) findViewById(R.id.StartScanButton);
         stopScanningButton = (Button) findViewById(R.id.StopScanButton);
+        disconnectButton = (Button) findViewById(R.id.DisconnectButton);
+
+        Intent intent = getIntent();
+        boolean connect = intent.getBooleanExtra(EXTRAS_CONNECT_BUTTON, true);
+
+        if (connect)
+            disconnectButton.setVisibility(View.GONE);
+        else
+            startScanningButton.setVisibility(View.GONE);
 
         // Start scanning if Scan-button is clicked
         startScanningButton.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +93,15 @@ public class BluetoothMainActivity extends AppCompatActivity {
                 stopScanning();
             }
         });
+
+        disconnectButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                disconnect();
+            }
+        });
         stopScanningButton.setVisibility(View.INVISIBLE);
+
+
 
         bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
@@ -169,6 +189,7 @@ public class BluetoothMainActivity extends AppCompatActivity {
                                     final Intent intent = new Intent(BluetoothMainActivity.this, ControlActivity.class);
                                     intent.putExtra(ControlActivity.EXTRAS_DEVICE_NAME, device.getName());
                                     intent.putExtra(ControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                                    intent.putExtra(ControlActivity.EXTRAS_CONNECT, true);
 
                                     if (mScanning) {
                                         stopScanning();
@@ -192,6 +213,7 @@ public class BluetoothMainActivity extends AppCompatActivity {
             addBluetoothDevice(result.getDevice());
         }
     };
+
 
     /**
      * Method which gets invoked when the user answers a permission request
@@ -268,6 +290,12 @@ public class BluetoothMainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void disconnect() {
+        Intent intent = new Intent(this, ControlActivity.class);
+        intent.putExtra(ControlActivity.EXTRAS_CONNECT, false);
+        startActivity(intent);
     }
 
 
