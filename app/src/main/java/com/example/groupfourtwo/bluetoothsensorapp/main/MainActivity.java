@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity
      * Whether the display shall be dimmed according to device settings.
      */
     private boolean displayTimeout = true;
+    private boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.nav_manage_connection:
                 intent = new Intent(this, BluetoothMainActivity.class);
+                intent.putExtra(BluetoothMainActivity.EXTRAS_CONNECT_BUTTON, !connected);
                 startActivity(intent);
                 break;
 
@@ -367,6 +369,14 @@ public class MainActivity extends AppCompatActivity
                     break;
 
                 case BluetoothLeService.ACTION_GATT_DISCONNECTED:
+                    connected = false;
+                    buttonStartStop.setChecked(false);
+                    buttonStartStop.setVisibility(View.GONE);
+                    mDatabaseUpdateService.stopUpdating();
+                    break;
+
+                case BluetoothLeService.ACTION_GATT_CONNECTED:
+                    connected = true;
                     buttonStartStop.setVisibility(View.GONE);
                     mDatabaseUpdateService.stopUpdating();
                     break;
@@ -387,6 +397,7 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(BluetoothLeService.ACTION_SET_BUTTON);
         intentFilter.addAction(BluetoothLeService.ACTION_RESET_BUTTON);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
         return intentFilter;
     }
 

@@ -22,6 +22,15 @@
         android:layout_marginTop="40dp"
         android:text="@string/StopScanButton" />
 
+    <Button
+        android:id="@+id/DisconnectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:text="Disconnect" />
+
     <ListView
         android:id="@+id/lelist"
         android:layout_width="wrap_content"

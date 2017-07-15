@@ -38,11 +38,11 @@ public class ControlActivity extends Activity {
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
+    public static final String EXTRAS_CONNECT = "CONNECT";
 
-    public static final String EXTRA_BUTTON = "EXTRA_BUTTON";
 
     private ProgressBar spinner;
-
+    private boolean connect = false;
     private String mDeviceAddress;
     private BluetoothLeService mBluetoothLeService;
 
@@ -61,7 +61,13 @@ public class ControlActivity extends Activity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            if (connect) {
+                Log.d(TAG, "connect");
+                mBluetoothLeService.connect(mDeviceAddress);
+            } else {
+                Log.d(TAG, "disconnect");
+                mBluetoothLeService.disconnect();
+            }
         }
 
         @Override
@@ -87,6 +93,15 @@ public class ControlActivity extends Activity {
                 //updateConnectionState("GATT_CONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
+                spinner.setVisibility(View.GONE);
+                //Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
+                Intent intent1 = new Intent(context, MainActivity.class);
+                intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //i.putExtra("BUTTON", false);
+                startActivity(intent1);
+                //Intent intent2 = new Intent(BluetoothLeService.ACTION_SET_BUTTON);
+                //sendBroadcast(intent2);
+                finish();
                 //updateConnectionState("GATT_DISCONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
@@ -122,6 +137,7 @@ public class ControlActivity extends Activity {
         final Intent intent = getIntent();
         String mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+        connect = intent.getBooleanExtra(EXTRAS_CONNECT, true);
 
         spinner = (ProgressBar) findViewById(R.id.bluetooth_spinner);
         spinner.setVisibility(View.VISIBLE);

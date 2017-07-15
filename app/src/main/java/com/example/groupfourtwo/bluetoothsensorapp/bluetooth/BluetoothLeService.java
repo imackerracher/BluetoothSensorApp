@@ -88,8 +88,8 @@ public class BluetoothLeService extends Service {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                connected = true;
-                Log.d(TAG, "connected = " + connected);
+                //connected = true;
+                //Log.d(TAG, "connected = " + connected);
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
@@ -98,8 +98,8 @@ public class BluetoothLeService extends Service {
                 mBluetoothGatt.discoverServices();
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                connected = false;
-                Log.d(TAG, "connected = " + connected);
+                //connected = false;
+                //Log.d(TAG, "connected = " + connected);
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
@@ -251,12 +251,12 @@ public class BluetoothLeService extends Service {
             return false;
         }
 
-        if (connected) {
+        /*if (connected) {
             disconnect();
             close();
             Intent intent = new Intent(ACTION_RESET_BUTTON);
             sendBroadcast(intent);
-        }
+        }*/
         // Previously connected device.  Try to reconnect.
         if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {

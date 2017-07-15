@@ -84,6 +84,7 @@
         <activity
             android:name=".bluetooth.ControlActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:screenOrientation="portrait"
             android:parentActivityName=".bluetooth.BluetoothMainActivity" />
         <activity
             android:name=".main.StorageActivity"
