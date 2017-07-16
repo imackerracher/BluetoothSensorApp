@@ -22,14 +22,23 @@ import java.util.List;
 import static android.R.attr.id;
 
 /**
+ * Activity for displaying recordings in a list and the ability to select recordings and display
+ * them in the visualization.
+ *
  * @author Tobias Nusser
  * @version 1.0
  */
 
 public class RecordsActivity extends AppCompatActivity {
 
+    /* debugging only */
     private final static String TAG = RecordsActivity.class.getSimpleName();
 
+    /**
+     * onCreate method which gets called when opening the recordings tab
+     *
+     * @param savedInstanceState Bundle object containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +67,9 @@ public class RecordsActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.records_listview);
         listView.setAdapter(myAdapter);
 
+        /**
+         * ItemClickListener for the selection of the recordings which should get visualized
+         */
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -71,7 +83,12 @@ public class RecordsActivity extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * Handling the selection of navigation elements
+     *
+     * @param item selected menu item for further navigation
+     * @return item called with the overlying super instance
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -82,8 +99,6 @@ public class RecordsActivity extends AppCompatActivity {
             finish();
             return true;
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 }

@@ -20,14 +20,33 @@ import com.example.groupfourtwo.bluetoothsensorapp.visualization.RecordsActivity
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Activity for clearing single or all recordings
+ *
+ * @author Tobias Nusser, Stefan Erk
+ * @version 1.1
+ */
+
 public class ClearDataActivity extends AppCompatActivity {
 
-    DataManager dataManager;
-    ListView recordList;
-    boolean confirmed;
-
+    /* debugging only */
     private final static String TAG = RecordsActivity.class.getSimpleName();
 
+    /**
+     * DataManager instance for database operations like show recordings and delete recordings
+     */
+    DataManager dataManager;
+
+    /**
+     * List of recordings from the database
+     */
+    ListView recordList;
+
+    /**
+     * Displays the saved recordings and ensures the ability to delete one or all recordings.
+     *
+     * @param savedInstanceState Bundle object containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +115,9 @@ public class ClearDataActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Getting all the saved recordings and displaying them in a ListView
+     */
     private void showAllRecords() {
         try {
             dataManager.open();

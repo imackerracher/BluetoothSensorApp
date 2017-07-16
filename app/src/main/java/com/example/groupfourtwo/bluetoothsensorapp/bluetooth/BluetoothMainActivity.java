@@ -1,7 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
 /**
- * Bluetooth Connection Main Activity
+ * Scans for bluetooh devices and connects with selected ones
  *
  * @author Tobias Nusser
  * @version 1.2
@@ -40,22 +40,68 @@ import java.util.List;
 
 public class BluetoothMainActivity extends AppCompatActivity {
 
+    /* Debugging only */
     private final static String TAG = BluetoothMainActivity.class.getSimpleName();
 
+    /**
+     * A bluetooth manager which brings necessary methods for searching and connecting to devices
+     */
     BluetoothManager bluetoothManager;
+
+    /**
+     * Bluetooth adapter which handles the connection
+     */
     BluetoothAdapter bluetoothAdapter;
+
+    /**
+     * Scanner instance, which is able to scan for devices
+     */
     BluetoothLeScanner bluetoothLeScanner;
+
+    /**
+     * A cache for all BLE devices which got found
+     */
     List<BluetoothDevice> listBluetoothDevice;
+
+    /**
+     * Listadapter to connect BLE device cache with ListView
+     */
     ListAdapter adapterLeScanResult;
+
+    /**
+     * Start scan button
+     */
     Button startScanningButton;
+
+    /**
+     * Stop scan button
+     */
     Button stopScanningButton;
+
+    /**
+     * Disconnect button
+     */
     Button disconnectButton;
+
+    /**
+     * ListView for the BLE devices which got scanned
+     */
     ListView listViewLE;
 
+    /**
+     * Boolean value for checking the LEScanners state
+     */
     private boolean mScanning = false;
+
+    /**
+     * Request values for diverse requests
+     */
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
+    /**
+     * Extras connect information
+     */
     public static final String EXTRAS_CONNECT_BUTTON = "EXTRAS_CONNECT";
 
     /**
@@ -100,7 +146,6 @@ public class BluetoothMainActivity extends AppCompatActivity {
             }
         });
         stopScanningButton.setVisibility(View.INVISIBLE);
-
 
 
         bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -292,6 +337,9 @@ public class BluetoothMainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Disconnects from a BLE device
+     */
     private void disconnect() {
         Intent intent = new Intent(this, ControlActivity.class);
         intent.putExtra(ControlActivity.EXTRAS_CONNECT, false);

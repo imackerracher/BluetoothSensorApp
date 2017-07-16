@@ -16,26 +16,67 @@ import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.*;
 
 /**
+ * Handler for the sensor settings. Ensures ability to choose two sensor visualizations.
+ *
  * @author Tobias Nusser
- * @version 1.0
+ * @version 1.1
  */
 
 public class SensorSettingsActivity extends AppCompatActivity {
 
+    /* debugging only */
     private static final String TAG = RecordsActivity.class.getSimpleName();
 
+    /**
+     * Temperature Switch to de-/activate in visualization
+     */
     private Switch tempSwitch;
+
+    /**
+     * Humidity Switch to de-/activate in visualization
+     */
     private Switch humiditySwitch;
+
+    /**
+     * Brightness Switch to de-/activate in visualization
+     */
     private Switch brightSwitch;
+
+    /**
+     * Pressure Switch to de-/activate in visualization
+     */
     private Switch pressureSwitch;
+
+    /**
+     * Previous visualized measure in the visualization
+     */
     Measure previous;
+
+    /**
+     * Previous visualized measure saved in local variable
+     */
     Measure prevAdditional;
+
+    /**
+     * Button for accepting changes and switching the activity back to the visualization with the
+     * parameters chosen through the switches
+     */
     Button saveBtn;
+
+    /**
+     * Booleans for previous activated visualizations
+     */
     boolean prevTemp = false;
     boolean prevHum = false;
     boolean prevBri = false;
     boolean prevPres = false;
 
+
+    /**
+     * Method which handles the interaction with the switches
+     *
+     * @param savedInstanceState Bundle object containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +134,7 @@ public class SensorSettingsActivity extends AppCompatActivity {
                 Log.d(TAG, "Debug previous: " + previous );
         }
 
-
+        // Event-Listener for the temperature switch
         tempSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -123,6 +164,8 @@ public class SensorSettingsActivity extends AppCompatActivity {
             }
         });
 
+
+        // Event-Listener for the humidity switch
         humiditySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -152,6 +195,7 @@ public class SensorSettingsActivity extends AppCompatActivity {
             }
         });
 
+        // Event-Listener for the brightness switch
         brightSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -181,6 +225,7 @@ public class SensorSettingsActivity extends AppCompatActivity {
             }
         });
 
+        // Event-Listener for the pressure switch
         pressureSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -231,7 +276,7 @@ public class SensorSettingsActivity extends AppCompatActivity {
             }
         }
 
-
+        // Clicking the "save" button will invoke the intent with the additional measure to visualize
         saveBtn = (Button) findViewById(R.id.saveBtn);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
