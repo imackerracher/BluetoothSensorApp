@@ -67,7 +67,7 @@ public class AboutActivity extends AppCompatActivity {
      * @param duration  the duration in milliseconds
      * @return  a string representation of the duration
      */
-    private String formatDuration(long duration) {
+    private static String formatDuration(long duration) {
         if (duration < DAY.length) {
             return String.format(Locale.ENGLISH, "%dh, %dmin",
                     duration / HOUR.length, (duration / 60000) % 60 );

@@ -1,6 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.main;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,7 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -34,6 +37,7 @@ import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
+import com.example.groupfourtwo.bluetoothsensorapp.data.DbExportImport;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
 import com.example.groupfourtwo.bluetoothsensorapp.data.User;
@@ -42,7 +46,13 @@ import com.example.groupfourtwo.bluetoothsensorapp.visualization.HumidityActivit
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.PressureActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.TemperatureActivity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService.*;
@@ -183,6 +193,24 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_export_import:
                 intent = new Intent(this, StorageActivity.class);
                 startActivity(intent);
+                break;
+
+            case R.id.nav_help:
+                File manual = getManual();
+
+                intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(manual), "application/pdf");
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(
+                            this, "No Application found to display manual.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
                 break;
 
             case R.id.nav_about:
@@ -463,5 +491,48 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
         return builder.show();
+    }
+
+
+    /**
+     * Build a public pdf file that contains the user guide of the application to be displayed
+     * with any pdf viewer (like Adobe Acrobat) that is installed on the device.     *
+     *
+     * @return  the abstract file of the application's user guide
+     */
+    private File getManual() {
+        File manual = new File (getExternalCacheDir(), "manual.pdf");
+        if (!manual.exists()) {
+            InputStream res = null;
+            OutputStream dest = null;
+            try {
+                res = getResources().openRawResource(R.raw.manual);
+                dest = new FileOutputStream(manual);
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = res.read(buf, 0, 1024)) > 0) {
+                    dest.write(buf, 0, len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (res != null) {
+                    try {
+                        res.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (dest != null) {
+                    try {
+                        dest.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return manual;
     }
 }

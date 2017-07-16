@@ -259,8 +259,9 @@ public class DbExportImport {
         FileChannel inChannel = new FileInputStream(src).getChannel();
         FileChannel outChannel = new FileOutputStream(dest).getChannel();
         try {
-            inChannel.transferTo(0, inChannel.size(), outChannel);
+            long b = inChannel.transferTo(0, inChannel.size(), outChannel);
             outChannel.truncate(inChannel.size());
+            Log.d(TAG, "Transferred " + b + " of " + inChannel.size() + "bytes");
         } finally {
             if (inChannel != null) {
                 inChannel.close();
