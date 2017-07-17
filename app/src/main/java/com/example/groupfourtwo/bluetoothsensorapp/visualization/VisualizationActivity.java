@@ -30,15 +30,21 @@ public class VisualizationActivity extends AppCompatActivity {
 
     private static final String TAG = VisualizationActivity.class.getSimpleName();
 
+    /* for declaring result requests on activity calls */
     private static final int RECORD_SELECTION_REQUEST = 2;
     private static final int TIME_SPAN_SELECTION_REQUEST = 3;
     private static final int SENSOR_SELECTION_REQUEST = 4;
 
+    /* According to the item order in layout file. */
     private static final int REFRESH_BUTTON_INDEX = 3;
 
+    /**
+     * Formatting template for {@link #showInfo()}
+     */
     private static final String SELECTION_INFO =
             "Record:\t%s\nSensor:\t%s\nStart:\t\t\t\t%tF  %<tR\nEnd:\t\t\t\t\t%tF  %<tR%s\nadded:\t\t%s";
 
+    /* for declaring intent extras on activity calls */
     static final String MAIN_MEASURE = "main_measure";
     static final String ADD_MEASURE = "add_measure";
     static final String RESULT_BEGIN = "begin_selection";
@@ -46,16 +52,40 @@ public class VisualizationActivity extends AppCompatActivity {
     static final String RESULT_RECORD = "record_selection";
     static final String RESULT_MEASURE = "measure_selection";
 
+    /**
+     * The main measure to display, that is set by clicking in the main activity.
+     */
     private final Measure mainMeasure;
+
+    /**
+     * The additional measure that is selected from
+     */
     private Measure addMeasure;
 
+    /**
+     * The current record that is selected.
+     */
     private Record record;
 
+    /**
+     * The start point of the current selection.
+     */
     private long begin;
+
+    /**
+     * The end point of the current selection.
+     */
     private long end;
 
+    /**
+     * Whether the refresh button is to be shown in the toolbar.
+     * Only true if a running record is displayed.
+     */
     private boolean refreshVisible = false;
 
+    /**
+     * The graph object that draws the requested data.
+     */
     private DrawGraph drawGraph;
 
     /**
@@ -237,6 +267,16 @@ public class VisualizationActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Show a message with details about the current selection including
+     * <ul>
+     *     <li> the selected record
+     *     <li> the sensor that recorded the displayed data
+     *     <li> the displayed time frame in date and time
+     *     <li> if this is a single record: whether it is still running
+     *     <li> the secondary measure that is displayed
+     * </ul>
+     */
     private void showInfo() {
         String details = String.format(Locale.ENGLISH,
                 SELECTION_INFO,
