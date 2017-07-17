@@ -35,15 +35,15 @@ import static java.lang.String.format;
 
 public class TimespanActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private final static String TAG = RecordsActivity.class.getSimpleName();
-    private final static String TAG2 = "TimeSpan --------";
-
     Button btnDatePickerStart, btnTimePickerStart, btnDatePickerEnd, btnTimePickerEnd, btnDisplayTimeframe;
     EditText txtDateStart, txtTimeStart, txtDateEnd, txtTimeEnd;
 
-    //final Calendar begin = Calendar.getInstance();
-    //final Calendar end = Calendar.getInstance();
 
+    /**
+     * This method is called from the visualization activity where the timespan is selected.
+     * It sets all the Picker buttons and text fields.
+     * @param savedInstanceState The visualization activity that called the TimeSpanActivity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +88,14 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
         txtTimeEnd.setText(String.format("%tR", s));
     }
 
+
+    /**
+     * Handles the selection of the start date/time and end date/time, as well as making sure that the
+     * selected timeframe is a valid date-time format and a valid timeframe (e.g. end not before start).
+     * Then the selected values are passed back to whichever visualization activity was active before,
+     * and displayed.
+     * @param v the selector or button that is clicked by the user
+     */
     @Override
     public void onClick(View v) {
 
@@ -112,7 +120,6 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }, yearStart, monthStart, dayStart);
             datePickerDialog.show();
-            Log.i(TAG2, c.toString());
         }
 
         if (v == btnTimePickerStart) {
@@ -183,8 +190,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
         if (v == btnDisplayTimeframe) {
 
-            //Log.d(TAG2, " -----------------" + txtDateStart.getText().toString());
-            Log.d(TAG2, " -----------------" + txtTimeEnd.getText().toString());
+
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
 
             Date begin;
@@ -193,7 +199,6 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                 begin = df.parse(txtDateStart.getText().toString() + " " + txtTimeStart.getText().toString());
                 end = df.parse(txtDateEnd.getText().toString() + " " + txtTimeEnd.getText().toString());
             } catch (ParseException e) {
-                Log.d(TAG, "Parsing went wrong.");
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Invalid time span, please select again.");
                 builder.setCancelable(true);
@@ -203,7 +208,6 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
             }
 
             if (end.getTime() <= begin.getTime()) {
-                Log.d(TAG, "Not a positive time span.");
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Invalid time span, please select again.");
                 builder.setCancelable(true);
