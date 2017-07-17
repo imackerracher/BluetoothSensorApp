@@ -107,7 +107,7 @@ public class DrawGraph {
         xAxis.setTextColor(textColour);
 
 
-        /**
+        /*
          * Generate the Values on the X-Axis
          */
         MyXAxisValueFormatter x = new MyXAxisValueFormatter(lineChart);
@@ -116,7 +116,7 @@ public class DrawGraph {
         x.setStartInSec(begin - EPOCH_TO_2016); // The start in milliseconds since 1st Jan 2016 in UTC
         xAxis.setValueFormatter(x);
 
-        /**
+        /*
          * Generate Y-Axis format
          */
 
@@ -142,7 +142,7 @@ public class DrawGraph {
 
 
 
-        /**
+        /*
          * Access to Database and Buffer
          */
         DataManager dataManager = DataManager.getInstance(context);
@@ -169,6 +169,7 @@ public class DrawGraph {
                 buf.setyAxes1Buffer(yAxes1);
             }
         }
+        isBuffered1 = true;
 
 
         if (measure2 != null) {
@@ -183,8 +184,10 @@ public class DrawGraph {
                     buf.setyAxes2Buffer(yAxes2);
                 }
             }
+            isBuffered2 = true;
         } else {
             yAxes2 = null;
+            isBuffered2 = false;
         }
         dataManager.close();
 
@@ -198,9 +201,9 @@ public class DrawGraph {
 
 
 
-        /**
+        /*
          * Generate the lineDataSets for Visualisation
-         * */
+         */
         ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
 
@@ -226,9 +229,9 @@ public class DrawGraph {
 
 
 
-        /**
+        /*
          * Restraining what's visible
-         **/
+         */
         lineChart.setVisibleXRangeMaximum((float) dataPointCount);
         lineChart.setVisibleXRangeMinimum(10f);
 
@@ -265,7 +268,7 @@ public class DrawGraph {
                 colorArray[i] = measure.color;
             else
                 colorArray[i] = TRANSPARENT;
-                //colorArray[i] = backgroundColour;
+            //colorArray[i] = backgroundColour;
 
             i++;
         }
@@ -327,7 +330,7 @@ public class DrawGraph {
         lineChart.invalidate();
     }
 
-    public int brighter(int color, float factor) {
+    private int brighter(int color, float factor) {
         float hsv[] = new float[3];
         Color.RGBToHSV( Color.red(color),Color.green(color), Color.blue(color)  , hsv);
         hsv[1] *= factor;
@@ -338,13 +341,13 @@ public class DrawGraph {
         return rgb;
     }
 
-    public void setDay(Boolean day)
+    private void setDay(Boolean day)
     {
         IMarker mvd = new CustomMarkerView(context, R.layout.marker_view_day);
         IMarker mvn = new CustomMarkerView(context, R.layout.marker_view_night);
 
 
-        if(day) {
+        if (day) {
             backgroundColour = Color.WHITE;
             textColour = Color.BLACK;
             lineChart.setMarker(mvd);
