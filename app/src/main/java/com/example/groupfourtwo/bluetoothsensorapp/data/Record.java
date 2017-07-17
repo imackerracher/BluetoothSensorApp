@@ -12,6 +12,9 @@ import java.util.Objects;
 
 public class Record {
 
+    /**
+     * A record instance that can be used if no other can be found.
+     */
     static final Record RECORD_DUMMY = new Record(
             0, Sensor.SENSOR_DUMMY, User.USER_DUMMY, Long.MIN_VALUE, Long.MAX_VALUE);
 
@@ -140,7 +143,7 @@ public class Record {
 
 
     /**
-     * Finish the record. May only be called when the record is just running.
+     * Finish the record. May only be called when the record is still running.
      */
     void stop() {
         if (end != Long.MAX_VALUE) {

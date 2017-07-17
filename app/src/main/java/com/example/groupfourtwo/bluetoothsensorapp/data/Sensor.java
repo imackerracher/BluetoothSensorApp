@@ -14,6 +14,9 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
 public class Sensor {
 
+    /**
+     * A sensor instance that can be used if no other can be found.
+     */
     static final Sensor SENSOR_DUMMY = new Sensor(0, "Dummy Sensor", 0);
 
     /**

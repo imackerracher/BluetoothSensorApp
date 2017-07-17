@@ -11,6 +11,9 @@ import java.util.Objects;
 
 public class User {
 
+    /**
+     * A user instance that can be used if no other can be found.
+     */
     static final User USER_DUMMY = new User(0, "Dummy User");
 
     /**
