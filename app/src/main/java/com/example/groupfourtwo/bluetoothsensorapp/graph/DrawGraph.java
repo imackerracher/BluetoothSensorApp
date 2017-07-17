@@ -34,7 +34,6 @@ import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT
  *
  */
 
-//Ideas: make the parts with missing Values White or Red.
 
 public class DrawGraph {
 
@@ -45,6 +44,9 @@ public class DrawGraph {
      */
     private static final long EPOCH_TO_2016 = 1451606400000L;
     private static final int TRANSPARENT = Color.argb(0, 0, 0, 0);
+
+    private static final boolean CHECK_MEASURE_1 = true;
+    private static final boolean CHECK_MEASURE_2 = false;
 
     private Context context;
     private Measure measure1, measure2;
@@ -157,7 +159,8 @@ public class DrawGraph {
         ArrayList<Entry> yAxes2;
 
 
-        if (buf.isBuffered1) {
+        Log.d(LOG_TAG, "" + isBuffered(CHECK_MEASURE_1));
+        if (isBuffered(CHECK_MEASURE_1)) {
             yAxes1 = buf.getyAxes1Buffer();
         } else {
             if (record == null) {
@@ -168,11 +171,11 @@ public class DrawGraph {
                 buf.setyAxes1Buffer(yAxes1);
             }
         }
-        buf.isBuffered1 = true;
 
 
         if (measure2 != null) {
-            if (buf.isBuffered2) {
+            Log.d(LOG_TAG, "" + isBuffered(CHECK_MEASURE_2));
+            if (isBuffered(CHECK_MEASURE_2)) {
                 yAxes2 = buf.getyAxes2Buffer();
             } else {
                 if (record == null) {
@@ -183,12 +186,16 @@ public class DrawGraph {
                     buf.setyAxes2Buffer(yAxes2);
                 }
             }
-            buf.isBuffered2 = true;
         } else {
             yAxes2 = null;
-            buf.isBuffered2 = false;
         }
         dataManager.close();
+
+        buf.measure1 = measure1;
+        buf.measure2 = measure2;
+        buf.record = record;
+        buf.begin = begin;
+        buf.end = end;
 
 
         if(yAxes1 == null  ||  yAxes1.isEmpty()) {
@@ -246,7 +253,6 @@ public class DrawGraph {
         lineChart.setDrawBorders(true); //Border around the Graph
         lineChart.setBorderColor( textColour);
         lineChart.setBorderWidth(1f);
-        //lineChart.setNoDataText("Sorry, there is no Data in this time slot");
 
         lineChart.setKeepScreenOn(true);
         lineChart.setKeepPositionOnRotation(true);
@@ -267,7 +273,6 @@ public class DrawGraph {
                 colorArray[i] = measure.color;
             else
                 colorArray[i] = TRANSPARENT;
-            //colorArray[i] = backgroundColour;
 
             i++;
         }
@@ -276,13 +281,13 @@ public class DrawGraph {
     }
 
     public void refresh() {
+        Log.d(LOG_TAG, "REFRESH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if (record != null) {
+            Log.d(LOG_TAG, "old : " + end + " new " + record.getEnd());
             end = record.getEnd();
+            lineChart.notifyDataSetChanged();
+            lineChart.invalidate();
         }
-        buf.isBuffered1 = false;
-        buf.isBuffered2 = false;
-        lineChart.notifyDataSetChanged();
-        lineChart.invalidate();
     }
 
     public void setMeasure2(Measure measure) {
@@ -291,7 +296,6 @@ public class DrawGraph {
         } else {
             measure2 = null;
         }
-        buf.isBuffered2 = false;
         Log.d(LOG_TAG, "Measure 2 wurde auf " + measure2 + " gestellt.");
         lineChart.notifyDataSetChanged(); // let the chart know it's data changed
         lineChart.invalidate(); // refresh
@@ -305,7 +309,6 @@ public class DrawGraph {
             lineChart.notifyDataSetChanged();
             lineChart.invalidate();
         }
-        refresh();
     }
 
     public void setTimeSpan(long begin, long end) {
@@ -320,29 +323,19 @@ public class DrawGraph {
         record = null;
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
-
-        refresh();
     }
 
-    public void resetZoom() {
-        Log.d(LOG_TAG, "reet");
-        lineChart.fitScreen();
-        lineChart.invalidate();
-    }
 
     private int brighter(int color, float factor) {
         float hsv[] = new float[3];
         Color.RGBToHSV( Color.red(color),Color.green(color), Color.blue(color)  , hsv);
         hsv[1] *= factor;
         hsv[1] = Math.min(1.0f, hsv[1]);
-        int rgb = Color.HSVToColor(hsv);
-        //rgb = (255 & 0xff) << 24 | (Color.red(rgb) & 0xff) << 16 | ((Color.green(rgb) & 0xff) << 16 | ((Color.blue(rgb))) & 0xff);
-        System.out.println("kimsDebugging:" + Color.alpha(rgb) +"red: " + Color.red(rgb) +" green: " + Color.green(rgb) +" blue: " + Color.blue(rgb));
-        return rgb;
+        return Color.HSVToColor(hsv);
     }
 
-    private void setDay(Boolean day)
-    {
+    private void setDay(Boolean day) {
+
         IMarker mvd = new CustomMarkerView(context, R.layout.marker_view_day);
         IMarker mvn = new CustomMarkerView(context, R.layout.marker_view_night);
 
@@ -358,6 +351,21 @@ public class DrawGraph {
         }
     }
 
+    private boolean isBuffered(boolean whichMeasure) {
+        if (whichMeasure && buf.measure1 != measure1) {
+            return false;
+        } else if (!whichMeasure && buf.measure2 != measure2) {
+            return false;
+        }
+
+        if (record != null  &&  (buf.record != record  ||  record.isRunning())) {
+            return false;
+        } else if (record == null  &&  (buf.begin != begin  ||  buf.end != end)) {
+            return false;
+        }
+
+        return true;
+    }
 
 
 }

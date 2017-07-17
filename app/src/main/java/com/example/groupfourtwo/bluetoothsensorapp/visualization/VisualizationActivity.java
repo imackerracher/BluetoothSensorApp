@@ -187,8 +187,7 @@ public class VisualizationActivity extends AppCompatActivity {
                 return true;
 
             case R.id.zoom_out:
-                drawGraph.resetZoom();
-                drawGraph.draw(this);
+                recreate();
                 return true;
 
             default:

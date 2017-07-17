@@ -1,5 +1,7 @@
 package com.example.groupfourtwo.bluetoothsensorapp.graph;
 
+import com.example.groupfourtwo.bluetoothsensorapp.data.Measure;
+import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
@@ -18,8 +20,11 @@ class BufferStorage {
     private ArrayList<Entry> yAxes1Buffer;
     private ArrayList<Entry> yAxes2Buffer;
 
-    boolean isBuffered1 = false;
-    boolean isBuffered2 = false;
+    Measure measure1 = null;
+    Measure measure2 = null;
+    Record record;
+    long begin;
+    long end;
 
     // Verhindere die Erzeugung des Objektes über andere Methoden
     private BufferStorage() { }
