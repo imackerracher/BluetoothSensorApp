@@ -55,6 +55,8 @@ public class DrawGraph {
     private int textColour;
     private LineChart lineChart;
 
+    private DataManager dataManager;
+    private BufferStorage buf;
     private boolean isBuffered1 = false;
     private boolean isBuffered2 = false;
 
@@ -71,6 +73,8 @@ public class DrawGraph {
             this.begin = begin;
             this.end = end;
         }
+        dataManager = DataManager.getInstance(context);
+        buf = BufferStorage.getInstance();
     }
 
 
@@ -145,9 +149,6 @@ public class DrawGraph {
         /*
          * Access to Database and Buffer
          */
-        DataManager dataManager = DataManager.getInstance(context);
-        BufferStorage buf = BufferStorage.getInstance();
-
         try {
             dataManager.open();
         } catch (IOException e) {
@@ -326,6 +327,7 @@ public class DrawGraph {
     }
 
     public void resetZoom() {
+        Log.d(LOG_TAG, "reet");
         lineChart.fitScreen();
         lineChart.invalidate();
     }
