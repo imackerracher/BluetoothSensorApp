@@ -57,8 +57,6 @@ public class DrawGraph {
 
     private DataManager dataManager;
     private BufferStorage buf;
-    private boolean isBuffered1 = false;
-    private boolean isBuffered2 = false;
 
     public DrawGraph(Context context, Measure measure1, Measure measure2,
                      Record record, long begin, long end) {
@@ -159,7 +157,7 @@ public class DrawGraph {
         ArrayList<Entry> yAxes2;
 
 
-        if (isBuffered1) {
+        if (buf.isBuffered1) {
             yAxes1 = buf.getyAxes1Buffer();
         } else {
             if (record == null) {
@@ -170,11 +168,11 @@ public class DrawGraph {
                 buf.setyAxes1Buffer(yAxes1);
             }
         }
-        isBuffered1 = true;
+        buf.isBuffered1 = true;
 
 
         if (measure2 != null) {
-            if (isBuffered2) {
+            if (buf.isBuffered2) {
                 yAxes2 = buf.getyAxes2Buffer();
             } else {
                 if (record == null) {
@@ -185,10 +183,10 @@ public class DrawGraph {
                     buf.setyAxes2Buffer(yAxes2);
                 }
             }
-            isBuffered2 = true;
+            buf.isBuffered2 = true;
         } else {
             yAxes2 = null;
-            isBuffered2 = false;
+            buf.isBuffered2 = false;
         }
         dataManager.close();
 
@@ -281,8 +279,8 @@ public class DrawGraph {
         if (record != null) {
             end = record.getEnd();
         }
-        isBuffered1 = false;
-        isBuffered2 = false;
+        buf.isBuffered1 = false;
+        buf.isBuffered2 = false;
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
     }
@@ -293,7 +291,7 @@ public class DrawGraph {
         } else {
             measure2 = null;
         }
-        isBuffered2 = false;
+        buf.isBuffered2 = false;
         Log.d(LOG_TAG, "Measure 2 wurde auf " + measure2 + " gestellt.");
         lineChart.notifyDataSetChanged(); // let the chart know it's data changed
         lineChart.invalidate(); // refresh

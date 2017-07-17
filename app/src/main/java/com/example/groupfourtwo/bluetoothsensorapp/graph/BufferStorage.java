@@ -18,6 +18,8 @@ class BufferStorage {
     private ArrayList<Entry> yAxes1Buffer;
     private ArrayList<Entry> yAxes2Buffer;
 
+    boolean isBuffered1 = false;
+    boolean isBuffered2 = false;
 
     // Verhindere die Erzeugung des Objektes über andere Methoden
     private BufferStorage() { }
