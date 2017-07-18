@@ -57,7 +57,8 @@
     <string name="loading">loading…</string>
     <string name="error_while_loading">inaccessible</string>
     <string name="desc_team"><b>Bluetooth Sensor App</b>\n\nStefan Erk\nIan Mackerracher\nTobias Nusser\nKim Rehberg\nPatrick Reichle</string>
-    <string name="licence">Usable under the terms of\nCreative Commons CC BY-SA 4.0</string>
+    <string name="library">Thanks to the MPAndroidChart library by PhilJay.</string>
+    <string name="licence">Usable under the terms of Apache License 2.0\nhttp://www.apache.org/licenses/</string>
 
     <string name="not_available">Not available</string>
     <string name="records">Recordings</string>
