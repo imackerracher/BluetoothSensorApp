@@ -78,7 +78,7 @@ public class DrawGraph {
     }
 
 
-    public void draw(Activity activity) {
+    public boolean draw(Activity activity) {
 
         Interval interval = fromLength(end - begin);
         long length = (end - begin);
@@ -199,7 +199,7 @@ public class DrawGraph {
 
 
         if(yAxes1 == null  ||  yAxes1.isEmpty()) {
-            return;
+            return false;
         }
 
 
@@ -259,6 +259,7 @@ public class DrawGraph {
 
         lineChart.setBackgroundColor(backgroundColour); //BackgroundColour of the whole background
 
+        return true;
     }
 
 
@@ -281,9 +282,7 @@ public class DrawGraph {
     }
 
     public void refresh() {
-        Log.d(LOG_TAG, "REFRESH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if (record != null) {
-            Log.d(LOG_TAG, "old : " + end + " new " + record.getEnd());
             end = record.getEnd();
             lineChart.notifyDataSetChanged();
             lineChart.invalidate();

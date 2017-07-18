@@ -20,18 +20,18 @@
         android:id="@+id/refresh"
         android:orderInCategory="4"
         android:title="@string/refresh"
-        android:icon="@android:drawable/ic_menu_rotate"
+        android:icon="@drawable/ic_refresh"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/info"
         android:orderInCategory="5"
         android:title="@string/info"
-        android:icon="@android:drawable/ic_menu_info_details"
+        android:icon="@drawable/ic_info"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/zoom_out"
         android:orderInCategory="6"
         android:title="@string/zoom_out"
-        android:icon="@android:drawable/ic_menu_zoom"
+        android:icon="@drawable/ic_zoom_out"
         app:showAsAction="ifRoom" />
 </menu>

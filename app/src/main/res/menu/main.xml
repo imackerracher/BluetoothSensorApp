@@ -5,13 +5,13 @@
         android:id="@+id/screen_on"
         android:orderInCategory="1"
         android:title="@string/screen_on"
-        android:icon="@android:drawable/ic_menu_view"
+        android:icon="@drawable/ic_display_on"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/screen_off"
         android:orderInCategory="1"
         android:title="@string/screen_off"
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/ic_display_timeout"
         app:showAsAction="always" />
 </menu>

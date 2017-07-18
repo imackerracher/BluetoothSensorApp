@@ -37,6 +37,7 @@ public class VisualizationActivity extends AppCompatActivity {
 
     /* According to the item order in layout file. */
     private static final int REFRESH_BUTTON_INDEX = 3;
+    private static final int ZOOM_OUT_BUTTON_INDEX = 5;
 
     /**
      * Formatting template for {@link #showInfo()}
@@ -82,6 +83,12 @@ public class VisualizationActivity extends AppCompatActivity {
      * Only true if a running record is displayed.
      */
     private boolean refreshVisible = false;
+
+    /**
+     * Whether the zoom out button is to be shown in the toolbar.
+     * Only true if an actual graph is displayed.
+     */
+    private boolean zoomOutVisible = false;
 
     /**
      * The graph object that draws the requested data.
@@ -135,7 +142,8 @@ public class VisualizationActivity extends AppCompatActivity {
         }
 
         drawGraph = new DrawGraph(this, mainMeasure, addMeasure, record, begin, end);
-        drawGraph.draw(this);
+        zoomOutVisible = drawGraph.draw(this);
+        invalidateOptionsMenu();
     }
 
 
@@ -144,6 +152,7 @@ public class VisualizationActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.visualization, menu);
         menu.getItem(REFRESH_BUTTON_INDEX).setVisible(refreshVisible);
+        menu.getItem(ZOOM_OUT_BUTTON_INDEX).setVisible(zoomOutVisible);
         return true;
     }
 
@@ -179,7 +188,8 @@ public class VisualizationActivity extends AppCompatActivity {
                     end = record.getEnd();
                 }
                 drawGraph.refresh();
-                drawGraph.draw(this);
+                zoomOutVisible = drawGraph.draw(this);
+                invalidateOptionsMenu();
                 return true;
 
             case R.id.info:
@@ -248,7 +258,8 @@ public class VisualizationActivity extends AppCompatActivity {
             default:
                 Log.e(TAG, "Received an unknown request code in onActivityResult.");
         }
-        drawGraph.draw(this);
+        zoomOutVisible = drawGraph.draw(this);
+        invalidateOptionsMenu();
     }
 
     @Override
