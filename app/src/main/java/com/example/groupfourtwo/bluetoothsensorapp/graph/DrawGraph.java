@@ -199,6 +199,7 @@ public class DrawGraph {
 
 
         if(yAxes1 == null  ||  yAxes1.isEmpty()) {
+            lineChart.setData(null);
             return false;
         }
 
