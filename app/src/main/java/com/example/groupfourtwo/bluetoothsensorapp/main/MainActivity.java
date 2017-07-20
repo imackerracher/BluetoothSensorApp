@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -37,7 +36,6 @@ import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.data.DbExportImport;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
 import com.example.groupfourtwo.bluetoothsensorapp.data.User;
@@ -47,12 +45,10 @@ import com.example.groupfourtwo.bluetoothsensorapp.visualization.PressureActivit
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.TemperatureActivity;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService.*;

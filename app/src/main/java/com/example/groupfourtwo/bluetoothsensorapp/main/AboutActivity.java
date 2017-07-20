@@ -3,15 +3,12 @@ package com.example.groupfourtwo.bluetoothsensorapp.main;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;

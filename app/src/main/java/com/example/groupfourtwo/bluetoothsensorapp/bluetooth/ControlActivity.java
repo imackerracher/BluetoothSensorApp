@@ -1,14 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
-/**
- * Bluetooth Connection Control Activity
- *
- * @author Tobias Nusser, Patrick Reichle
- * @version 1.0
- */
-
 import android.app.Activity;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,19 +10,22 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.example.groupfourtwo.bluetoothsensorapp.main.MainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
 
 import java.util.UUID;
+
+/**
+ * Bluetooth Connection Control Activity
+ *
+ * @author Tobias Nusser, Patrick Reichle
+ * @version 1.0
+ */
 
 public class ControlActivity extends Activity {
 

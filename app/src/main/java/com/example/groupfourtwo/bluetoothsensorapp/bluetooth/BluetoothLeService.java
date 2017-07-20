@@ -1,14 +1,5 @@
 package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
-/**
- * Bluetooth Low Energy Connection Service Activity
- *
- * @author Tobias Nusser, Patrick Reichle
- * @version 1.0
- */
-
-
-
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -19,18 +10,12 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-import android.widget.ToggleButton;
-
-
-import com.example.groupfourtwo.bluetoothsensorapp.R;
 
 import java.util.Queue;
 import java.util.UUID;
@@ -39,9 +24,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.Conversions.*;
 
-import java.util.List;
+/**
+ * Bluetooth Low Energy Connection Service Activity
+ * Service for managing connection and data communication with a Gatt server hosted on BLE device.
+ *
+ * @author Tobias Nusser, Patrick Reichle
+ * @version 1.0
+ */
 
-// Service for managing connection and data communication with a Gatt server hosted on BLE device
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
 

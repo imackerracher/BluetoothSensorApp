@@ -19,8 +19,6 @@ import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 import java.io.IOException;
 import java.util.List;
 
-import static android.R.attr.id;
-
 /**
  * Activity for displaying recordings in a list and the ability to select recordings and display
  * them in the visualization.
