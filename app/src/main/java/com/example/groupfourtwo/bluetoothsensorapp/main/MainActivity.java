@@ -51,8 +51,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
+import static android.content.Intent.ACTION_VIEW;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.support.v4.content.FileProvider.getUriForFile;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.*;
+
+/**
+ * The welcome and home screen of the application. Holds connection to the bluetooth services.
+ */
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -193,10 +201,15 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.nav_help:
                 File manual = getManual();
+                if (manual == null) {
+                    Toast.makeText(this, "Manual could not be found.", Toast.LENGTH_LONG).show();
+                    break;
+                }
 
-                intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(manual), "application/pdf");
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Uri contentUri = getUriForFile(this, "com.example.fileprovider", manual);
+                intent = new Intent(ACTION_VIEW);
+                intent.setDataAndType(contentUri, "application/pdf");
+                intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_GRANT_READ_URI_PERMISSION);
 
                 try {
                     startActivity(intent);
@@ -497,7 +510,11 @@ public class MainActivity extends AppCompatActivity
      * @return  the abstract file of the application's user guide
      */
     private File getManual() {
-        File manual = new File (getExternalCacheDir(), "manual.pdf");
+        File manualDir = new File(getCacheDir(), "manual");
+        File manual = new File(manualDir, "manual.pdf");
+        if (!manualDir.exists() && !manualDir.mkdir()) {
+            return null;
+        }
         if (!manual.exists()) {
             InputStream res = null;
             OutputStream dest = null;
