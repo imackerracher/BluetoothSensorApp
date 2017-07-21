@@ -1,5 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.main;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity
 
         dataManager = DataManager.getInstance(this);
         try {
+            @SuppressLint("HardwareIds")
             String macAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
             userId = Sensor.parseAddress(macAddress);
 
@@ -490,6 +492,7 @@ public class MainActivity extends AppCompatActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
 
+        @SuppressLint("InflateParams")
         View dialogsView = inflater.inflate(R.layout.dialog_edit_name, null);
 
         final EditText editTextNewName = (EditText) dialogsView.findViewById(R.id.editText_new_name);
