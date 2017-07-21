@@ -361,11 +361,18 @@ public class MainActivity extends AppCompatActivity
         currentPressure.setText(String.format(Locale.ENGLISH, "%.2f %s", t, PRESSURE.unit));
     }
 
-
+    /*
+     * Broadcast receiver for various events.
+     * ACTION_*_DATA: received new value, update UI
+     * ACTION_SET_BUTTON: connected to sensor, enable start-/stopbutton
+     * ACTION_GATT_DISCONNECTED: disconnected from sensor, disable start-/stopbutton,
+     * close record if running.
+     * ACTION_STATE_CHANGED: sent from BluetoothAdapter everytime its state changes,
+     * if Bluetooth is getting turned off close record if running, disable button.
+     */
     private final BroadcastReceiver bleDataReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
+        public void onReceive(Context context, Intent intent) {final String action = intent.getAction();
             switch (action) {
                 case BluetoothLeService.ACTION_TEMP_DATA:
                     setTemperature(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f));
@@ -401,8 +408,17 @@ public class MainActivity extends AppCompatActivity
 
                 case BluetoothLeService.ACTION_GATT_CONNECTED:
                     connected = true;
-                    buttonStartStop.setVisibility(View.GONE);
-                    mDatabaseUpdateService.stopUpdating();
+                    buttonStartStop.setVisibility(View.VISIBLE);
+                    break;
+
+                case BluetoothAdapter.ACTION_STATE_CHANGED:
+                    if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
+                        buttonStartStop.setVisibility(View.GONE);
+                        buttonStartStop.setChecked(false);
+                        mDatabaseUpdateService.stopUpdating();
+                        Log.d(LOG_TAG, "BLUETOOTH TURNED OFF");
+                        stopBleService();
+                    }
                     break;
 
 
@@ -411,6 +427,11 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
+
+    private void stopBleService() {
+        Intent intent = new Intent(this,BluetoothLeService.class);
+        stopService(intent);
+    }
 
     private static IntentFilter makeBleDataIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -422,6 +443,7 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(BluetoothLeService.ACTION_RESET_BUTTON);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         return intentFilter;
     }
 
