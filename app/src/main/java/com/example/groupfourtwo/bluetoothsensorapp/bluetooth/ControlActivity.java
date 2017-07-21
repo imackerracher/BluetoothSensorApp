@@ -41,8 +41,6 @@ public class ControlActivity extends Activity {
     private String mDeviceAddress;
     private BluetoothLeService mBluetoothLeService;
 
-    //private ProgressBar spinner;
-
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -59,9 +57,17 @@ public class ControlActivity extends Activity {
             if (connect) {
                 Log.d(TAG, "connect");
                 mBluetoothLeService.connect(mDeviceAddress);
-            } else {
+            }
+            else {
                 Log.d(TAG, "disconnect");
-                mBluetoothLeService.disconnect();
+                mBluetoothLeService.close();
+                spinner.setVisibility(View.GONE);
+                Intent intent = new Intent(BluetoothLeService.ACTION_RESET_BUTTON);
+                sendBroadcast(intent);
+                Intent intent1 = new Intent(ControlActivity.this, MainActivity.class);
+                intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //i.putExtra("BUTTON", false);
+                startActivity(intent1);
             }
         }
 
@@ -76,8 +82,6 @@ public class ControlActivity extends Activity {
     // ACTION_GATT_CONNECTED: connected to a GATT server.
     // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
     // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -85,35 +89,23 @@ public class ControlActivity extends Activity {
             boolean mConnected = false;
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
-                //updateConnectionState("GATT_CONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                spinner.setVisibility(View.GONE);
-                //Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
-                Intent intent1 = new Intent(context, MainActivity.class);
-                intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                //i.putExtra("BUTTON", false);
-                startActivity(intent1);
+
                 //Intent intent2 = new Intent(BluetoothLeService.ACTION_SET_BUTTON);
                 //sendBroadcast(intent2);
                 finish();
-                //updateConnectionState("GATT_DISCONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                // Show all the supported services and characteristics on the user interface.
                 for (UUID id : gattServices) {
                     subscribe(id);
                 }
                 spinner.setVisibility(View.GONE);
-                //Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
                 Intent intent1 = new Intent(context, MainActivity.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                //i.putExtra("BUTTON", false);
                 startActivity(intent1);
                 Intent intent2 = new Intent(BluetoothLeService.ACTION_SET_BUTTON);
-                sendBroadcast(intent2);
+                //sendBroadcast(intent2);
                 finish();
-            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
