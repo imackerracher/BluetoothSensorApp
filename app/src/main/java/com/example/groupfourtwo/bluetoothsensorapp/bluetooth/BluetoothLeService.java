@@ -94,7 +94,7 @@ public class BluetoothLeService extends Service {
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
                 Log.d(TAG,"DISCONNECTED");
-                //TODO: disable button
+                stopSelf();
             }
         }
 
@@ -240,13 +240,6 @@ public class BluetoothLeService extends Service {
         if (bluetoothAdapter == null || address == null) {
             return false;
         }
-
-        /*if (connected) {
-            disconnect();
-            close();
-            Intent intent = new Intent(ACTION_RESET_BUTTON);
-            sendBroadcast(intent);
-        }*/
         // Previously connected device.  Try to reconnect.
         if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {

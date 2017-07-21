@@ -405,16 +405,23 @@ public class MainActivity extends AppCompatActivity
                     break;
 
                 case BluetoothLeService.ACTION_SET_BUTTON:
+                    Log.d(LOG_TAG, "SET_BUTTON");
                     buttonStartStop.setVisibility(View.VISIBLE);
                     break;
 
                 case BluetoothLeService.ACTION_RESET_BUTTON:
+                    Log.d(LOG_TAG, "RESET_BUTTON");
+                    connected = false;
+                    buttonStartStop.setVisibility(View.GONE);
                     buttonStartStop.setChecked(false);
                     mDatabaseUpdateService.stopUpdating();
                     break;
 
                 case BluetoothLeService.ACTION_GATT_DISCONNECTED:
                     connected = false;
+                    Toast.makeText(context, "Lost connection to sensor.",
+                            Toast.LENGTH_SHORT).show();
+                    //AlertDialog statt Toast.
                     buttonStartStop.setChecked(false);
                     buttonStartStop.setVisibility(View.GONE);
                     mDatabaseUpdateService.stopUpdating();
@@ -427,11 +434,16 @@ public class MainActivity extends AppCompatActivity
 
                 case BluetoothAdapter.ACTION_STATE_CHANGED:
                     if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
-                        buttonStartStop.setVisibility(View.GONE);
-                        buttonStartStop.setChecked(false);
-                        mDatabaseUpdateService.stopUpdating();
-                        Log.d(LOG_TAG, "BLUETOOTH TURNED OFF");
-                        stopBleService();
+                        if (connected) {
+                            connected = false;
+                            buttonStartStop.setVisibility(View.GONE);
+                            buttonStartStop.setChecked(false);
+                            mDatabaseUpdateService.stopUpdating();
+                            Log.d(LOG_TAG, "BLUETOOTH TURNED OFF");
+                            stopBleService();
+                            Toast.makeText(context, "Bluetooth was turned off.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
 
