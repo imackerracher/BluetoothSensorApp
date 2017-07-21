@@ -385,7 +385,8 @@ public class MainActivity extends AppCompatActivity
      */
     private final BroadcastReceiver bleDataReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {final String action = intent.getAction();
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
             switch (action) {
                 case BluetoothLeService.ACTION_TEMP_DATA:
                     setTemperature(intent.getFloatExtra(BluetoothLeService.EXTRA_DATA, 0f));
