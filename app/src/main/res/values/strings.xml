@@ -82,4 +82,7 @@
 
     <string name="edit_dialog_name">Name:</string>
 
+    <string name="invalid_time_span">Invalid time span, please select again.</string>
+    <string name="time_span_too_long">Selected time span is longer than one month. Please select again.</string>
+
 </resources>

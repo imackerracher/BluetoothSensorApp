@@ -198,7 +198,7 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
                 end = df.parse(txtDateEnd.getText().toString() + " " + txtTimeEnd.getText().toString());
             } catch (ParseException e) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Invalid time span, please select again.");
+                builder.setMessage(getString(R.string.invalid_time_span));
                 builder.setCancelable(true);
                 AlertDialog alert = builder.create();
                 alert.show();
@@ -207,14 +207,14 @@ public class TimespanActivity extends AppCompatActivity implements View.OnClickL
 
             if (end.getTime() <= begin.getTime()) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Invalid time span, please select again.");
+                builder.setMessage(getString(R.string.invalid_time_span));
                 builder.setCancelable(true);
                 AlertDialog alert = builder.create();
                 alert.show();
                 return;
             } else if (end.getTime() - begin.getTime() > MONTH.length) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Time Span is too long, please select again.");
+                builder.setMessage(getString(R.string.time_span_too_long));
                 builder.setCancelable(true);
                 AlertDialog alert = builder.create();
                 alert.show();
