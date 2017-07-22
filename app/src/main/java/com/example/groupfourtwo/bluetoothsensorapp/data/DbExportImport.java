@@ -5,18 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.util.concurrent.ExecutionException;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.example.groupfourtwo.bluetoothsensorapp.main.StorageActivity;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.DatabaseContract.*;
 
@@ -32,6 +27,7 @@ public class DbExportImport {
 
     /**
      * The name of the application directory on the external storage.
+     * Note: Not used because of access problems on provided device.
      */
     private static final String PACKAGE_NAME = "groupfourtwo.bluetoothsensorapp";
 
@@ -40,14 +36,11 @@ public class DbExportImport {
      */
     private static final File EXTERNAL_DATABASE_DIRECTORY =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            //new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-              //      PACKAGE_NAME);
 
     /**
      * The file that is used for a backup, as well as a source to restore the internal database.
      */
-    private static final File EXPORT_IMPORT_FILE =
-            new File(EXTERNAL_DATABASE_DIRECTORY, "sensor_tag.db");
+    private static final File EXPORT_IMPORT_FILE = new File(EXTERNAL_DATABASE_DIRECTORY, DB_NAME);
 
 
     /**

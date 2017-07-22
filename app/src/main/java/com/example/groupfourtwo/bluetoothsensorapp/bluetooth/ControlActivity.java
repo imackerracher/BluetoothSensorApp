@@ -1,14 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.bluetooth;
 
-/**
- * Bluetooth Connection Control Activity
- *
- * @author Tobias Nusser, Patrick Reichle
- * @version 1.0
- */
-
 import android.app.Activity;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,19 +10,22 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.example.groupfourtwo.bluetoothsensorapp.main.MainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.SensortagUUIDs.*;
 
 import java.util.UUID;
+
+/**
+ * Bluetooth Connection Control Activity
+ *
+ * @author Tobias Nusser, Patrick Reichle
+ * @version 1.0
+ */
 
 public class ControlActivity extends Activity {
 
@@ -45,8 +40,6 @@ public class ControlActivity extends Activity {
     private boolean connect = false;
     private String mDeviceAddress;
     private BluetoothLeService mBluetoothLeService;
-
-    //private ProgressBar spinner;
 
 
     // Code to manage Service lifecycle.
@@ -64,9 +57,17 @@ public class ControlActivity extends Activity {
             if (connect) {
                 Log.d(TAG, "connect");
                 mBluetoothLeService.connect(mDeviceAddress);
-            } else {
+            }
+            else {
                 Log.d(TAG, "disconnect");
-                mBluetoothLeService.disconnect();
+                mBluetoothLeService.close();
+                spinner.setVisibility(View.GONE);
+                Intent intent = new Intent(BluetoothLeService.ACTION_RESET_BUTTON);
+                sendBroadcast(intent);
+                Intent intent1 = new Intent(ControlActivity.this, MainActivity.class);
+                intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //i.putExtra("BUTTON", false);
+                startActivity(intent1);
             }
         }
 
@@ -81,8 +82,6 @@ public class ControlActivity extends Activity {
     // ACTION_GATT_CONNECTED: connected to a GATT server.
     // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
     // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -90,35 +89,23 @@ public class ControlActivity extends Activity {
             boolean mConnected = false;
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
-                //updateConnectionState("GATT_CONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                spinner.setVisibility(View.GONE);
-                //Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
-                Intent intent1 = new Intent(context, MainActivity.class);
-                intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                //i.putExtra("BUTTON", false);
-                startActivity(intent1);
+
                 //Intent intent2 = new Intent(BluetoothLeService.ACTION_SET_BUTTON);
                 //sendBroadcast(intent2);
                 finish();
-                //updateConnectionState("GATT_DISCONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                // Show all the supported services and characteristics on the user interface.
                 for (UUID id : gattServices) {
                     subscribe(id);
                 }
                 spinner.setVisibility(View.GONE);
-                //Toast.makeText(context, "Conncted succesfully", Toast.LENGTH_SHORT).show();
                 Intent intent1 = new Intent(context, MainActivity.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                //i.putExtra("BUTTON", false);
                 startActivity(intent1);
                 Intent intent2 = new Intent(BluetoothLeService.ACTION_SET_BUTTON);
-                sendBroadcast(intent2);
+                //sendBroadcast(intent2);
                 finish();
-            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };

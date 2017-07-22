@@ -3,15 +3,12 @@ package com.example.groupfourtwo.bluetoothsensorapp.main;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.data.Record;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.DAY;
@@ -25,15 +22,50 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
 
 public class AboutActivity extends AppCompatActivity {
 
-    DataManager dataManager;
-    TextView noOfSensors;
-    TextView noOfRecords;
-    TextView noOfMeasurements;
-    TextView recordingTime;
-    int sensors;
-    int records;
-    int measurements;
-    long time;
+    /**
+     * Retrieves data from the database.
+     */
+    private DataManager dataManager;
+
+    /**
+     * Displays the number of sensors saved in the databse.
+     */
+    private TextView noOfSensors;
+
+    /**
+     * Displays the number of finished records saved in the databse.
+     */
+    private TextView noOfRecords;
+
+    /**
+     * Displays the number of measurements saved in the databse.
+     */
+    private TextView noOfMeasurements;
+
+    /**
+     * Displays the sum of durations of all finished records.
+     */
+    private TextView recordingTime;
+
+    /**
+     * The number of sensors that are saved in the database.
+     */
+    private int sensors;
+
+    /**
+     * The number of records that are saved in the database.
+     */
+    private int records;
+
+    /**
+     * The number of measurements that are saved in the database.
+     */
+    private int measurements;
+
+    /**
+     * The total recording time, summed over all finished records.
+     */
+    private long time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +84,10 @@ public class AboutActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Calculate the statistics and save them in the corresponding fields.
         new Statistics().doInBackground(null);
 
+        // Display the values just calculated.
         noOfSensors.setText(getString(R.string.no_of_sensors, sensors));
         noOfRecords.setText(getString(R.string.no_of_records, records));
         noOfMeasurements.setText(getString(R.string.no_of_measurements, measurements));
@@ -77,7 +111,9 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * A background task to calculate the values displayed as the app's statistics.
+     */
     private class Statistics extends AsyncTask {
         @Override
         protected Object doInBackground(Object[] params) {

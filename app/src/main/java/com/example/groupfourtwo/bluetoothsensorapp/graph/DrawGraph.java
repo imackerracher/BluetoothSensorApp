@@ -242,7 +242,7 @@ public class DrawGraph {
         lineChart.setVisibleXRangeMaximum((float) dataPointCount);
         lineChart.setVisibleXRangeMinimum(10f);
 
-        lineChart.animateX(1000); // Animation that shows the values from left to right
+        //lineChart.animateX(3000); // Animation that shows the values from left to right
 
         lineDataSet1.setDrawValues(true); //Default is true
         lineDataSet1.setValueTextColor(textColour);

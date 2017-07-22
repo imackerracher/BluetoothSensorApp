@@ -11,7 +11,7 @@ public enum Interval {
     HOUR  (      3600000L,    1000, 3600), // 1/s
     DAY   (     86400000L,   60000, 1440), // 1/min
     WEEK  (    604800000L,  600000, 1008), // 6/h
-    MONTH (   2592000000L, 3600000,  720), // 1/h
+    MONTH (   2678400000L, 3600000,  744), // 1/h
     MAX   (Long.MAX_VALUE, 3600000, Integer.MAX_VALUE);
 
 

@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 
@@ -231,16 +232,19 @@ public class BluetoothMainActivity extends AppCompatActivity {
                             .setPositiveButton(getString(R.string.connect), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    final Intent intent = new Intent(BluetoothMainActivity.this, ControlActivity.class);
-                                    intent.putExtra(ControlActivity.EXTRAS_DEVICE_NAME, device.getName());
-                                    intent.putExtra(ControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-                                    intent.putExtra(ControlActivity.EXTRAS_CONNECT, true);
+                                        final Intent intent = new Intent(BluetoothMainActivity.this, ControlActivity.class);
+                                        intent.putExtra(ControlActivity.EXTRAS_DEVICE_NAME, device.getName());
+                                        intent.putExtra(ControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                                        intent.putExtra(ControlActivity.EXTRAS_CONNECT, true);
 
-                                    if (mScanning) {
-                                        stopScanning();
-                                        mScanning = false;
+                                        if (mScanning) {
+                                            stopScanning();
+                                            mScanning = false;
+
+                                        startActivity(intent);
                                     }
-                                    startActivity(intent);
+
+
                                 }
                             })
                             .show();
@@ -352,7 +356,7 @@ public class BluetoothMainActivity extends AppCompatActivity {
      * @param device which got found by the scan-method
      */
     private void addBluetoothDevice(BluetoothDevice device){
-        if(!listBluetoothDevice.contains(device)){
+        if(!listBluetoothDevice.contains(device) && device.getName() != null && device.getName().equals("CC2650 SensorTag")){
             listBluetoothDevice.add(device);
             listViewLE.invalidateViews();
         }

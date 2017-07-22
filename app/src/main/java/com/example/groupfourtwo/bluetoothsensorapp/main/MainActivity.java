@@ -1,5 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.main;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -11,7 +12,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -37,7 +37,6 @@ import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothLeService;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.BluetoothMainActivity;
 import com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DataManager;
-import com.example.groupfourtwo.bluetoothsensorapp.data.DbExportImport;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Measurement;
 import com.example.groupfourtwo.bluetoothsensorapp.data.Sensor;
 import com.example.groupfourtwo.bluetoothsensorapp.data.User;
@@ -47,16 +46,22 @@ import com.example.groupfourtwo.bluetoothsensorapp.visualization.PressureActivit
 import com.example.groupfourtwo.bluetoothsensorapp.visualization.TemperatureActivity;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.util.Locale;
 
+import static android.content.Intent.ACTION_VIEW;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.support.v4.content.FileProvider.getUriForFile;
 import static com.example.groupfourtwo.bluetoothsensorapp.bluetooth.DatabaseUpdateService.*;
 import static com.example.groupfourtwo.bluetoothsensorapp.data.Measure.*;
+
+/**
+ * The welcome and home screen of the application. Holds connection to the bluetooth services.
+ */
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -112,6 +117,7 @@ public class MainActivity extends AppCompatActivity
 
         dataManager = DataManager.getInstance(this);
         try {
+            @SuppressLint("HardwareIds")
             String macAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
             userId = Sensor.parseAddress(macAddress);
 
@@ -197,10 +203,15 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.nav_help:
                 File manual = getManual();
+                if (manual == null) {
+                    Toast.makeText(this, "Manual could not be found.", Toast.LENGTH_LONG).show();
+                    break;
+                }
 
-                intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(manual), "application/pdf");
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Uri contentUri = getUriForFile(this, "com.example.fileprovider", manual);
+                intent = new Intent(ACTION_VIEW);
+                intent.setDataAndType(contentUri, "application/pdf");
+                intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_GRANT_READ_URI_PERMISSION);
 
                 try {
                     startActivity(intent);
@@ -233,8 +244,8 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         // Either show the icon to disable or enable display timeout.
-        menu.getItem(SCREEN_ON).setVisible(displayTimeout);
-        menu.getItem(SCREEN_OFF).setVisible(!displayTimeout);
+        menu.getItem(SCREEN_ON).setVisible(!displayTimeout);
+        menu.getItem(SCREEN_OFF).setVisible(displayTimeout);
         return true;
     }
 
@@ -242,19 +253,19 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.screen_on:
-                if (displayTimeout) {
-                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    displayTimeout = false;
-                    Toast.makeText(this, "Display will stay turned on.", Toast.LENGTH_SHORT).show();
+                if (!displayTimeout){
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    displayTimeout = true;
+                    Toast.makeText(this, "Display will be turned off.", Toast.LENGTH_SHORT).show();
                 }
                 invalidateOptionsMenu();
                 return true;
 
             case R.id.screen_off:
-                if (!displayTimeout){
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    displayTimeout = true;
-                    Toast.makeText(this, "Display will be turned off.", Toast.LENGTH_SHORT).show();
+                if (displayTimeout) {
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    displayTimeout = false;
+                    Toast.makeText(this, "Display will stay turned on.", Toast.LENGTH_SHORT).show();
                 }
                 invalidateOptionsMenu();
                 return true;
@@ -365,7 +376,15 @@ public class MainActivity extends AppCompatActivity
         currentPressure.setText(String.format(Locale.ENGLISH, "%.2f %s", t, PRESSURE.unit));
     }
 
-
+    /*
+     * Broadcast receiver for various events.
+     * ACTION_*_DATA: received new value, update UI
+     * ACTION_SET_BUTTON: connected to sensor, enable start-/stopbutton
+     * ACTION_GATT_DISCONNECTED: disconnected from sensor (external event), disable start-/stopbutton,
+     * close record if running.
+     * ACTION_STATE_CHANGED: sent from BluetoothAdapter everytime its state changes,
+     * if Bluetooth is getting turned off close record if running, disable button.
+     */
     private final BroadcastReceiver bleDataReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -388,25 +407,58 @@ public class MainActivity extends AppCompatActivity
                     break;
 
                 case BluetoothLeService.ACTION_SET_BUTTON:
+                    Log.d(LOG_TAG, "SET_BUTTON");
                     buttonStartStop.setVisibility(View.VISIBLE);
                     break;
 
                 case BluetoothLeService.ACTION_RESET_BUTTON:
+                    Log.d(LOG_TAG, "RESET_BUTTON");
+                    connected = false;
+                    buttonStartStop.setVisibility(View.GONE);
                     buttonStartStop.setChecked(false);
                     mDatabaseUpdateService.stopUpdating();
                     break;
 
                 case BluetoothLeService.ACTION_GATT_DISCONNECTED:
                     connected = false;
+                    //Toast.makeText(context, "Lost connection to sensor.",Toast.LENGTH_SHORT).show();
+                    //AlertDialog statt Toast.
                     buttonStartStop.setChecked(false);
                     buttonStartStop.setVisibility(View.GONE);
                     mDatabaseUpdateService.stopUpdating();
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                            MainActivity.this);
+
+                    alertDialogBuilder.setTitle("Disconnected");
+
+                    // set dialog message
+                    alertDialogBuilder
+                            .setMessage("Connection to sensor has been lost.");
+
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    alertDialog.show();
                     break;
 
                 case BluetoothLeService.ACTION_GATT_CONNECTED:
                     connected = true;
-                    buttonStartStop.setVisibility(View.GONE);
-                    mDatabaseUpdateService.stopUpdating();
+                    buttonStartStop.setVisibility(View.VISIBLE);
+                    break;
+
+                case BluetoothAdapter.ACTION_STATE_CHANGED:
+                    if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
+                        if (connected) {
+                            connected = false;
+                            buttonStartStop.setVisibility(View.GONE);
+                            buttonStartStop.setChecked(false);
+                            mDatabaseUpdateService.stopUpdating();
+                            Log.d(LOG_TAG, "BLUETOOTH TURNED OFF");
+                            stopBleService();
+                            Toast.makeText(context, "Bluetooth was turned off.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
                     break;
 
 
@@ -415,6 +467,11 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
+
+    private void stopBleService() {
+        Intent intent = new Intent(this,BluetoothLeService.class);
+        stopService(intent);
+    }
 
     private static IntentFilter makeBleDataIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -426,6 +483,7 @@ public class MainActivity extends AppCompatActivity
         intentFilter.addAction(BluetoothLeService.ACTION_RESET_BUTTON);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         return intentFilter;
     }
 
@@ -458,6 +516,7 @@ public class MainActivity extends AppCompatActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
 
+        @SuppressLint("InflateParams")
         View dialogsView = inflater.inflate(R.layout.dialog_edit_name, null);
 
         final EditText editTextNewName = (EditText) dialogsView.findViewById(R.id.editText_new_name);
@@ -501,7 +560,11 @@ public class MainActivity extends AppCompatActivity
      * @return  the abstract file of the application's user guide
      */
     private File getManual() {
-        File manual = new File (getExternalCacheDir(), "manual.pdf");
+        File manualDir = new File(getCacheDir(), "manual");
+        File manual = new File(manualDir, "manual.pdf");
+        if (!manualDir.exists() && !manualDir.mkdir()) {
+            return null;
+        }
         if (!manual.exists()) {
             InputStream res = null;
             OutputStream dest = null;

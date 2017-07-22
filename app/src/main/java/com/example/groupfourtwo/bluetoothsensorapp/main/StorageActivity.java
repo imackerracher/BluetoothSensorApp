@@ -1,7 +1,6 @@
 package com.example.groupfourtwo.bluetoothsensorapp.main;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -12,12 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.example.groupfourtwo.bluetoothsensorapp.R;
 import com.example.groupfourtwo.bluetoothsensorapp.data.DbExportImport;
-
-import java.util.concurrent.ExecutionException;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 

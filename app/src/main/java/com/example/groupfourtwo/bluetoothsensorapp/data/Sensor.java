@@ -3,8 +3,6 @@ package com.example.groupfourtwo.bluetoothsensorapp.data;
 import java.util.Locale;
 import java.util.Objects;
 
-import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
-
 /**
  * Wrapper for information about the sensor chip generating a measurement.
  *
