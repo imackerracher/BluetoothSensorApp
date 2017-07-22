@@ -131,56 +131,6 @@ public class DataManager {
 
 
     /**
-     * Fetch a collection of all records that have been saved in the database.
-     *
-     * @return  a list of all saved records
-     */
-    public ArrayList<Record> getAllRecords() {
-        String[] select = RecordData.ALL_COLUMNS;
-
-        // SELECT * FROM RECORD ORDER BY BEGIN DESC
-        Cursor cursor = database.query(RecordData.TABLE_RECORD, select,
-                null, null, null, null, RecordData.COLUMN_BEGIN + " DESC");
-
-        ArrayList<Record> result = new ArrayList<>(cursor.getCount());
-
-        // For every entry in the record table, insert that record into the list.
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            Record record = cursorToRecord(cursor);
-            result.add(record);
-        }
-        cursor.close();
-
-        return result;
-    }
-
-
-    /**
-     * Fetch a collection of all sensors that have been saved in the database.
-     *
-     * @return  a list of all saved sensors
-     */
-    public ArrayList<Sensor> getAllSensors() {
-        String[] select = SensorData.ALL_COLUMNS;
-
-        // SELECT * FROM SENSOR ORDER BY NAME
-        Cursor cursor = database.query(SensorData.TABLE_SENSOR, select,
-                null, null, null, null, SensorData.COLUMN_NAME);
-
-        ArrayList<Sensor> result = new ArrayList<>(cursor.getCount());
-
-        // For every entry in the sensor table, insert that sensor into the list.
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            Sensor sensor = cursorToSensor(cursor);
-            result.add(sensor);
-        }
-        cursor.close();
-
-        return result;
-    }
-
-
-    /**
      * Find and return the {@link Record} with the given id.
      * <p>
      * If not already present in the cache, the record is fetched from the database and
@@ -252,6 +202,56 @@ public class DataManager {
             }
         }
         return user;
+    }
+
+
+    /**
+     * Fetch a collection of all records that have been saved in the database.
+     *
+     * @return  a list of all saved records
+     */
+    public ArrayList<Record> getAllRecords() {
+        String[] select = RecordData.ALL_COLUMNS;
+
+        // SELECT * FROM RECORD ORDER BY BEGIN DESC
+        Cursor cursor = database.query(RecordData.TABLE_RECORD, select,
+                null, null, null, null, RecordData.COLUMN_BEGIN + " DESC");
+
+        ArrayList<Record> result = new ArrayList<>(cursor.getCount());
+
+        // For every entry in the record table, insert that record into the list.
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            Record record = cursorToRecord(cursor);
+            result.add(record);
+        }
+        cursor.close();
+
+        return result;
+    }
+
+
+    /**
+     * Fetch a collection of all sensors that have been saved in the database.
+     *
+     * @return  a list of all saved sensors
+     */
+    public ArrayList<Sensor> getAllSensors() {
+        String[] select = SensorData.ALL_COLUMNS;
+
+        // SELECT * FROM SENSOR ORDER BY NAME
+        Cursor cursor = database.query(SensorData.TABLE_SENSOR, select,
+                null, null, null, null, SensorData.COLUMN_NAME);
+
+        ArrayList<Sensor> result = new ArrayList<>(cursor.getCount());
+
+        // For every entry in the sensor table, insert that sensor into the list.
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            Sensor sensor = cursorToSensor(cursor);
+            result.add(sensor);
+        }
+        cursor.close();
+
+        return result;
     }
 
 
@@ -420,11 +420,11 @@ public class DataManager {
     }
 
 
-    /**
+    /*
      * Calculate the total number of users that are saved in the database.
      *
      * @return  number of saved users
-     */
+     *
     public int getNoOfUsers() {
         String query = String.format(SQL_SELECT_NUMBER_OF,
                 UserData._ID,
@@ -442,6 +442,7 @@ public class DataManager {
         cursor.close();
         return result;
     }
+    */
 
 
     /**
@@ -502,7 +503,7 @@ public class DataManager {
      *
      * @param measurement  the measurement to save
      */
-    public long saveMeasurement(Measurement measurement) {
+    public void saveMeasurement(Measurement measurement) {
         if (measurement.getId() != -1) {
             throw new IllegalArgumentException("Measurement was already inserted some other time.");
         }
@@ -517,16 +518,15 @@ public class DataManager {
         values.put(MeasurementData.COLUMN_PRESSURE, measurement.getPressure());
         values.put(MeasurementData.COLUMN_TEMPERATURE, measurement.getTemperature());
 
-        // INSERT INTO MEASUREMENT VALUES (record, time, ..., pressure, temperature)
+        // INSERT INTO MEASUREMENT VALUES (record, ..., temperature)
         long id = database.insert(MeasurementData.TABLE_MEASUREMENT, null, values);
         Log.d(LOG_TAG, "Inserted new measurement: " + id);
 
         measurement.setId(id);
-        return id;
     }
 
 
-    /**
+    /*
      * Insert a new measurement by its information into the database.
      *
      * @param recordId     the id of the respective record
@@ -536,7 +536,7 @@ public class DataManager {
      * @param humidity     the humidity value
      * @param pressure     the pressure value
      * @param temperature  the temperature value
-     */
+     *
     long saveMeasurement(long recordId, long time, float brightness, float distance,
                                 float humidity, float pressure, float temperature) {
         ContentValues values = new ContentValues();
@@ -549,11 +549,12 @@ public class DataManager {
         values.put(MeasurementData.COLUMN_PRESSURE, pressure);
         values.put(MeasurementData.COLUMN_TEMPERATURE, temperature);
 
-        // INSERT INTO MEASUREMENT VALUES (record, time, ..., pressure, temperature)
+        // INSERT INTO MEASUREMENT VALUES (record, ..., temperature)
         long id = database.insert(MeasurementData.TABLE_MEASUREMENT, null, values);
         Log.d(LOG_TAG, "Inserted new measurement: " + id);
         return id;
     }
+    */
 
 
     /**
@@ -680,16 +681,17 @@ public class DataManager {
     }
 
 
-    /**
+    /*
      * Alter the name of a user.
      *
      * @param user  the user to rename
      * @param name  the new name
-     */
+     *
     public void renameUser(User user, String name) {
         user.setName(name);
         updateUser(user);
     }
+    */
 
 
     /**
@@ -813,12 +815,12 @@ public class DataManager {
     }
 
 
-    /**
+    /*
      * Search for and return the measurement with the given id in the database.
      *
      * @param id  the id of the wanted measurement
      * @return  the wanted measurement
-     */
+     *
     private Measurement searchMeasurement(long id) {
         String[] select = MeasurementData.ALL_COLUMNS;
 
@@ -835,6 +837,7 @@ public class DataManager {
         Log.d(LOG_TAG, "Retrieved measurement " + id + " from database.");
         return measurement;
     }
+    */
 
 
     /**
@@ -952,11 +955,11 @@ public class DataManager {
     }
 
 
-    /**
+    /*
      * Replace the data of a user with a new version.
      *
      * @param user  the new version of the user
-     */
+     *
     private void updateUser(User user) {
         ContentValues values = new ContentValues();
         values.put(UserData.COLUMN_NAME, user.getName());
@@ -968,6 +971,7 @@ public class DataManager {
 
         users.put(id, user);
     }
+    */
 
 
     /**
