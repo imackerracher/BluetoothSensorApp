@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity
      * Broadcast receiver for various events.
      * ACTION_*_DATA: received new value, update UI
      * ACTION_SET_BUTTON: connected to sensor, enable start-/stopbutton
-     * ACTION_GATT_DISCONNECTED: disconnected from sensor, disable start-/stopbutton,
+     * ACTION_GATT_DISCONNECTED: disconnected from sensor (external event), disable start-/stopbutton,
      * close record if running.
      * ACTION_STATE_CHANGED: sent from BluetoothAdapter everytime its state changes,
      * if Bluetooth is getting turned off close record if running, disable button.
@@ -421,12 +421,24 @@ public class MainActivity extends AppCompatActivity
 
                 case BluetoothLeService.ACTION_GATT_DISCONNECTED:
                     connected = false;
-                    Toast.makeText(context, "Lost connection to sensor.",
-                            Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Lost connection to sensor.",Toast.LENGTH_SHORT).show();
                     //AlertDialog statt Toast.
                     buttonStartStop.setChecked(false);
                     buttonStartStop.setVisibility(View.GONE);
                     mDatabaseUpdateService.stopUpdating();
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                            MainActivity.this);
+
+                    alertDialogBuilder.setTitle("Disconnected");
+
+                    // set dialog message
+                    alertDialogBuilder
+                            .setMessage("Connection to sensor has been lost.");
+
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    alertDialog.show();
                     break;
 
                 case BluetoothLeService.ACTION_GATT_CONNECTED:
