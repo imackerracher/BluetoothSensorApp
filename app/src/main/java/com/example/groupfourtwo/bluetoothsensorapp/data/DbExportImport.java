@@ -27,6 +27,7 @@ public class DbExportImport {
 
     /**
      * The name of the application directory on the external storage.
+     * Note: Not used because of access problems on provided device.
      */
     private static final String PACKAGE_NAME = "groupfourtwo.bluetoothsensorapp";
 
@@ -35,14 +36,11 @@ public class DbExportImport {
      */
     private static final File EXTERNAL_DATABASE_DIRECTORY =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            //new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-              //      PACKAGE_NAME);
 
     /**
      * The file that is used for a backup, as well as a source to restore the internal database.
      */
-    private static final File EXPORT_IMPORT_FILE =
-            new File(EXTERNAL_DATABASE_DIRECTORY, "sensor_tag.db");
+    private static final File EXPORT_IMPORT_FILE = new File(EXTERNAL_DATABASE_DIRECTORY, DB_NAME);
 
 
     /**
@@ -98,13 +96,13 @@ public class DbExportImport {
         File database = getDatabaseFile(context);
         File importFile = EXPORT_IMPORT_FILE;
 
-        if(!checkDbIsValid(importFile)) {
-            Log.d(TAG, "Import database is not valid");
+        if (!importFile.exists()) {
+            Log.d(TAG, "File does not exist");
             return false;
         }
 
-        if (!importFile.exists()) {
-            Log.d(TAG, "File does not exist");
+        if(!checkDbIsValid(importFile)) {
+            Log.d(TAG, "Import database is not valid");
             return false;
         }
 
@@ -141,7 +139,13 @@ public class DbExportImport {
 
         File importFile = EXPORT_IMPORT_FILE;
 
+        if (!importFile.exists()) {
+            Log.d(TAG, "File does not exist");
+            return false;
+        }
+
         if(!checkDbIsValid(importFile)) {
+            Log.d(TAG, "Import database is not valid");
             return false;
         }
 
@@ -195,8 +199,8 @@ public class DbExportImport {
      */
     private static boolean checkDbIsValid(File db) {
         try{
-            SQLiteDatabase sqlDb = SQLiteDatabase.openDatabase
-                    (db.getPath(), null, SQLiteDatabase.OPEN_READONLY);
+            SQLiteDatabase sqlDb = SQLiteDatabase.openDatabase(
+                    db.getPath(), null, SQLiteDatabase.OPEN_READONLY);
 
             Cursor cursor;
 
