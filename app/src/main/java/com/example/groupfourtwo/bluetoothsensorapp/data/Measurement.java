@@ -82,7 +82,8 @@ public class Measurement {
 
     /**
      * Creates a completely new measurement object just received.
-     * <p>Note: As the measurement is not saved in the database yet, id is set to -1.
+     * <p>
+     * Note: As the measurement is not saved in the database yet, id is set to -1.
      *
      * @param record       the record the measurement was taken at
      * @param time         the time when the measurement was taken

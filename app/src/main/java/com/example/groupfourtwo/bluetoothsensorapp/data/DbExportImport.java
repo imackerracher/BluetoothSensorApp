@@ -96,13 +96,13 @@ public class DbExportImport {
         File database = getDatabaseFile(context);
         File importFile = EXPORT_IMPORT_FILE;
 
-        if(!checkDbIsValid(importFile)) {
-            Log.d(TAG, "Import database is not valid");
+        if (!importFile.exists()) {
+            Log.d(TAG, "File does not exist");
             return false;
         }
 
-        if (!importFile.exists()) {
-            Log.d(TAG, "File does not exist");
+        if(!checkDbIsValid(importFile)) {
+            Log.d(TAG, "Import database is not valid");
             return false;
         }
 
@@ -139,7 +139,13 @@ public class DbExportImport {
 
         File importFile = EXPORT_IMPORT_FILE;
 
+        if (!importFile.exists()) {
+            Log.d(TAG, "File does not exist");
+            return false;
+        }
+
         if(!checkDbIsValid(importFile)) {
+            Log.d(TAG, "Import database is not valid");
             return false;
         }
 
@@ -193,8 +199,8 @@ public class DbExportImport {
      */
     private static boolean checkDbIsValid(File db) {
         try{
-            SQLiteDatabase sqlDb = SQLiteDatabase.openDatabase
-                    (db.getPath(), null, SQLiteDatabase.OPEN_READONLY);
+            SQLiteDatabase sqlDb = SQLiteDatabase.openDatabase(
+                    db.getPath(), null, SQLiteDatabase.OPEN_READONLY);
 
             Cursor cursor;
 
