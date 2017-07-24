@@ -62,29 +62,18 @@ public class DatabaseUpdateService extends Service {
         } else {
             user = new User(userId, "defaultName");
         }
-        Log.d(TAG, "onBind()");
         return mBinder;
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind()");
-        //stopUpdating();
-        return super.onUnbind(intent);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         dataManager = DataManager.getInstance(this);
-        Log.d(TAG, "Created new data manager object.");
         try {
             dataManager.open();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, "Open Database");
-        Log.d(TAG, "onCreate() , service started...");
         registerReceiver(bleDataReceiver, makeBleDataIntentFilter());
 
     }
@@ -93,15 +82,13 @@ public class DatabaseUpdateService extends Service {
     public void onDestroy() {
         super.onDestroy();
         dataManager.close();
-        //stopUpdating();
         unregisterReceiver(bleDataReceiver);
-        Log.d(TAG, "onDestroy() , service stopped...");
     }
 
     public void startUpdating() {
         if (!isUpdating) {
             isUpdating = true;
-            handler.postDelayed(runnable, 0);
+            handler.post(updateTask);
             startTime = System.currentTimeMillis();
 
             long sensorId = Sensor.parseAddress(sensorAddress);
@@ -114,7 +101,6 @@ public class DatabaseUpdateService extends Service {
                 Log.d(TAG, "saved Sensor :" + sensorAddress);
             }
             record = dataManager.startRecord(sensor, user);
-            Log.d(TAG, "startUpdating()");
         }
     }
 
@@ -123,22 +109,20 @@ public class DatabaseUpdateService extends Service {
             isUpdating = false;
             Log.d(TAG, "stopUpdating()");
             dataManager.stopRecord(record);
-            handler.removeCallbacks(runnable);
+            handler.removeCallbacks(updateTask);
         }
     }
     private Handler handler = new Handler();
 
 
-    private Runnable runnable = new Runnable() {
+    private Runnable updateTask = new Runnable() {
         @Override
         public void run() {
             long t1 = 0;
-            //long t2 = 0;
             if (temp != null  && brightness != null && humidity != null && pressure != null) {
                 t1 = System.currentTimeMillis();
                 dataManager.saveMeasurement(Measurement.newMeasurement(
                         record, System.currentTimeMillis(), brightness, 0.0f, humidity, pressure, temp));
-                //t2 = System.currentTimeMillis();
             }
             handler.postDelayed(this, Math.max(0, UPDATE_INTERVAL - (System.currentTimeMillis() - t1)));
 

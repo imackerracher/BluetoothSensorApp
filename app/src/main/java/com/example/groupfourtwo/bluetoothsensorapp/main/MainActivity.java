@@ -171,6 +171,11 @@ public class MainActivity extends AppCompatActivity
         //finish();
     }
 
+    /***
+     * Handles the selection of items from the menu and starts the corresponding activity
+     * @param item The selected item from the menu
+     * @return False if not valid item is selected
+     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
@@ -246,6 +251,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * When selected, the screen won't turn off
+     * @param item Icon in the header bar that leaves the screen turned on/off
+     * @return True/or False
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -322,6 +332,9 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    /**
+     * Method that lets the user start and stop a recording
+     */
     public void startStopRecord(View view) {
         if (buttonStartStop.isChecked()) {
             Log.d(LOG_TAG, "start record");
@@ -353,6 +366,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * These methods set the current values that are being displayed in the home screen
+     */
     public void setTemperature(Float t) {
         currentTemperature.setText(String.format(Locale.ENGLISH, "%.2f %s", t, TEMPERATURE.unit));
     }
