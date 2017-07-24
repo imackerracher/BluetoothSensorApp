@@ -148,7 +148,7 @@ public abstract class VisualizationActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.visualization, menu);
         menu.findItem(R.id.refresh).setVisible(refreshVisible);
-        menu.getItem(R.id.zoom_out).setVisible(zoomOutVisible);
+        menu.findItem(R.id.zoom_out).setVisible(zoomOutVisible);
         return true;
     }
 
