@@ -26,7 +26,7 @@ import static com.example.groupfourtwo.bluetoothsensorapp.data.Interval.HOUR;
  * @author all
  */
 
-public class VisualizationActivity extends AppCompatActivity {
+public abstract class VisualizationActivity extends AppCompatActivity {
 
     private static final String TAG = VisualizationActivity.class.getSimpleName();
 
@@ -34,10 +34,6 @@ public class VisualizationActivity extends AppCompatActivity {
     private static final int RECORD_SELECTION_REQUEST = 2;
     private static final int TIME_SPAN_SELECTION_REQUEST = 3;
     private static final int SENSOR_SELECTION_REQUEST = 4;
-
-    /* According to the item order in layout file. */
-    private static final int REFRESH_BUTTON_INDEX = 3;
-    private static final int ZOOM_OUT_BUTTON_INDEX = 5;
 
     /**
      * Formatting template for {@link #showInfo()}
@@ -151,8 +147,8 @@ public class VisualizationActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.visualization, menu);
-        menu.getItem(REFRESH_BUTTON_INDEX).setVisible(refreshVisible);
-        menu.getItem(ZOOM_OUT_BUTTON_INDEX).setVisible(zoomOutVisible);
+        menu.findItem(R.id.refresh).setVisible(refreshVisible);
+        menu.getItem(R.id.zoom_out).setVisible(zoomOutVisible);
         return true;
     }
 
