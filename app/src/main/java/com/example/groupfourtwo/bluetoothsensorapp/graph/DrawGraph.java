@@ -60,6 +60,17 @@ public class DrawGraph {
     private DataManager dataManager;
     private BufferStorage buf;
 
+    /**
+     * Creates a Graph that can be drawn
+     *
+     * @param context  the context of the current activity
+     * @param measure1 the main measure of the graph
+     * @param measure2 the second measure or null
+     * @param record if the data from a record should be displayed use this field else null
+     * @param begin begin in milliseconds from interval
+     * @param end end in milliseconds from interval
+     * @return  whether the sensor has an entry in the database
+     */
     public DrawGraph(Context context, Measure measure1, Measure measure2,
                      Record record, long begin, long end) {
         this.context = context;
@@ -77,7 +88,12 @@ public class DrawGraph {
         buf = BufferStorage.getInstance();
     }
 
-
+    /**
+     * Draws the graph.
+     *
+     * @param activity  the current activity
+     * @return  whether the graph could be drawn
+     */
     public boolean draw(Activity activity) {
 
         Interval interval = fromLength(end - begin);
@@ -282,6 +298,10 @@ public class DrawGraph {
         return colorArray;
     }
 
+    /**
+     * Refreshes the graph data
+     *
+     */
     public void refresh() {
         if (record != null) {
             end = record.getEnd();
@@ -289,6 +309,12 @@ public class DrawGraph {
             lineChart.invalidate();
         }
     }
+
+    /**
+     * Adds a second measure to the graph.
+     *
+     * @param measure to be added
+     */
 
     public void setMeasure2(Measure measure) {
         if (measure != measure1) {
@@ -301,6 +327,11 @@ public class DrawGraph {
         lineChart.invalidate(); // refresh
     }
 
+    /**
+     * Adds the data for the record to the graph.
+     *
+     * @param record to be added
+     */
     public void setRecord(Record record) {
         if (record != null) {
             this.record = record;
@@ -311,6 +342,12 @@ public class DrawGraph {
         }
     }
 
+    /**
+     * Adds the data from begin to end to the graph.
+     *
+     * @param begin in milliseconds
+     * @param end in milliseconds
+     */
     public void setTimeSpan(long begin, long end) {
         if (end <= begin) {
             throw new IllegalArgumentException("Begin must lay in the past of end.");
@@ -325,7 +362,13 @@ public class DrawGraph {
         lineChart.invalidate();
     }
 
-
+    /**
+     * Makes a color brighter or darker depending on the factor
+     *
+     * @param color that should be changed
+     * @param factor how much brighter
+     * @return new color as an integer
+     */
     private int brighter(int color, float factor) {
         float hsv[] = new float[3];
         Color.RGBToHSV( Color.red(color),Color.green(color), Color.blue(color)  , hsv);
@@ -334,6 +377,11 @@ public class DrawGraph {
         return Color.HSVToColor(hsv);
     }
 
+    /**
+     * Sets all colors so that they fit to a Black or White Background.
+     *
+     * @param day means white instead of black background
+     */
     private void setDay(Boolean day) {
 
         IMarker mvd = new CustomMarkerView(context, R.layout.marker_view_day);
@@ -351,6 +399,12 @@ public class DrawGraph {
         }
     }
 
+    /**
+     * Are the current values already in the buffer?
+     *
+     * @param whichMeasure decides if the first or second measure is chosen
+     * @return Are the current values already in the buffer?
+     */
     private boolean isBuffered(boolean whichMeasure) {
         if (whichMeasure && buf.measure1 != measure1) {
             return false;
